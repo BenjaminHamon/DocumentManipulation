@@ -36,6 +36,9 @@ def main():
 	metadata = load_metadata(text_source_file_path)
 	document = create_document(configuration, metadata)
 
+	if arguments.annotation is not None:
+		document.title += " - " + arguments.annotation.replace("{revision}", document.revision)
+
 	logger.info("Loading document content from '%s'", text_source_file_path)
 	document.content = load_content(text_source_file_path)
 
@@ -48,7 +51,7 @@ def parse_arguments() -> argparse.Namespace:
 	parser = argparse.ArgumentParser()
 	parser.add_argument("configuration", help = "path to the configuration file")
 	parser.add_argument("output_file_path", help = "path to the output file")
-
+	parser.add_argument("--annotation", metavar = "<annotation>", help = "add an annotation to differentiate between several versions")
 	return parser.parse_args()
 
 

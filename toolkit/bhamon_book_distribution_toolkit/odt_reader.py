@@ -1,6 +1,8 @@
+import datetime
 from typing import Dict, Optional
 import zipfile
 
+import dateutil.parser
 import lxml.etree
 
 from bhamon_book_distribution_toolkit.documents.document_content import DocumentContent
@@ -17,13 +19,47 @@ class OdtReader:
 		self._style_map = style_map
 
 
-	def read_odt(self, odt_file_path: str) -> bytes:
-		if odt_file_path.endswith(".fodt"):
-			with open(odt_file_path, mode = "rb") as fodt_file:
-				return fodt_file.read()
+	def read_fodt(self, odt_file_path: str) -> bytes:
+		with open(odt_file_path, mode = "rb") as fodt_file:
+			return fodt_file.read()
 
+
+	def read_odt(self, odt_file_path: str, content_file_path: str) -> bytes:
 		with zipfile.ZipFile(odt_file_path, mode = "r") as odt_file:
-			return odt_file.read("content.xml")
+			return odt_file.read(content_file_path)
+
+
+	def read_metadata(self, odt_content: bytes) -> dict:
+		odt_as_xml = lxml.etree.fromstring(odt_content, self._parser)
+		metatada_as_xml = odt_as_xml.find("office:meta", namespaces = odt_as_xml.nsmap)
+		metadata = {}
+
+		for item_as_xml in metatada_as_xml.iter():
+			key = lxml.etree.QName(item_as_xml).localname
+			value = item_as_xml.text
+
+			if key == "meta":
+				continue
+
+			if key == "title":
+				metadata["title"] = value
+
+			if key == "creator":
+				metadata["author"] = value
+
+			if key == "creation-date":
+				metadata["creation_date"] = dateutil.parser.parse(value).astimezone(datetime.timezone.utc).replace(microsecond = 0)
+
+			if key == "date":
+				metadata["update_date"] = dateutil.parser.parse(value).astimezone(datetime.timezone.utc).replace(microsecond = 0)
+
+			if key == "editing-cycles":
+				metadata["revision"] = int(value)
+
+			if key == "user-defined":
+				continue
+
+		return metadata
 
 
 	def read_document_content(self, odt_content: bytes) -> DocumentContent:

@@ -26,14 +26,17 @@ def main():
 	configuration_file_path: str = os.path.normpath(arguments.configuration)
 	document_repository = os.path.dirname(configuration_file_path)
 
-	logger.info("Loading document configuration '%s'", configuration_file_path)
+	logger.info("Loading document configuration from '%s'", configuration_file_path)
 	with open(configuration_file_path, mode = "r", encoding = "utf-8") as configuration_file:
 		configuration = yaml.safe_load(configuration_file)
 
-	document = create_document(configuration)
-
 	text_source_file_path = os.path.normpath(os.path.join(document_repository, configuration["Resources"]["FullText"]))
-	logger.info("Loading document content '%s'", text_source_file_path)
+
+	logger.info("Loading document metadata from '%s'", text_source_file_path)
+	metadata = load_metadata(text_source_file_path)
+	document = create_document(configuration, metadata)
+
+	logger.info("Loading document content from '%s'", text_source_file_path)
 	document.content = load_content(text_source_file_path)
 
 	output_file_path: str = os.path.normpath(arguments.output_file_path)
@@ -49,16 +52,48 @@ def parse_arguments() -> argparse.Namespace:
 	return parser.parse_args()
 
 
-def create_document(configuration: dict) -> Document:
+def create_document(configuration: dict, metadata: dict) -> Document:
 	return Document(
 		identifier = configuration["Identifier"],
 		title = configuration["Title"],
 		authors = configuration["Authors"],
 		language = configuration.get("Language", None),
-		identifier_for_epub = configuration.get("IdentifierForEpub", None))
+		identifier_for_epub = configuration.get("IdentifierForEpub", None),
+		revision = str(metadata["revision"]),
+		revision_date = metadata["update_date"])
+
+
+def load_metadata(text_source_file_path: str):
+	if text_source_file_path.endswith(".fodt"):
+		odt_reader = OdtReader({})
+		odt_content = odt_reader.read_fodt(text_source_file_path)
+		odt_metadata = odt_reader.read_metadata(odt_content)
+		return odt_metadata
+
+	if text_source_file_path.endswith(".odt"):
+		odt_reader = OdtReader({})
+		odt_content = odt_reader.read_odt(text_source_file_path, "meta.xml")
+		odt_metadata = odt_reader.read_metadata(odt_content)
+		return odt_metadata
+
+	raise ValueError("File is unsupported: '%s'" % text_source_file_path)
 
 
 def load_content(text_source_file_path: str) -> DocumentContent:
+	if text_source_file_path.endswith(".fodt"):
+		style_map = {
+			"Custom - Chapter Body": "chapter-body",
+			"Custom - Chapter Body Separator": "chapter-body-separator",
+			"Custom - Chapter Hint": "chapter-hint",
+			"Custom - Character Thoughts": "character-thoughts",
+			"Custom - Journal Entry Header": "journal-entry-header",
+			"Custom - Journal Entry": "journal-entry",
+		}
+
+		odt_reader = OdtReader(style_map)
+		odt_content = odt_reader.read_fodt(text_source_file_path)
+		return odt_reader.read_document_content(odt_content)
+
 	if text_source_file_path.endswith(".odt"):
 		style_map = {
 			"Custom - Chapter Body": "chapter-body",
@@ -70,7 +105,7 @@ def load_content(text_source_file_path: str) -> DocumentContent:
 		}
 
 		odt_reader = OdtReader(style_map)
-		odt_content = odt_reader.read_odt(text_source_file_path)
+		odt_content = odt_reader.read_odt(text_source_file_path, "content.xml")
 		return odt_reader.read_document_content(odt_content)
 
 	raise ValueError("File is unsupported: '%s'" % text_source_file_path)

@@ -1,0 +1,27 @@
+.chapter-body {
+	text-align: justify;
+	text-indent: 1em;
+}
+
+.chapter-body-separator {
+	text-align: center;
+}
+
+.chapter-hint {
+	font-weight: bold;
+	text-align: center;
+}
+
+.character-thoughts {
+	font-style: italic;
+}
+
+.journal-entry-header {
+	font-style: italic;
+}
+
+.journal-entry {
+	font-style: italic;
+	text-align: justify;
+	text-indent: 1em;
+}

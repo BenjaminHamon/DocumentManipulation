@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 
+import jinja2
 import yaml
 from ebooklib.epub import EpubWriter
 
@@ -60,6 +61,7 @@ def create_document(configuration: dict, metadata: dict) -> Document:
 		identifier = configuration["Identifier"],
 		title = configuration["Title"],
 		authors = configuration["Authors"],
+		copyright = configuration["Copyright"],
 		language = configuration.get("Language", None),
 		identifier_for_epub = configuration.get("IdentifierForEpub", None),
 		revision = str(metadata["revision"]),
@@ -116,8 +118,9 @@ def load_content(text_source_file_path: str) -> DocumentContent:
 
 def write_document(document: Document, output_file_path: str) -> None:
 	if output_file_path.endswith(".epub"):
-		epub_converter = EpubConverter()
-		document_as_epub = epub_converter.convert_document(document, "styles/book.css")
+		jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(searchpath = ".", encoding = "utf-8"))
+		epub_converter = EpubConverter(jinja_environment)
+		document_as_epub = epub_converter.convert_document(document, "styles/book.css", "templates/front_page.xhtml")
 		epub = EpubWriter(output_file_path, document_as_epub)
 		epub.process()
 		epub.write()

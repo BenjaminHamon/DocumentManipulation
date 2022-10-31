@@ -1,3 +1,53 @@
+html, body {
+	height: 100%;
+}
+
+#front-page {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 2fr 2fr 1fr 1fr;
+	grid-template-areas:
+		"title"
+		"authors"
+		"version"
+		"copyright";
+
+	height: 100%;
+}
+
+#front-page .book-title {
+	grid-area: title;
+	font-size: 4em;
+}
+
+#front-page .book-authors {
+	grid-area: authors;
+	font-size: 3em;
+}
+
+#front-page .book-version {
+	grid-area: version;
+	font-size: 1.5em;
+}
+
+#front-page .book-copyright {
+	grid-area: copyright;
+	font-size: 1.5em;
+}
+
+#front-page > div {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+}
+
+#front-page > div > p {
+	margin: 0.2em;
+	padding: 0;
+}
+
+
 .chapter-body {
 	text-align: justify;
 	text-indent: 1em;

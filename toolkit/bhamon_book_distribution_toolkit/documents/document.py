@@ -10,6 +10,7 @@ class Document:
 	identifier: str
 	title: str
 	authors: List[str]
+	copyright: str
 	language: Optional[str] = None
 	identifier_for_epub: Optional[str] = None
 	revision: Optional[str] = None

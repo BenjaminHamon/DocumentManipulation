@@ -1,6 +1,7 @@
 import re
 from typing import Optional
 
+import jinja2
 import lxml.etree
 from ebooklib.epub import EpubBook
 from ebooklib.epub import EpubItem
@@ -16,9 +17,13 @@ from bhamon_book_distribution_toolkit.documents.paragraph_element import Paragra
 class EpubConverter:
 
 
-	def convert_document(self, document: Document, css_file_path: Optional[str] = None) -> EpubBook:
+	def __init__(self, jinja_environment: jinja2.Environment) -> None:
+		self._jinja_environment = jinja_environment
+
+
+	def convert_document(self, document: Document, css_file_path: Optional[str] = None, front_page_template_path: Optional[str] = None) -> EpubBook:
 		document_as_epub = EpubBook()
-		document_as_epub.spine = [ "nav" ]
+		document_as_epub.spine = []
 		
 		self._add_general_information(document, document_as_epub)
 
@@ -28,6 +33,21 @@ class EpubConverter:
 
 			style_as_epub = self.convert_style("document", css_data)
 			document_as_epub.add_item(style_as_epub)
+
+		if front_page_template_path is not None:
+			template_parameters = {
+				"title": document.title,
+				"authors": document.authors,
+				"revision": document.revision,
+				"revision_date": document.revision_date,
+				"copyright": document.copyright.replace("(c)", "©"),
+			}
+
+			page_as_epub = self.convert_page("FrontPage", front_page_template_path, template_parameters)
+			document_as_epub.add_item(page_as_epub)
+			document_as_epub.spine.append(page_as_epub)
+
+		document_as_epub.spine += [ "nav" ]
 
 		for section in document.content.sections:
 			section_as_epub = self.convert_section(section)
@@ -61,6 +81,19 @@ class EpubConverter:
 		style_as_epub.content = css_data
 
 		return style_as_epub
+
+
+	def convert_page(self, identifier: str, template_file_path: str, parameters: dict) -> EpubHtml:
+		page_as_epub = EpubHtml(
+			title = identifier,
+			file_name = "pages" + "/" + self._sanitize_identifier(identifier) + ".xhtml")
+
+		page_as_epub.add_link(href = "../styles/document.css", rel = "stylesheet", type = "text/css")
+
+		template = self._jinja_environment.get_template(template_file_path)
+		page_as_epub.content = template.render(**parameters)
+
+		return page_as_epub
 
 
 	def convert_section(self, section: SectionElement) -> EpubHtml:

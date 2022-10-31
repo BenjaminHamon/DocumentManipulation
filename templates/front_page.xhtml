@@ -1,0 +1,15 @@
+<div id="front-page">
+	<div class="book-title">
+		<p>{{ title }}</p>
+	</div>
+	<div class="book-authors">
+		<p>{{ authors | join(', ') }}</p>
+	</div>
+	<div class="book-version">
+		<p>Version {{ revision }}</p>
+		<p>{{ revision_date.strftime('%d %B %Y') }}</p>
+	</div>
+	<div class="book-copyright">
+		<p>{{ copyright }}</p>
+	</div>
+</div>

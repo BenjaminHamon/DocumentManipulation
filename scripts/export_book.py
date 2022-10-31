@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+from typing import Optional
 
 import jinja2
 import yaml
@@ -38,14 +39,14 @@ def main():
 	document = create_document(configuration, metadata)
 
 	if arguments.annotation is not None:
-		document.title += " - " + arguments.annotation.replace("{revision}", document.revision)
+		arguments.annotation = arguments.annotation.replace("{revision}", document.revision)
 
 	logger.info("Loading document content from '%s'", text_source_file_path)
 	document.content = load_content(text_source_file_path)
 
 	output_file_path: str = os.path.normpath(arguments.output_file_path)
 	logger.info("Writing document to '%s'", output_file_path)
-	write_document(document, output_file_path)
+	write_document(document, arguments.annotation, output_file_path)
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -116,11 +117,11 @@ def load_content(text_source_file_path: str) -> DocumentContent:
 	raise ValueError("File is unsupported: '%s'" % text_source_file_path)
 
 
-def write_document(document: Document, output_file_path: str) -> None:
+def write_document(document: Document, annotation: Optional[str], output_file_path: str) -> None:
 	if output_file_path.endswith(".epub"):
 		jinja_environment = jinja2.Environment(loader = jinja2.FileSystemLoader(searchpath = ".", encoding = "utf-8"))
 		epub_converter = EpubConverter(jinja_environment)
-		document_as_epub = epub_converter.convert_document(document, "styles/book.css", "templates/front_page.xhtml")
+		document_as_epub = epub_converter.convert_document(document, annotation, "styles/book.css", "templates/front_page.xhtml")
 		epub = EpubWriter(output_file_path, document_as_epub)
 		epub.process()
 		epub.write()

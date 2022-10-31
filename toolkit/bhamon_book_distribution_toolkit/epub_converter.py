@@ -21,11 +21,16 @@ class EpubConverter:
 		self._jinja_environment = jinja_environment
 
 
-	def convert_document(self, document: Document, css_file_path: Optional[str] = None, front_page_template_path: Optional[str] = None) -> EpubBook:
+	def convert_document(self,
+			document: Document,
+			annotation: Optional[str] = None,
+			css_file_path: Optional[str] = None,
+			front_page_template_path: Optional[str] = None) -> EpubBook:
+
 		document_as_epub = EpubBook()
 		document_as_epub.spine = []
 		
-		self._add_general_information(document, document_as_epub)
+		self._add_general_information(document, document_as_epub, annotation)
 
 		if css_file_path is not None:
 			with open(css_file_path) as css_file:
@@ -38,6 +43,7 @@ class EpubConverter:
 			template_parameters = {
 				"title": document.title,
 				"authors": document.authors,
+				"annotation": annotation,
 				"revision": document.revision,
 				"revision_date": document.revision_date,
 				"copyright": document.copyright.replace("(c)", "©"),
@@ -60,8 +66,12 @@ class EpubConverter:
 		return document_as_epub
 
 
-	def _add_general_information(self, document: Document, document_as_epub: EpubBook) -> None:
-		document_as_epub.set_title(document.title)
+	def _add_general_information(self, document: Document, document_as_epub: EpubBook, annotation: Optional[str]) -> None:
+		title = document.title
+		if annotation is not None:
+			title += " - " + annotation
+
+		document_as_epub.set_title(title)
 
 		for author in document.authors:
 			document_as_epub.add_author(author)

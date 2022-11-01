@@ -98,10 +98,17 @@ class OdtReader:
 		paragraph_element = ParagraphElement(style = style)
 
 		for text_as_xml in paragraph_as_xml.iter():
-			style = self._get_style_from_element(text_as_xml, namespaces)
-			text_element = TextElement(text_as_xml.text, style = style)
-			if text_element.text is None:
-				text_element.text = ""
+			if text_as_xml.text is not None:
+				style = self._get_style_from_element(text_as_xml, namespaces)
+				text_element = TextElement(text_as_xml.text, style = style)
+				paragraph_element.text_elements.append(text_element)
+
+			if text_as_xml.tail is not None:
+				text_element = TextElement(text_as_xml.tail)
+				paragraph_element.text_elements.append(text_element)
+
+		if len(paragraph_element.text_elements) == 0:
+			text_element = TextElement("")
 			paragraph_element.text_elements.append(text_element)
 		
 		return paragraph_element

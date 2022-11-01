@@ -58,6 +58,7 @@ class EpubConverter:
 		for section in document.content.sections:
 			section_as_epub = self.convert_section(section)
 			document_as_epub.add_item(section_as_epub)
+			document_as_epub.toc.append(section_as_epub)
 			document_as_epub.spine.append(section_as_epub)
 
 		document_as_epub.add_item(EpubNcx())

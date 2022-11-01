@@ -92,8 +92,10 @@ def load_content(text_source_file_path: str) -> DocumentContent:
 			"Custom - Chapter Body Separator": "chapter-body-separator",
 			"Custom - Chapter Hint": "chapter-hint",
 			"Custom - Character Thoughts": "character-thoughts",
+			"Custom - Dream": "dream",
 			"Custom - Journal Entry Header": "journal-entry-header",
 			"Custom - Journal Entry": "journal-entry",
+			"Custom - Poem": "poem",
 		}
 
 		odt_reader = OdtReader(style_map)
@@ -106,8 +108,10 @@ def load_content(text_source_file_path: str) -> DocumentContent:
 			"Custom - Chapter Body Separator": "chapter-body-separator",
 			"Custom - Chapter Hint": "chapter-hint",
 			"Custom - Character Thoughts": "character-thoughts",
+			"Custom - Dream": "dream",
 			"Custom - Journal Entry Header": "journal-entry-header",
 			"Custom - Journal Entry": "journal-entry",
+			"Custom - Poem": "poem",
 		}
 
 		odt_reader = OdtReader(style_map)

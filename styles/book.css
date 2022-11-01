@@ -1,5 +1,12 @@
 html, body {
 	height: 100%;
+	font-family: Calibri, sans-serif
+}
+
+p {
+	margin: 0;
+	padding: 0;
+	font-size: 1em;
 }
 
 #front-page {
@@ -49,16 +56,21 @@ html, body {
 
 
 .chapter-body {
+	line-height: 1.5em;
+	margin: 0.5em 0;
 	text-align: justify;
 	text-indent: 1em;
 }
 
 .chapter-body-separator {
+	margin: 1.5em 0;
 	text-align: center;
 }
 
 .chapter-hint {
 	font-weight: bold;
+	line-height: 1.5em;
+	margin: 1em 0;
 	text-align: center;
 }
 
@@ -66,12 +78,29 @@ html, body {
 	font-style: italic;
 }
 
+.dream {
+	font-style: italic;
+	line-height: 1.5em;
+	margin: 0.5em 0;
+	text-indent: 1em;
+}
+
 .journal-entry-header {
 	font-style: italic;
+	line-height: 1.5em;
+	margin: 0.5em 0;
 }
 
 .journal-entry {
 	font-style: italic;
+	line-height: 1.5em;
+	margin: 0.5em 0;
 	text-align: justify;
 	text-indent: 1em;
+}
+
+.poem {
+	font-style: italic;
+	line-height: 1.25em;
+	text-align: center;
 }

@@ -100,11 +100,11 @@ class OdtReader:
 		for text_as_xml in paragraph_as_xml.iter():
 			if text_as_xml.text is not None:
 				style = self._get_style_from_element(text_as_xml, namespaces)
-				text_element = TextElement(text_as_xml.text, style = style)
+				text_element = TextElement(text_as_xml.text.strip(), style = style)
 				paragraph_element.text_elements.append(text_element)
 
 			if text_as_xml.tail is not None:
-				text_element = TextElement(text_as_xml.tail)
+				text_element = TextElement(text_as_xml.tail.strip())
 				paragraph_element.text_elements.append(text_element)
 
 		if len(paragraph_element.text_elements) == 0:

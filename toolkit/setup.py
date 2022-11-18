@@ -16,10 +16,6 @@ def run_setup():
 		"python_requires": "~= 3.7",
 	}
 
-	parameters.update({
-		
-	})
-
 	setuptools.setup(**parameters)
 
 

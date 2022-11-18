@@ -14,6 +14,11 @@ def run_setup():
 		],
 
 		"python_requires": "~= 3.7",
+
+		"install_requires": [
+			"lxml ~= 4.9.1",
+			"python-dateutil ~= 2.8.2",
+		]
 	}
 
 	setuptools.setup(**parameters)

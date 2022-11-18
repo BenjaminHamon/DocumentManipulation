@@ -10,8 +10,8 @@ from ebooklib.epub import EpubWriter
 from bhamon_book_distribution_toolkit.documents.document import Document
 from bhamon_book_distribution_toolkit.documents.document_content import DocumentContent
 from bhamon_book_distribution_toolkit.epub_converter import EpubConverter
-from bhamon_book_distribution_toolkit.markdown_writer import MarkdownWriter
-from bhamon_book_distribution_toolkit.odt_reader import OdtReader
+from bhamon_book_distribution_toolkit.markdown.markdown_writer import MarkdownWriter
+from bhamon_book_distribution_toolkit.open_document.odt_reader import OdtReader
 
 
 logger = logging.getLogger("Main")

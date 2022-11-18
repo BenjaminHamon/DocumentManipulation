@@ -14,8 +14,8 @@ from bhamon_book_distribution_toolkit.documents.text_element import TextElement
 class OdtReader:
 
 
-	def __init__(self, style_map: Dict[str, str]) -> None:
-		self._parser = lxml.etree.XMLParser(encoding = "utf-8")
+	def __init__(self, xml_parser: lxml.etree.XMLParser, style_map: Dict[str,str]) -> None:
+		self._xml_parser = xml_parser
 		self._style_map = style_map
 
 
@@ -30,7 +30,7 @@ class OdtReader:
 
 
 	def read_metadata(self, odt_content: bytes) -> dict:
-		odt_as_xml = lxml.etree.fromstring(odt_content, self._parser)
+		odt_as_xml = lxml.etree.fromstring(odt_content, self._xml_parser)
 		metatada_as_xml = odt_as_xml.find("office:meta", namespaces = odt_as_xml.nsmap)
 		metadata = {}
 
@@ -63,7 +63,7 @@ class OdtReader:
 
 
 	def read_document_content(self, odt_content: bytes) -> DocumentContent:
-		odt_as_xml = lxml.etree.fromstring(odt_content, self._parser)
+		odt_as_xml = lxml.etree.fromstring(odt_content, self._xml_parser)
 		body_xml = odt_as_xml.find("office:body/office:text", namespaces = odt_as_xml.nsmap)
 		text_elements = body_xml.xpath("//*[self::text:h or self::text:p]", namespaces = odt_as_xml.nsmap)
 
@@ -94,18 +94,24 @@ class OdtReader:
 
 
 	def _convert_paragraph_element(self, paragraph_as_xml: lxml.etree.ElementBase, namespaces: Dict[str,str]) -> ParagraphElement:
-		style = self._get_style_from_element(paragraph_as_xml, namespaces)
-		paragraph_element = ParagraphElement(style = style)
+		paragraph_element = ParagraphElement()
 
 		for text_as_xml in paragraph_as_xml.iter():
-			if text_as_xml.text is not None:
-				style = self._get_style_from_element(text_as_xml, namespaces)
-				text_element = TextElement(text_as_xml.text.strip(), style = style)
-				paragraph_element.text_elements.append(text_element)
+			is_new_text_element = lxml.etree.QName(text_as_xml).localname in [ "p", "span" ] or len(paragraph_element.text_elements) == 0
 
-			if text_as_xml.tail is not None:
-				text_element = TextElement(text_as_xml.tail.strip())
-				paragraph_element.text_elements.append(text_element)
+			if is_new_text_element:
+				if text_as_xml.text is not None:
+					style = self._get_style_from_element(text_as_xml, namespaces)
+					text_element = TextElement(text_as_xml.text.strip(), style = style)
+					paragraph_element.text_elements.append(text_element)
+
+				if text_as_xml.tail is not None:
+					text_element = TextElement(text_as_xml.tail.strip())
+					paragraph_element.text_elements.append(text_element)
+
+			if not is_new_text_element:
+				if text_as_xml.tail is not None:
+					paragraph_element.text_elements[-1].text += " " + text_as_xml.tail.strip()
 
 		if len(paragraph_element.text_elements) == 0:
 			text_element = TextElement("")

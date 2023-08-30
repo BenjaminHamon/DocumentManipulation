@@ -23,6 +23,11 @@ def run_setup() -> None:
         url = project_configuration["ProjectUrl"],
         packages = setuptools.find_packages(include = [ "benjaminhamon_book_distribution_toolkit", "benjaminhamon_book_distribution_toolkit.*" ]),
         python_requires = "~= 3.9",
+
+        install_requires = [
+            "lxml ~= 4.9.3",
+            "lxml-stubs ~= 0.4.0",
+        ],
     )
 
 

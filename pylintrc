@@ -8,6 +8,9 @@ max-attributes = 10
 indent-string = '    '
 max-line-length = 160
 
+[MASTER]
+extension-pkg-allow-list = lxml
+
 [MESSAGES CONTROL]
 disable =
 	consider-using-f-string,

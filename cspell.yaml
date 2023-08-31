@@ -1,5 +1,12 @@
 ---
 
+# cspell:words pycache venv
+
+ignorePaths:
+- ".venv/**"
+- "**/__pycache__/**"
+- "**/*.egg-info/**"
+
 words:
 - benjaminhamon
 - bhamon

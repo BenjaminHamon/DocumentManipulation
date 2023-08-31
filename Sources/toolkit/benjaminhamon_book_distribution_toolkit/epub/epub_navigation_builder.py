@@ -1,3 +1,5 @@
+# cspell:words nsmap
+
 from typing import List
 
 import lxml.etree

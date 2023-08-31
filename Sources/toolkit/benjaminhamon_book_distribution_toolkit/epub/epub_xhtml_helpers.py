@@ -5,18 +5,16 @@ from typing import List, Optional
 import lxml.etree
 import lxml.html
 
-
-_epub_namespace = "http://www.idpf.org/2007/ops"
-_xhtml_namespace = "http://www.w3.org/1999/xhtml"
+from benjaminhamon_book_distribution_toolkit.epub import epub_namespaces
 
 
 def create_xhtml() -> lxml.etree._ElementTree:
     namespaces = {
-        None: _xhtml_namespace,
-        "epub": _epub_namespace,
+        None: epub_namespaces.xhtml_default_namespace,
+        "epub": epub_namespaces.xhtml_epub_namespace,
     }
 
-    html_element = lxml.etree.Element(lxml.etree.QName(_xhtml_namespace, "html"), attrib = None, nsmap = namespaces) # type: ignore
+    html_element = lxml.etree.Element(lxml.etree.QName(epub_namespaces.xhtml_default_namespace, "html"), attrib = None, nsmap = namespaces) # type: ignore
 
     create_xhtml_subelement(html_element, "head")
     create_xhtml_subelement(html_element, "body")
@@ -34,7 +32,7 @@ def create_xhtml_subelement(
         parent: lxml.etree._Element, tag: str,
         attributes: Optional[dict] = None, text: Optional[str] = None) -> lxml.etree._Element:
 
-    element = lxml.etree.SubElement(parent, lxml.etree.QName(_xhtml_namespace, tag), attrib = attributes, nsmap = None)
+    element = lxml.etree.SubElement(parent, lxml.etree.QName(epub_namespaces.xhtml_default_namespace, tag), attrib = attributes, nsmap = None)
     element.text = text
 
     return element
@@ -43,7 +41,7 @@ def create_xhtml_subelement(
 def try_find_xhtml_element_collection(element: lxml.etree._Element, xpath: str) -> List[lxml.etree._Element]:
 
     # XPath cannot work with the default namespace, thus we pass an explicit namespace for XHTML
-    namespaces = { "x": _xhtml_namespace }
+    namespaces = { "x": epub_namespaces.xhtml_default_namespace }
 
     xpath_result = element.xpath(xpath, namespaces = namespaces)
     if xpath_result is None or len(xpath_result) == 0: # type: ignore
@@ -55,7 +53,7 @@ def try_find_xhtml_element_collection(element: lxml.etree._Element, xpath: str) 
 def try_find_xhtml_element(element: lxml.etree._Element, xpath: str) -> Optional[lxml.etree._Element]:
 
     # XPath cannot work with the default namespace, thus we pass an explicit namespace for XHTML
-    namespaces = { "x": _xhtml_namespace }
+    namespaces = { "x": epub_namespaces.xhtml_default_namespace }
 
     xpath_result = element.xpath(xpath , namespaces = namespaces)
     if xpath_result is None or len(xpath_result) == 0: # type: ignore

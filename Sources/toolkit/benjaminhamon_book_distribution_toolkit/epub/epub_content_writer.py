@@ -8,14 +8,12 @@ import urllib.parse
 
 import lxml.etree
 
+from benjaminhamon_book_distribution_toolkit.epub import epub_namespaces
 from benjaminhamon_book_distribution_toolkit.epub.epub_metadata_item import EpubMetadataItem
 from benjaminhamon_book_distribution_toolkit.epub.epub_package_document import EpubPackageDocument
 
 
 logger = logging.getLogger("EpubContentWriter")
-
-
-_container_namespace = "urn:oasis:names:tc:opendocument:xmlns:container"
 
 
 class EpubContentWriter:
@@ -53,22 +51,23 @@ class EpubContentWriter:
 
     def create_container_as_xml(self, opf_file_path: str) -> lxml.etree._ElementTree:
         namespaces = {
-            None: _container_namespace,
+            None: epub_namespaces.container_namespace,
         }
 
-        container_element = lxml.etree.Element(lxml.etree.QName(_container_namespace, "container"), nsmap = namespaces, version = "1.0") # type: ignore
+        container_element = lxml.etree.Element(
+            lxml.etree.QName(epub_namespaces.container_namespace, "container"), nsmap = namespaces, version = "1.0") # type: ignore
 
-        root_file_collection_element = lxml.etree.SubElement(container_element, lxml.etree.QName(_container_namespace, "rootfiles"))
+        root_file_collection_element = lxml.etree.SubElement(container_element, lxml.etree.QName(epub_namespaces.container_namespace, "rootfiles"))
 
         root_file_attributes = { "full-path": os.path.normpath(opf_file_path).replace("\\", "/"), "media-type": "application/oebps-package+xml" }
-        lxml.etree.SubElement(root_file_collection_element, lxml.etree.QName(_container_namespace, "rootfile"), attrib = root_file_attributes)
+        lxml.etree.SubElement(root_file_collection_element, lxml.etree.QName(epub_namespaces.container_namespace, "rootfile"), attrib = root_file_attributes)
 
         return lxml.etree.ElementTree(container_element)
 
 
     def convert_package_document_to_xml(self, package_document: EpubPackageDocument) -> lxml.etree._ElementTree:
         namespaces = {
-            None: "http://www.idpf.org/2007/opf",
+            None: epub_namespaces.opf_default_namespace,
         }
 
         package_as_xml = lxml.etree.Element("package", nsmap = namespaces, version = self.version) # type: ignore
@@ -121,7 +120,7 @@ class EpubContentWriter:
             raise ValueError("Unsupported metadata value type: '%s'" % type(value))
 
         namespaces = {
-            "dc": "http://purl.org/dc/elements/1.1/",
+            "dc": epub_namespaces.opf_dublin_core_namespace,
         }
 
         metadata_as_xml = lxml.etree.Element("metadata", nsmap = namespaces)

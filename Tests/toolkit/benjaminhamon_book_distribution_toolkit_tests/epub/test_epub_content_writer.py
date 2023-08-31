@@ -45,11 +45,11 @@ def test_convert_package_document_to_xml():
 
 
     package_document.add_manifest_item(
-        EpubManifestItem("toc_xhtml", "toc.xhtml", "toc.xhtml", media_type = "application/xhtml+xml", properties = [ "nav" ]))
+        EpubManifestItem("toc_xhtml", "toc.xhtml", media_type = "application/xhtml+xml", properties = [ "nav" ]))
     package_document.add_manifest_item(
-        EpubManifestItem("my_first_section_xhtml", "my_first_section.xhtml", "my_first_section.xhtml", media_type = "application/xhtml+xml"))
+        EpubManifestItem("my_first_section_xhtml", "my_first_section.xhtml", media_type = "application/xhtml+xml"))
     package_document.add_manifest_item(
-        EpubManifestItem("my_second_section_xhtml", "my_second_section.xhtml", "my_second_section.xhtml", media_type = "application/xhtml+xml"))
+        EpubManifestItem("my_second_section_xhtml", "my_second_section.xhtml", media_type = "application/xhtml+xml"))
 
     package_document.add_spine_item(EpubSpineItem("toc_xhtml"))
     package_document.add_spine_item(EpubSpineItem("my_first_section_xhtml"))

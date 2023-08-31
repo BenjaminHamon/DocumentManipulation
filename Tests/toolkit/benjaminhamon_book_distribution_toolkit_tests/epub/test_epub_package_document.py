@@ -12,22 +12,19 @@ def test_add_manifest_item():
 
     first_item = EpubManifestItem(
         identifier = "id1",
-        source_file_path = "file_1.xhtml",
-        path_relative_to_opf = "file_1.xhtml",
+        reference = "file_1.xhtml",
         media_type = "application/xhtml+xml",
     )
 
     second_item = EpubManifestItem(
         identifier = "id2",
-        source_file_path = "file_2.xhtml",
-        path_relative_to_opf = "file_2.xhtml",
+        reference = "file_2.xhtml",
         media_type = "application/xhtml+xml",
     )
 
     third_item = EpubManifestItem(
         identifier = "id3",
-        source_file_path = "file_3.xhtml",
-        path_relative_to_opf = "file_3.xhtml",
+        reference = "file_3.xhtml",
         media_type = "application/xhtml+xml",
     )
 
@@ -43,15 +40,13 @@ def test_add_manifest_item_with_conflict():
 
     first_item = EpubManifestItem(
         identifier = "id1",
-        source_file_path = "file_1.xhtml",
-        path_relative_to_opf = "file_1.xhtml",
+        reference = "file_1.xhtml",
         media_type = "application/xhtml+xml",
     )
 
     second_item = EpubManifestItem(
         identifier = "id1",
-        source_file_path = "file_2.xhtml",
-        path_relative_to_opf = "file_2.xhtml",
+        reference = "file_2.xhtml",
         media_type = "application/xhtml+xml",
     )
 
@@ -65,8 +60,7 @@ def test_set_manifest_item_as_navigation():
 
     toc_item = EpubManifestItem(
         identifier = "toc",
-        source_file_path = "toc.xhtml",
-        path_relative_to_opf = "toc.xhtml",
+        reference = "toc.xhtml",
         media_type = "application/xhtml+xml",
     )
 
@@ -88,8 +82,7 @@ def test_set_manifest_item_as_cover_image():
 
     toc_item = EpubManifestItem(
         identifier = "cover",
-        source_file_path = "cover.jpeg",
-        path_relative_to_opf = "cover.jpeg",
+        reference = "cover.jpeg",
         media_type = "image/jpeg",
     )
 
@@ -111,8 +104,7 @@ def test_add_spine_item():
 
     manifest_item = EpubManifestItem(
         identifier = "id1",
-        source_file_path = "file_1.xhtml",
-        path_relative_to_opf = "file_1.xhtml",
+        reference = "file_1.xhtml",
         media_type = "application/xhtml+xml",
     )
 

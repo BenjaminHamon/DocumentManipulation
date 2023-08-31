@@ -83,7 +83,7 @@ class EpubContentWriter:
         for manifest_item in package_document.get_manifest_items():
             attributes = {
                 "id": manifest_item.identifier,
-                "href": urllib.parse.quote(manifest_item.path_relative_to_opf.replace("\\", "/")),
+                "href": urllib.parse.quote(manifest_item.reference.replace("\\", "/")),
                 "media-type": manifest_item.media_type,
             }
 

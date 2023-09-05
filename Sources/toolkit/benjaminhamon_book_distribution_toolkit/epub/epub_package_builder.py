@@ -25,7 +25,7 @@ class EpubPackageBuilder:
 
 
     def stage_package_files(self,
-            staging_directory: str, configuration: EpubPackageConfiguration, package_document: EpubPackageDocument, simulate: bool = False) -> None:
+            staging_directory: str, configuration: EpubPackageConfiguration, simulate: bool = False) -> None:
 
         self.stage_content_files(staging_directory, configuration.content_file_mappings, simulate = simulate)
 
@@ -33,7 +33,7 @@ class EpubPackageBuilder:
             self.update_xhtml_links(staging_directory, configuration.content_file_mappings, configuration.resource_link_mappings)
 
         self.stage_navigation(staging_directory, configuration.navigation_items, configuration.landmarks, simulate = simulate)
-        self.stage_package_document_definition(staging_directory, package_document, simulate = simulate)
+        self.stage_package_document(staging_directory, configuration.package_document, simulate = simulate)
         self.stage_container(staging_directory, simulate = simulate)
 
 
@@ -101,7 +101,7 @@ class EpubPackageBuilder:
         self._content_writer.write_xml(xhtml_file_path, navigation_document, simulate = simulate)
 
 
-    def stage_package_document_definition(self,
+    def stage_package_document(self,
             staging_directory: str, package_document_definition: EpubPackageDocument, simulate: bool = False) -> None:
 
         opf_file_path = os.path.join(staging_directory, "EPUB", "package.opf")

@@ -11,6 +11,9 @@
 # Environment
 /environment.json
 
+# Libre Office
+.~lock.*
+
 # Logs
 *.log
 

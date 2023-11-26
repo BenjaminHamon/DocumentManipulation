@@ -1,10 +1,18 @@
 # cspell:words dateutil fodt localname lxml nsmap
 
 import datetime
+from typing import Dict, List, Optional
 import zipfile
 
 import dateutil.parser
 import lxml.etree
+
+from benjaminhamon_book_distribution_toolkit.documents.heading_element import HeadingElement
+from benjaminhamon_book_distribution_toolkit.documents.paragraph_element import ParagraphElement
+from benjaminhamon_book_distribution_toolkit.documents.root_element import RootElement
+from benjaminhamon_book_distribution_toolkit.documents.section_element import SectionElement
+from benjaminhamon_book_distribution_toolkit.documents.text_element import TextElement
+from benjaminhamon_book_distribution_toolkit.xml import xpath_helpers
 
 
 class OdtReader:
@@ -59,3 +67,110 @@ class OdtReader:
                 continue
 
         return metadata
+
+
+    def read_content(self, odt_content: bytes) -> RootElement:
+        odt_as_xml = lxml.etree.fromstring(odt_content, self._xml_parser)
+
+        self._strip_comments(odt_as_xml)
+
+        body_as_xml = xpath_helpers.find_xml_element(odt_as_xml, "office:body/office:text", odt_as_xml.nsmap)
+        text_elements = xpath_helpers.try_find_xml_element_collection(body_as_xml, "//*[self::text:h or self::text:p]", odt_as_xml.nsmap)
+
+        root_element = RootElement()
+        root_element.identifier = "root"
+
+        current_section = None
+
+        for element in text_elements:
+            tag = lxml.etree.QName(element).localname
+
+            if tag == "h":
+                current_section = self._convert_section_element(element, odt_as_xml.nsmap)
+                root_element.children.append(current_section)
+
+            if tag == "p":
+                if current_section is None:
+                    continue
+
+                current_section.children.append(self._convert_paragraph_element(element, odt_as_xml.nsmap))
+
+        return root_element
+
+
+    def _strip_comments(self, odt_as_xml: lxml.etree._Element) -> None:
+        comment_tags = [
+            lxml.etree.QName(odt_as_xml.nsmap["office"], "annotation"),
+            lxml.etree.QName(odt_as_xml.nsmap["office"], "annotation-end"),
+        ]
+
+        lxml.etree.strip_elements(odt_as_xml, *comment_tags, with_tail = False)
+
+
+    def _convert_section_element(self, section_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> SectionElement:
+        section_element = SectionElement()
+
+        heading_element = HeadingElement()
+        heading_element.style_collection = self._get_styles_from_element(section_as_xml, namespaces)
+        heading_element.children.extend(self._get_text(section_as_xml, namespaces))
+
+        section_element.children.append(heading_element)
+
+        return section_element
+
+
+    def _convert_paragraph_element(self, paragraph_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> ParagraphElement:
+        paragraph_element = ParagraphElement()
+        paragraph_element.style_collection = self._get_styles_from_element(paragraph_as_xml, namespaces)
+        paragraph_element.children.extend(self._get_text(paragraph_as_xml, namespaces))
+
+        return paragraph_element
+
+
+    def _get_text(self, text_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> List[TextElement]:
+
+        # A text XML element from an ODT document will directly contain raw text,
+        # but it may also contain child elements such as spans and breaks, and then raw text as tails.
+        # e.g. <p>text <span>italic</span> text</p> or <p>text <soft-page-break/>text</p>
+
+        all_text_elements: List[TextElement] = []
+
+        for current_xml_element in text_as_xml.iter(None):
+            tag = lxml.etree.QName(current_xml_element).localname
+
+            if tag not in ( "a", "h", "p", "span", "line-break", "soft-page-break" ):
+                raise ValueError("Unsupported text tag: '%s'" % tag)
+
+            if current_xml_element.text is not None:
+                if tag in ( "h", "p" ):
+                    text_element = TextElement(current_xml_element.text.strip())
+                    all_text_elements.append(text_element)
+
+                if tag in ( "a", "span" ):
+                    text_element = TextElement(current_xml_element.text.strip())
+                    text_element.style_collection = self._get_styles_from_element(current_xml_element, namespaces)
+                    all_text_elements.append(text_element)
+
+            if current_xml_element.tail is not None and not current_xml_element.tail.isspace():
+                if tag in ( "a", "h", "p", "span", "line-break" ):
+                    text_element = TextElement(current_xml_element.tail.strip())
+                    all_text_elements.append(text_element)
+
+                if tag in ( "soft-page-break" ):
+                    if len(all_text_elements) == 0:
+                        text_element = TextElement(current_xml_element.tail.strip())
+                        all_text_elements.append(text_element)
+                    else:
+                        all_text_elements[-1].text += " " + current_xml_element.tail.strip()
+
+        return all_text_elements
+
+
+    def _get_styles_from_element(self, element_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> List[str]:
+        style_collection = []
+
+        odt_style: str = element_as_xml.attrib.get(lxml.etree.QName(namespaces["text"], "style-name")) # type: ignore
+        if odt_style is not None:
+            style_collection.append(odt_style.replace("_20_", " ")) # Spaces in style names are stored as "_20_"
+
+        return style_collection

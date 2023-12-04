@@ -1,6 +1,6 @@
 """ Unit tests for EpubNavigationBuilder """
 
-# cspell:words bodymatter
+# cspell:words bodymatter lxml
 
 import lxml.etree
 

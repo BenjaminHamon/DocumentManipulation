@@ -1,3 +1,5 @@
+# cspell:words dateutil lxml
+
 import os
 import sys
 
@@ -27,6 +29,7 @@ def run_setup() -> None:
         install_requires = [
             "lxml ~= 4.9.3",
             "lxml-stubs ~= 0.4.0",
+            "python-dateutil ~= 2.8.2",
         ],
     )
 

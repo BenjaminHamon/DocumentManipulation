@@ -2,60 +2,12 @@
 
 import os
 import zipfile
-from benjaminhamon_book_distribution_toolkit.epub import epub_xhtml_helpers
 
+from benjaminhamon_book_distribution_toolkit.epub import epub_xhtml_helpers
+from benjaminhamon_book_distribution_toolkit.epub.epub_content_writer import EpubContentWriter
 from benjaminhamon_book_distribution_toolkit.epub.epub_package_builder import EpubPackageBuilder
 from benjaminhamon_book_distribution_toolkit.epub.epub_package_configuration import EpubPackageConfiguration
-from benjaminhamon_book_distribution_toolkit.epub.epub_content_writer import EpubContentWriter
 from benjaminhamon_book_distribution_toolkit.epub.epub_package_document import EpubPackageDocument
-
-
-def test_stage_package_files(tmpdir):
-    content_writer = EpubContentWriter()
-    package_builder = EpubPackageBuilder(content_writer)
-
-    source_directory = os.path.join(tmpdir, "Sources")
-    staging_directory = os.path.join(tmpdir, "Working")
-
-    os.makedirs(source_directory)
-    content_writer.write_xml(os.path.join(source_directory, "my_first_section.xhtml"), epub_xhtml_helpers.create_xhtml())
-    content_writer.write_xml(os.path.join(source_directory, "my_second_section.xhtml"), epub_xhtml_helpers.create_xhtml())
-
-    epub_configuration = EpubPackageConfiguration()
-
-    epub_configuration.content_file_mappings = [
-        (os.path.join(source_directory, "my_first_section.xhtml"), "my_first_section.xhtml"),
-        (os.path.join(source_directory, "my_second_section.xhtml"), "my_second_section.xhtml"),
-    ]
-
-    package_document = EpubPackageDocument()
-
-    package_builder.stage_package_files(staging_directory, epub_configuration, package_document, simulate = False)
-
-    assert os.path.exists(os.path.join(staging_directory, "EPUB", "my_first_section.xhtml"))
-    assert os.path.exists(os.path.join(staging_directory, "EPUB", "my_second_section.xhtml"))
-    assert os.path.exists(os.path.join(staging_directory, "EPUB", "toc.xhtml"))
-    assert os.path.exists(os.path.join(staging_directory, "EPUB", "package.opf"))
-    assert os.path.exists(os.path.join(staging_directory, "META-INF", "container.xml"))
-
-
-def test_stage_package_files_with_simulate(tmpdir):
-    content_writer = EpubContentWriter()
-    package_builder = EpubPackageBuilder(content_writer)
-
-    source_directory = os.path.join(tmpdir, "Sources")
-    staging_directory = os.path.join(tmpdir, "Working")
-
-    epub_configuration = EpubPackageConfiguration()
-
-    epub_configuration.content_file_mappings = [
-        (os.path.join(source_directory, "my_first_section.xhtml"), "my_first_section.xhtml"),
-        (os.path.join(source_directory, "my_second_section.xhtml"), "my_second_section.xhtml"),
-    ]
-
-    package_document = EpubPackageDocument()
-
-    package_builder.stage_package_files(staging_directory, epub_configuration, package_document, simulate = True)
 
 
 def test_update_xhtml_links(tmpdir):
@@ -80,7 +32,8 @@ def test_update_xhtml_links(tmpdir):
     with open(os.path.join(staging_directory, "EPUB", "content", "file.xhtml"), mode = "w", encoding = "utf-8") as xhtml_file:
         xhtml_file.write(xhtml_file_content_initial.lstrip())
 
-    package_builder.update_xhtml_links(staging_directory, [ ("content/file.xhtml", "content/file.xhtml") ], [ ("styles/default.css", "styles/final.css") ])
+    package_builder.update_xhtml_links(
+        staging_directory, [ ("EPUB/content/file.xhtml", "EPUB/content/file.xhtml") ], [ ("EPUB/styles/default.css", "EPUB/styles/final.css") ])
 
     with open(os.path.join(staging_directory, "EPUB", "content", "file.xhtml"), mode = "r", encoding = "utf-8") as xhtml_file:
         xhtml_file_content_final = xhtml_file.read()
@@ -112,16 +65,18 @@ def test_create_package(tmpdir):
     content_writer.write_xml(os.path.join(source_directory, "my_first_section.xhtml"), epub_xhtml_helpers.create_xhtml())
     content_writer.write_xml(os.path.join(source_directory, "my_second_section.xhtml"), epub_xhtml_helpers.create_xhtml())
 
-    epub_configuration = EpubPackageConfiguration()
+    package_document = EpubPackageDocument()
+    epub_package_configuration = EpubPackageConfiguration(package_document)
 
-    epub_configuration.content_file_mappings = [
+    epub_package_configuration.content_file_mappings = [
         (os.path.join(source_directory, "my_first_section.xhtml"), "my_first_section.xhtml"),
-        (os.path.join(source_directory, "my_second_section.xhtml"), "my_second_section.xhtml"),
+        (os.path.join(source_directory, "my_second_section.xhtml"),"my_second_section.xhtml"),
     ]
 
-    package_document = EpubPackageDocument()
+    content_writer.generate_package_files(source_directory, epub_package_configuration, simulate = False)
+    content_file_mappings = package_builder.load_file_mappings(source_directory)
 
-    package_builder.stage_package_files(staging_directory, epub_configuration, package_document, simulate = False)
+    package_builder.stage_files(staging_directory, content_file_mappings, simulate = False)
     package_builder.create_package(package_file_path, staging_directory, simulate = False)
 
     assert os.path.exists(package_file_path)

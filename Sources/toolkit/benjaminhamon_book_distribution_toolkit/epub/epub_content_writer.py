@@ -3,13 +3,19 @@
 import datetime
 import logging
 import os
-from typing import Any, List
+from typing import Any, Dict, List, Tuple
 import urllib.parse
 
 import lxml.etree
+import yaml
 
+from benjaminhamon_book_distribution_toolkit import text_operations
 from benjaminhamon_book_distribution_toolkit.epub import epub_namespaces
+from benjaminhamon_book_distribution_toolkit.epub.epub_landmark import EpubLandmark
 from benjaminhamon_book_distribution_toolkit.epub.epub_metadata_item import EpubMetadataItem
+from benjaminhamon_book_distribution_toolkit.epub.epub_navigation_builder import EpubNavigationBuilder
+from benjaminhamon_book_distribution_toolkit.epub.epub_navigation_item import EpubNavigationItem
+from benjaminhamon_book_distribution_toolkit.epub.epub_package_configuration import EpubPackageConfiguration
 from benjaminhamon_book_distribution_toolkit.epub.epub_package_document import EpubPackageDocument
 
 
@@ -25,14 +31,68 @@ class EpubContentWriter:
         self.version = "3.0"
 
 
-    def write_container_file(self, xml_file_path: str, opf_file_path: str,  simulate: bool = False) -> None:
-        container_as_xml = self.create_container_as_xml(opf_file_path)
-        self.write_xml(xml_file_path, container_as_xml, simulate = simulate)
+    def generate_package_files(self,
+            output_directory: str, configuration: EpubPackageConfiguration, simulate: bool = False) -> None:
+
+        container_file_path = os.path.join(output_directory, "container.xml")
+        package_document_file_path = os.path.join(output_directory, "package.opf")
+        file_mapping_listing_file_path = os.path.join(output_directory, "FileMappings.yaml")
+        toc_file_path = os.path.join(output_directory, "toc.xhtml")
+
+        self.generate_package_document(package_document_file_path, configuration.package_document, simulate = simulate)
+        self.generate_file_mapping_listing(file_mapping_listing_file_path, configuration.content_file_mappings, simulate = simulate)
+        self.generate_navigation(toc_file_path, configuration.navigation_items, configuration.landmarks, simulate = simulate)
+        self.generate_container(container_file_path, simulate = simulate)
 
 
-    def write_opf_file(self, opf_file_path: str, package_document: EpubPackageDocument, simulate: bool = False) -> None:
+    def generate_package_document(self,
+            package_document_file_path: str, package_document: EpubPackageDocument, simulate: bool = False) -> None:
+
         package_document_as_xml = self.convert_package_document_to_xml(package_document)
-        self.write_xml(opf_file_path, package_document_as_xml, simulate = simulate)
+        self.write_xml(package_document_file_path, package_document_as_xml, simulate = simulate)
+
+
+    def generate_file_mapping_listing(self,
+            file_mapping_listing_file_path: str, file_mapping_collection: List[Tuple[str,str]], simulate: bool = False) -> None:
+
+        file_mappings_for_serialization: List[Dict[str,str]] = []
+
+        for source, destination in file_mapping_collection:
+            source = os.path.normpath(source).replace("\\", "/")
+            destination = os.path.normpath(destination).replace("\\", "/")
+            file_mappings_for_serialization.append({ "source": source, "destination": destination })
+
+        logger.debug("Writing '%s'", file_mapping_listing_file_path)
+
+        if not simulate:
+            with open(file_mapping_listing_file_path, mode = "w", encoding = "utf-8") as mappings_file:
+                yaml.safe_dump(file_mappings_for_serialization, mappings_file, sort_keys = False)
+
+
+    def generate_navigation(self,
+            toc_file_path: str, item_collection: List[EpubNavigationItem], landmark_collection: List[EpubLandmark], simulate: bool = False) -> None:
+
+        navigation_builder = EpubNavigationBuilder("Table of Contents")
+        navigation_builder.add_table_of_contents(item_collection)
+        navigation_builder.add_landmarks(landmark_collection)
+
+        navigation_document = navigation_builder.get_xhtml_document()
+
+        self.write_xml(toc_file_path, navigation_document, simulate = simulate)
+
+
+    def generate_container(self, container_file_path: str, simulate: bool = False) -> None:
+        package_document_file_path = os.path.join("EPUB", "package.opf")
+        container_as_xml = self.create_container_as_xml(package_document_file_path)
+        self.write_xml(container_file_path, container_as_xml, simulate = simulate)
+
+
+    def update_xhtml_content(self,
+            xml_parser: lxml.etree.XMLParser, xhtml_file_path: str, format_parameters: Dict[str,str], simulate: bool = False) -> None:
+
+        xhtml_document = lxml.etree.parse(xhtml_file_path, parser = xml_parser)
+        self.format_text_in_xml(xhtml_document.getroot(), format_parameters)
+        self.write_xml(xhtml_file_path, xhtml_document, simulate = simulate)
 
 
     def write_xml(self, xml_file_path: str, document: lxml.etree._ElementTree, simulate: bool = False) -> None:
@@ -47,6 +107,12 @@ class EpubContentWriter:
         if not simulate:
             document.write(xml_file_path + ".tmp", **write_options)
             os.replace(xml_file_path + ".tmp", xml_file_path)
+
+
+    def format_text_in_xml(self, xml_root: lxml.etree._Element, format_parameters: Dict[str,str]) -> None:
+        for xml_element in xml_root.iter():
+            if xml_element.text is not None:
+                xml_element.text = text_operations.format_text(xml_element.text, format_parameters)
 
 
     def create_container_as_xml(self, opf_file_path: str) -> lxml.etree._ElementTree:

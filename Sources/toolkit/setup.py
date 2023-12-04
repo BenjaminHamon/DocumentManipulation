@@ -1,3 +1,5 @@
+# cspell:words lxml
+
 import os
 import sys
 

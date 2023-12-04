@@ -1,3 +1,5 @@
+# cspell:words lxml
+
 """ Unit tests for epub_xhtml_helpers """
 
 import io

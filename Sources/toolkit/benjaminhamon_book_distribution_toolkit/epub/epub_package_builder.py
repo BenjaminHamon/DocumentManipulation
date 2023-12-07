@@ -25,7 +25,7 @@ class EpubPackageBuilder:
     def load_file_mappings(self, configuration_directory: str) -> List[Tuple[str,str]]:
         file_mapping_collection: List[Tuple[str,str]] = []
 
-        file_mapping_collection.append((os.path.join(configuration_directory, "package.opf"), os.path.join("EPUB", "package.opf")))
+        file_mapping_collection.append((os.path.join(configuration_directory, "content.opf"), os.path.join("EPUB", "content.opf")))
         file_mapping_collection.append((os.path.join(configuration_directory, "toc.xhtml"), os.path.join("EPUB", "toc.xhtml")))
         file_mapping_collection.append((os.path.join(configuration_directory, "container.xml"), os.path.join("META-INF", "container.xml")))
 

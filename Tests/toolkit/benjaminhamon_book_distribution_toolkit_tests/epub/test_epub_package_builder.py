@@ -89,6 +89,6 @@ def test_create_package(tmpdir):
         assert "EPUB/my_first_section.xhtml" in file_collection
         assert "EPUB/my_second_section.xhtml" in file_collection
         assert "EPUB/toc.xhtml" in file_collection
-        assert "EPUB/package.opf" in file_collection
+        assert "EPUB/content.opf" in file_collection
         assert "META-INF/container.xml" in file_collection
         assert "mimetype" in file_collection

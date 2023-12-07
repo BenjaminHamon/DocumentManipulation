@@ -17,13 +17,13 @@ from benjaminhamon_book_distribution_toolkit.epub.epub_spine_item import EpubSpi
 
 def test_create_container_as_xml():
     content_writer = EpubContentWriter()
-    container_xml = content_writer.create_container_as_xml(os.path.join("EPUB", "package.opf"))
+    container_xml = content_writer.create_container_as_xml(os.path.join("EPUB", "content.opf"))
 
     document_as_string_expected = """
 <?xml version='1.0' encoding='utf-8'?>
 <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
   <rootfiles>
-    <rootfile full-path="EPUB/package.opf" media-type="application/oebps-package+xml"/>
+    <rootfile full-path="EPUB/content.opf" media-type="application/oebps-package+xml"/>
   </rootfiles>
 </container>
 """

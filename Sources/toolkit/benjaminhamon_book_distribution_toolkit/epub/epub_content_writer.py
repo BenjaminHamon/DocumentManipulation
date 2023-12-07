@@ -35,7 +35,7 @@ class EpubContentWriter:
             output_directory: str, configuration: EpubPackageConfiguration, simulate: bool = False) -> None:
 
         container_file_path = os.path.join(output_directory, "container.xml")
-        package_document_file_path = os.path.join(output_directory, "package.opf")
+        package_document_file_path = os.path.join(output_directory, "content.opf")
         file_mapping_listing_file_path = os.path.join(output_directory, "FileMappings.yaml")
         toc_file_path = os.path.join(output_directory, "toc.xhtml")
 
@@ -82,7 +82,7 @@ class EpubContentWriter:
 
 
     def generate_container(self, container_file_path: str, simulate: bool = False) -> None:
-        package_document_file_path = os.path.join("EPUB", "package.opf")
+        package_document_file_path = os.path.join("EPUB", "content.opf")
         container_as_xml = self.create_container_as_xml(package_document_file_path)
         self.write_xml(container_file_path, container_as_xml, simulate = simulate)
 

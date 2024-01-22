@@ -5,6 +5,8 @@
 import os
 import zipfile
 
+import lxml.etree
+
 from benjaminhamon_book_distribution_toolkit.documents import document_element_factory
 from benjaminhamon_book_distribution_toolkit.documents.heading_element import HeadingElement
 from benjaminhamon_book_distribution_toolkit.documents.root_element import RootElement
@@ -40,7 +42,8 @@ def create_document() -> RootElement:
 
 
 def test_write_as_single_document_to_fodt(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     document = create_document()
     fodt_file_path = os.path.join(tmpdir, "Working", "MyDocument.fodt")
@@ -55,7 +58,7 @@ def test_write_as_single_document_to_fodt(tmpdir):
 
     expected_content = """
 <?xml version='1.0' encoding='utf-8'?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <text:h>
@@ -87,7 +90,8 @@ def test_write_as_single_document_to_fodt(tmpdir):
 
 
 def test_write_as_single_document_to_odt(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     document = create_document()
     odt_file_path = os.path.join(tmpdir, "Working", "MyDocument.odt")
@@ -102,7 +106,7 @@ def test_write_as_single_document_to_odt(tmpdir):
 
     expected_content = """
 <?xml version='1.0' encoding='utf-8'?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <text:h>
@@ -134,7 +138,8 @@ def test_write_as_single_document_to_odt(tmpdir):
 
 
 def test_write_as_single_document_to_fodt_with_simulate(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     fodt_file_path = os.path.join(tmpdir, "Working", "MyDocument.fodt")
 
@@ -145,7 +150,8 @@ def test_write_as_single_document_to_fodt_with_simulate(tmpdir):
 
 
 def test_write_as_single_document_to_odt_with_simulate(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     odt_file_path = os.path.join(tmpdir, "Working", "MyDocument.odt")
 
@@ -156,7 +162,8 @@ def test_write_as_single_document_to_odt_with_simulate(tmpdir):
 
 
 def test_write_as_many_documents_to_fodt(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     document = create_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -175,7 +182,7 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 
     expected_content = """
 <?xml version='1.0' encoding='utf-8'?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <text:h>
@@ -205,7 +212,7 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 
     expected_content = """
 <?xml version='1.0' encoding='utf-8'?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <text:h>
@@ -228,7 +235,8 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 
 
 def test_write_as_many_documents_to_odt(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     document = create_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -247,7 +255,7 @@ def test_write_as_many_documents_to_odt(tmpdir):
 
     expected_content = """
 <?xml version='1.0' encoding='utf-8'?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <text:h>
@@ -277,7 +285,7 @@ def test_write_as_many_documents_to_odt(tmpdir):
 
     expected_content = """
 <?xml version='1.0' encoding='utf-8'?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <text:h>
@@ -300,7 +308,8 @@ def test_write_as_many_documents_to_odt(tmpdir):
 
 
 def test_write_as_many_documents_to_fodt_with_simulate(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     document = create_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -311,7 +320,8 @@ def test_write_as_many_documents_to_fodt_with_simulate(tmpdir):
 
 
 def test_write_as_many_documents_to_odt_with_simulate(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
 
     document = create_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -322,7 +332,8 @@ def test_write_as_many_documents_to_odt_with_simulate(tmpdir):
 
 
 def test_write_heading_with_prefix(tmpdir):
-    odt_writer = OdtWriter()
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
     odt_writer.heading_prefix_style = "Heading prefix"
 
     document = RootElement()
@@ -348,7 +359,7 @@ def test_write_heading_with_prefix(tmpdir):
 
     expected_content = """
 <?xml version='1.0' encoding='utf-8'?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <text:h>

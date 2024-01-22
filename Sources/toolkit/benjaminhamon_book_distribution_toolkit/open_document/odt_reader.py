@@ -32,8 +32,8 @@ class OdtReader:
             return odt_file.read(content_file_path)
 
 
-    def read_metadata(self, odt_content: bytes) -> dict:
-        odt_as_xml = lxml.etree.fromstring(odt_content, self._xml_parser)
+    def read_metadata(self, odt_as_bytes: bytes) -> dict:
+        odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
         metadata_as_xml = odt_as_xml.find("office:meta", namespaces = odt_as_xml.nsmap) # type: ignore
 
         if metadata_as_xml is None:
@@ -69,8 +69,8 @@ class OdtReader:
         return metadata
 
 
-    def read_content(self, odt_content: bytes) -> RootElement:
-        odt_as_xml = lxml.etree.fromstring(odt_content, self._xml_parser)
+    def read_content(self, odt_as_bytes: bytes) -> RootElement:
+        odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
 
         self._strip_comments(odt_as_xml)
 
@@ -169,8 +169,9 @@ class OdtReader:
     def _get_styles_from_element(self, element_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> List[str]:
         style_collection = []
 
-        odt_style: str = element_as_xml.attrib.get(lxml.etree.QName(namespaces["text"], "style-name")) # type: ignore
+        style_name_attribute_key = lxml.etree.QName(namespaces["text"], "style-name")
+        odt_style = element_as_xml.attrib.get(str(style_name_attribute_key))
         if odt_style is not None:
-            style_collection.append(odt_style.replace("_20_", " ")) # Spaces in style names are stored as "_20_"
+            style_collection.append(str(odt_style).replace("_20_", " ")) # Spaces in style names are stored as "_20_"
 
         return style_collection

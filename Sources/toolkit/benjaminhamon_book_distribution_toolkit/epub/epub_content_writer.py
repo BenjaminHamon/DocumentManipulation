@@ -9,7 +9,6 @@ import urllib.parse
 import lxml.etree
 import yaml
 
-from benjaminhamon_book_distribution_toolkit import text_operations
 from benjaminhamon_book_distribution_toolkit.epub import epub_namespaces
 from benjaminhamon_book_distribution_toolkit.epub.epub_landmark import EpubLandmark
 from benjaminhamon_book_distribution_toolkit.epub.epub_metadata_item import EpubMetadataItem
@@ -17,6 +16,7 @@ from benjaminhamon_book_distribution_toolkit.epub.epub_navigation_builder import
 from benjaminhamon_book_distribution_toolkit.epub.epub_navigation_item import EpubNavigationItem
 from benjaminhamon_book_distribution_toolkit.epub.epub_package_configuration import EpubPackageConfiguration
 from benjaminhamon_book_distribution_toolkit.epub.epub_package_document import EpubPackageDocument
+from benjaminhamon_book_distribution_toolkit.xml import xml_operations
 
 
 logger = logging.getLogger("EpubContentWriter")
@@ -91,7 +91,7 @@ class EpubContentWriter:
             xml_parser: lxml.etree.XMLParser, xhtml_file_path: str, format_parameters: Dict[str,str], simulate: bool = False) -> None:
 
         xhtml_document = lxml.etree.parse(xhtml_file_path, parser = xml_parser)
-        self.format_text_in_xml(xhtml_document.getroot(), format_parameters)
+        xml_operations.format_text_in_xml(xhtml_document.getroot(), format_parameters)
         self.write_xml(xhtml_file_path, xhtml_document, simulate = simulate)
 
 
@@ -107,12 +107,6 @@ class EpubContentWriter:
         if not simulate:
             document.write(xml_file_path + ".tmp", **write_options)
             os.replace(xml_file_path + ".tmp", xml_file_path)
-
-
-    def format_text_in_xml(self, xml_root: lxml.etree._Element, format_parameters: Dict[str,str]) -> None:
-        for xml_element in xml_root.iter():
-            if xml_element.text is not None:
-                xml_element.text = text_operations.format_text(xml_element.text, format_parameters)
 
 
     def create_container_as_xml(self, opf_file_path: str) -> lxml.etree._ElementTree:

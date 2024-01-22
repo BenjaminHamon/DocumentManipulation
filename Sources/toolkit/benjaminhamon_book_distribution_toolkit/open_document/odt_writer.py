@@ -10,6 +10,7 @@ import lxml.etree
 
 from benjaminhamon_book_distribution_toolkit.documents import document_operations
 from benjaminhamon_book_distribution_toolkit.documents.root_element import RootElement
+from benjaminhamon_book_distribution_toolkit.open_document import odt_operations
 from benjaminhamon_book_distribution_toolkit.open_document.odt_builder import OdtBuilder
 
 
@@ -19,7 +20,9 @@ logger = logging.getLogger("OdtWriter")
 class OdtWriter:
 
 
-    def __init__(self) -> None:
+    def __init__(self, xml_parser: lxml.etree.XMLParser) -> None:
+        self._xml_parser = xml_parser
+
         self.pretty_print = True
         self.encoding = "utf-8"
         self.heading_prefix_style: Optional[str] = None
@@ -47,7 +50,7 @@ class OdtWriter:
             output_file_path: str, document_content: RootElement,
             template_file_path: Optional[str] = None, flat_odt: bool = False, simulate: bool = False) -> None:
 
-        odt_builder = OdtBuilder(template_file_path)
+        odt_builder = OdtBuilder(self._create_document(template_file_path))
         odt_builder.heading_prefix_style = self.heading_prefix_style
         odt_builder.add_content(document_content)
 
@@ -63,7 +66,7 @@ class OdtWriter:
         for section_index, section in enumerate(document_content.enumerate_sections()):
             title = section.get_heading().get_title()
 
-            odt_builder = OdtBuilder(template_file_path)
+            odt_builder = OdtBuilder(self._create_document(template_file_path))
             odt_builder.heading_prefix_style = self.heading_prefix_style
             odt_builder.add_section(section)
 
@@ -71,6 +74,12 @@ class OdtWriter:
             odt_file_path = os.path.join(output_directory, file_name + (".fodt" if flat_odt else ".odt"))
 
             self.write_to_file(odt_file_path, odt_builder.get_xml_document(), flat_odt = flat_odt, simulate = simulate)
+
+
+    def _create_document(self, template_file_path: Optional[str]) -> lxml.etree._ElementTree:
+        if template_file_path is None:
+            return odt_operations.create_document()
+        return odt_operations.load_document(self._xml_parser, template_file_path)
 
 
     def _serialize_to_xml(self, document: lxml.etree._ElementTree) -> str:

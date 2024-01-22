@@ -1,7 +1,6 @@
-# cspell:words getroottree fodt lxml nsmap opendocument
+# cspell:words lxml nsmap
 
 from typing import List, Optional
-import zipfile
 
 import lxml.etree
 
@@ -10,49 +9,19 @@ from benjaminhamon_book_distribution_toolkit.documents.paragraph_element import 
 from benjaminhamon_book_distribution_toolkit.documents.root_element import RootElement
 from benjaminhamon_book_distribution_toolkit.documents.section_element import SectionElement
 from benjaminhamon_book_distribution_toolkit.documents.text_element import TextElement
+from benjaminhamon_book_distribution_toolkit.open_document import odt_operations
 
 
 class OdtBuilder:
 
 
-    def __init__(self, template_file_path: Optional[str] = None) -> None:
-        self._xml_document = OdtBuilder._create_document(template_file_path)
+    def __init__(self, xml_document_base: lxml.etree._ElementTree) -> None:
+        self._xml_document = xml_document_base
         self.heading_prefix_style: Optional[str] = None
-
-
-    @staticmethod
-    def _create_document(template_file_path: Optional[str] = None) -> lxml.etree._ElementTree:
-        if template_file_path is None:
-            namespaces = {
-                "office": "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
-                "text": "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
-            }
-
-            document_element = lxml.etree.Element(lxml.etree.QName(namespaces["office"], "document"), nsmap = namespaces)
-            body_element = lxml.etree.SubElement(document_element, lxml.etree.QName(namespaces["office"], "body"))
-            lxml.etree.SubElement(body_element, lxml.etree.QName(namespaces["office"], "text"))
-            return lxml.etree.ElementTree(document_element)
-
-        xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-
-        if template_file_path.endswith(".fodt"):
-            return lxml.etree.parse(template_file_path, xml_parser)
-
-        if template_file_path.endswith(".odt"):
-            with zipfile.ZipFile(template_file_path, mode = "r") as odt_file:
-                odt_content = odt_file.read("content.xml")
-            return lxml.etree.fromstring(odt_content).getroottree()
-
-        raise ValueError("Unsupported template file: '%s'" % template_file_path)
 
 
     def get_xml_document(self) -> lxml.etree._ElementTree:
         return self._xml_document
-
-
-    def _get_body_text_element(self) -> lxml.etree._Element:
-        namespaces = self._xml_document.getroot().nsmap
-        return self._xml_document.xpath("./office:body/office:text", namespaces = namespaces)[0] # type: ignore
 
 
     def add_content(self, root_element: RootElement) -> None:
@@ -95,7 +64,7 @@ class OdtBuilder:
     def _create_text_xml_element(self,
             parent: Optional[lxml.etree._Element], tag: str, style_collection: List[str], text: Optional[str]) -> lxml.etree._Element:
 
-        body_as_xml = self._get_body_text_element()
+        body_as_xml = odt_operations.get_body_text_element(self._xml_document)
         if parent is None:
             parent = body_as_xml
 
@@ -112,7 +81,7 @@ class OdtBuilder:
 
 
     def _create_line_break_element(self, parent: Optional[lxml.etree._Element]) -> lxml.etree._Element:
-        body_as_xml = self._get_body_text_element()
+        body_as_xml = odt_operations.get_body_text_element(self._xml_document)
         if parent is None:
             parent = body_as_xml
 

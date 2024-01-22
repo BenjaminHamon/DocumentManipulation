@@ -138,7 +138,7 @@ class OdtReader:
         for current_xml_element in text_as_xml.iter(None):
             tag = lxml.etree.QName(current_xml_element).localname
 
-            if tag not in ( "a", "h", "p", "span", "line-break", "soft-page-break" ):
+            if tag not in ( "a", "h", "s", "p", "span", "line-break", "soft-page-break" ):
                 raise ValueError("Unsupported text tag: '%s'" % tag)
 
             if current_xml_element.text is not None:

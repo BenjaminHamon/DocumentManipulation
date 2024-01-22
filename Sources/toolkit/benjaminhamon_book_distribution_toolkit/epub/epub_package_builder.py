@@ -3,15 +3,13 @@ import logging
 import os
 import shutil
 import zipfile
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
+import yaml
+
+from benjaminhamon_book_distribution_toolkit import text_operations
 from benjaminhamon_book_distribution_toolkit.epub import epub_xhtml_helpers
 from benjaminhamon_book_distribution_toolkit.epub.epub_content_writer import EpubContentWriter
-from benjaminhamon_book_distribution_toolkit.epub.epub_landmark import EpubLandmark
-from benjaminhamon_book_distribution_toolkit.epub.epub_navigation_builder import EpubNavigationBuilder
-from benjaminhamon_book_distribution_toolkit.epub.epub_navigation_item import EpubNavigationItem
-from benjaminhamon_book_distribution_toolkit.epub.epub_package_configuration import EpubPackageConfiguration
-from benjaminhamon_book_distribution_toolkit.epub.epub_package_document import EpubPackageDocument
 
 
 logger = logging.getLogger("EpubBuilder")
@@ -24,30 +22,25 @@ class EpubPackageBuilder:
         self._content_writer = content_writer
 
 
-    def stage_package_files(self,
-            staging_directory: str, configuration: EpubPackageConfiguration, package_document: EpubPackageDocument, simulate: bool = False) -> None:
+    def load_file_mappings(self, configuration_directory: str) -> List[Tuple[str,str]]:
+        file_mapping_collection: List[Tuple[str,str]] = []
 
-        self.stage_content_files(staging_directory, configuration.content_file_mappings, simulate = simulate)
+        file_mapping_collection.append((os.path.join(configuration_directory, "content.opf"), os.path.join("EPUB", "content.opf")))
+        file_mapping_collection.append((os.path.join(configuration_directory, "toc.xhtml"), os.path.join("EPUB", "toc.xhtml")))
+        file_mapping_collection.append((os.path.join(configuration_directory, "container.xml"), os.path.join("META-INF", "container.xml")))
 
-        if not simulate:
-            self.update_xhtml_links(staging_directory, configuration.content_file_mappings, configuration.resource_link_mappings)
+        file_mapping_listing_file_path = os.path.join(configuration_directory, "FileMappings.yaml")
+        with open(file_mapping_listing_file_path, mode = "r", encoding = "utf-8") as file_mapping_listing_file:
+            content_file_mappings: List[Dict[str,str]] = yaml.safe_load(file_mapping_listing_file)
 
-        self.stage_navigation(staging_directory, configuration.navigation_items, configuration.landmarks, simulate = simulate)
-        self.stage_package_document_definition(staging_directory, package_document, simulate = simulate)
-        self.stage_container(staging_directory, simulate = simulate)
+        for file_mapping in content_file_mappings:
+            file_mapping_collection.append((os.path.normpath(file_mapping["source"]), os.path.join("EPUB", os.path.normpath(file_mapping["destination"]))))
 
-
-    def stage_content_files(self,
-            staging_directory: str, file_mappings: List[Tuple[str,str]], simulate: bool = False):
-
-        epub_directory = os.path.join(staging_directory, "EPUB")
-
-        self._stage_files(epub_directory, file_mappings, simulate = simulate)
+        return file_mapping_collection
 
 
-    def _stage_files(self, staging_directory: str, file_mappings: List[Tuple[str,str]], simulate: bool = False) -> None:
-        if not simulate:
-            os.makedirs(staging_directory, exist_ok = True)
+    def stage_files(self, staging_directory: str, file_mappings: List[Tuple[str,str]], simulate: bool = False) -> None:
+        logger.info("Staging files")
 
         for source, destination in file_mappings:
             destination = os.path.normpath(os.path.join(staging_directory, destination))
@@ -58,14 +51,31 @@ class EpubPackageBuilder:
                 shutil.copy(source, destination)
 
 
+    def update_package_information(self,
+            package_document_file_path: str, parameters: Dict[str,str], simulate: bool = False) -> None:
+
+        logger.info("Updating package information")
+
+        with open(package_document_file_path, mode = "r", encoding = "utf-8") as package_document_file:
+            package_document_text = package_document_file.read()
+
+        package_document_text = text_operations.format_text(package_document_text, parameters)
+
+        logger.debug("Writing '%s'", package_document_file_path)
+
+        if not simulate:
+            with open(package_document_file_path, mode = "w", encoding = "utf-8") as package_document_file:
+                package_document_file.write(package_document_text)
+
+
     def update_xhtml_links(self,
             staging_directory: str, content_files: List[Tuple[str,str]], resource_links: List[Tuple[str,str]], simulate: bool = False) -> None:
 
-        epub_directory = os.path.join(staging_directory, "EPUB")
+        logger.info("Updating links")
 
         for source, destination in content_files:
             if source.endswith(".xhtml"):
-                destination = os.path.join(epub_directory, destination)
+                destination = os.path.join(staging_directory, destination)
 
                 document = epub_xhtml_helpers.load_xhtml(destination)
                 link_element_collection = epub_xhtml_helpers.try_find_xhtml_element_collection(document.getroot(), "./x:head/x:link")
@@ -79,42 +89,12 @@ class EpubPackageBuilder:
                         if matching_mapping is None:
                             raise ValueError("Link target not found: '%s'" % link_raw_value)
 
-                        link_updated = os.path.join(epub_directory, matching_mapping[1])
+                        link_updated = os.path.join(staging_directory, matching_mapping[1])
                         link_updated = os.path.relpath(link_updated, os.path.dirname(destination))
 
                         link_element.attrib["href"] = link_updated.replace("\\", "/")
 
                 self._content_writer.write_xml(destination, document, simulate = simulate)
-
-
-    def stage_navigation(self,
-            staging_directory: str, item_collection: List[EpubNavigationItem], landmark_collection: List[EpubLandmark], simulate: bool = False) -> None:
-
-        xhtml_file_path = os.path.join(staging_directory, "EPUB", "toc.xhtml")
-
-        navigation_builder = EpubNavigationBuilder("Table of Contents")
-        navigation_builder.add_table_of_contents(item_collection)
-        navigation_builder.add_landmarks(landmark_collection)
-
-        navigation_document = navigation_builder.get_xhtml_document()
-
-        self._content_writer.write_xml(xhtml_file_path, navigation_document, simulate = simulate)
-
-
-    def stage_package_document_definition(self,
-            staging_directory: str, package_document_definition: EpubPackageDocument, simulate: bool = False) -> None:
-
-        opf_file_path = os.path.join(staging_directory, "EPUB", "package.opf")
-        self._content_writer.write_opf_file(opf_file_path, package_document_definition, simulate = simulate)
-
-
-    def stage_container(self, staging_directory: str, simulate: bool = False) -> None:
-        container_xml_file_path = os.path.join(staging_directory, "META-INF", "container.xml")
-        opf_file_path = os.path.join(staging_directory, "EPUB", "package.opf")
-
-        if not simulate:
-            os.makedirs(os.path.dirname(container_xml_file_path), exist_ok = True)
-        self._content_writer.write_container_file(container_xml_file_path, opf_file_path, simulate = simulate)
 
 
     def create_package(self, package_file_path: str, staging_directory: str, simulate: bool = False) -> None:

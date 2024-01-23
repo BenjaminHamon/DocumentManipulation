@@ -13,7 +13,7 @@ def test_empty():
     navigation_builder = EpubNavigationBuilder("Table of Contents")
 
     document_as_string_expected = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <title>Table of Contents</title>
@@ -25,7 +25,8 @@ def test_empty():
     document_as_string_expected = document_as_string_expected.lstrip()
 
     document = navigation_builder.get_xhtml_document()
-    document_as_string = lxml.etree.tostring(document, encoding = "utf-8", pretty_print = True, xml_declaration = True).decode("utf-8")
+    document_as_string = lxml.etree.tostring(document,
+        doctype = "<?xml version=\"1.0\" encoding=\"utf-8\"?>", encoding = "utf-8", pretty_print = True).decode("utf-8")
 
     assert document_as_string == document_as_string_expected
 
@@ -45,7 +46,7 @@ def test_full():
 
 
     document_as_string_expected = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <title>Table of Contents</title>
@@ -80,6 +81,7 @@ def test_full():
     document_as_string_expected = document_as_string_expected.lstrip()
 
     document = navigation_builder.get_xhtml_document()
-    document_as_string = lxml.etree.tostring(document, encoding = "utf-8", pretty_print = True, xml_declaration = True).decode("utf-8")
+    document_as_string = lxml.etree.tostring(document,
+        doctype = "<?xml version=\"1.0\" encoding=\"utf-8\"?>", encoding = "utf-8", pretty_print = True).decode("utf-8")
 
     assert document_as_string == document_as_string_expected

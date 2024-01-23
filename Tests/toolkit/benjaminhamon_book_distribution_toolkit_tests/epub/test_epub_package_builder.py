@@ -19,7 +19,7 @@ def test_update_xhtml_links(tmpdir):
     os.makedirs(staging_directory)
 
     xhtml_file_content_initial = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <link href="../styles/default.css" rel="stylesheet" type="text/css"/>
@@ -39,7 +39,7 @@ def test_update_xhtml_links(tmpdir):
         xhtml_file_content_final = xhtml_file.read()
 
     xhtml_file_content_expected = """
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <link href="../styles/final.css" rel="stylesheet" type="text/css"/>

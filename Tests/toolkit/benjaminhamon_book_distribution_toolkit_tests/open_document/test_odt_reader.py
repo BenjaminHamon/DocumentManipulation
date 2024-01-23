@@ -131,7 +131,7 @@ def test_read_content_from_simple_odt():
 
 def test_read_content_from_clean_fodt():
     fodt_data = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
@@ -183,7 +183,7 @@ def test_read_content_from_clean_fodt():
 
 def test_read_content_from_original_fodt():
     fodt_data = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>

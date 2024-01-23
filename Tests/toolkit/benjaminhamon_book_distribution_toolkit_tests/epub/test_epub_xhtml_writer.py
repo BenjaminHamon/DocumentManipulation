@@ -52,7 +52,7 @@ def test_write_as_many_documents(tmpdir):
         actual_content = xhtml_file.read()
 
     expected_content = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <title>Section 1</title>
@@ -85,7 +85,7 @@ def test_write_as_many_documents(tmpdir):
         actual_content = xhtml_file.read()
 
     expected_content = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <title>Section 2</title>

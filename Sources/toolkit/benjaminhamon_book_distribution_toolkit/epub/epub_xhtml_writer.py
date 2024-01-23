@@ -1,3 +1,5 @@
+# cspell:words lxml
+
 import logging
 import os
 from typing import Optional
@@ -23,11 +25,17 @@ class EpubXhtmlWriter:
     def write_to_file(self, output_file_path: str, document: lxml.etree._ElementTree, simulate: bool = False) -> None:
         logger.debug("Writing '%s'", output_file_path)
 
-        content_as_string = self._serialize_to_xml(document)
+        write_options = {
+            "encoding": self.encoding,
+            "pretty_print": self.pretty_print,
+            "doctype": "<?xml version=\"1.0\" encoding=\"%s\"?>" % self.encoding,
+        }
+
+        document_as_xml_string = lxml.etree.tostring(document, **write_options).decode(self.encoding)
 
         if not simulate:
             with open(output_file_path + ".tmp", mode = "w", encoding = self.encoding) as output_file:
-                output_file.write(content_as_string)
+                output_file.write(document_as_xml_string)
             os.replace(output_file_path + ".tmp", output_file_path)
 
 
@@ -54,16 +62,3 @@ class EpubXhtmlWriter:
             docx_file_path = os.path.join(output_directory, file_name + ".xhtml")
 
             self.write_to_file(docx_file_path, xhtml_builder.get_xhtml_document(), simulate = simulate)
-
-
-    def _serialize_to_xml(self, document: lxml.etree._ElementTree) -> str:
-        write_options = {
-            "encoding": self.encoding,
-            "pretty_print": self.pretty_print,
-            "xml_declaration": True,
-        }
-
-        content_as_string = lxml.etree.tostring(document, **write_options).decode(self.encoding)
-        content_as_string = content_as_string.replace("<?xml version='1.0' encoding='UTF-8'?>", "<?xml version='1.0' encoding='utf-8'?>")
-
-        return content_as_string

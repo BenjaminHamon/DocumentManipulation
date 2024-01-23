@@ -99,13 +99,16 @@ class EpubContentWriter:
         logger.debug("Writing '%s'", xml_file_path)
 
         write_options = {
+            "doctype": "<?xml version=\"1.0\" encoding=\"%s\"?>" % self.encoding,
             "encoding": self.encoding,
             "pretty_print": self.pretty_print,
-            "xml_declaration": True,
         }
 
+        document_as_xml_string = lxml.etree.tostring(document, **write_options).decode(self.encoding)
+
         if not simulate:
-            document.write(xml_file_path + ".tmp", **write_options)
+            with open(xml_file_path + ".tmp", mode = "w", encoding = self.encoding) as output_file:
+                output_file.write(document_as_xml_string)
             os.replace(xml_file_path + ".tmp", xml_file_path)
 
 

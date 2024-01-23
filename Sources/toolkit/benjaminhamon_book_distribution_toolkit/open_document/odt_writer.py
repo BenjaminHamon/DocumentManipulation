@@ -31,18 +31,26 @@ class OdtWriter:
     def write_to_file(self, output_file_path: str, document: lxml.etree._ElementTree, flat_odt: bool = False, simulate: bool = False) -> None:
         logger.debug("Writing '%s'", output_file_path)
 
-        content_as_string = self._serialize_to_xml(document)
+        write_options = {
+            "doctype": "<?xml version=\"1.0\" encoding=\"%s\"?>" % self.encoding,
+            "encoding": self.encoding,
+            "pretty_print": self.pretty_print,
+        }
+
+        document_as_xml_string = lxml.etree.tostring(document, **write_options).decode(self.encoding)
+        document_as_xml_string = re.sub(r"/text:span>\s+<text:span", "/text:span> <text:span", document_as_xml_string)
+        document_as_xml_string = re.sub(r">\s+<text:line-break/>\s+<", "><text:line-break/><", document_as_xml_string)
 
         if flat_odt:
             if not simulate:
                 with open(output_file_path + ".tmp", mode = "w", encoding = self.encoding) as output_file:
-                    output_file.write(content_as_string)
+                    output_file.write(document_as_xml_string)
                 os.replace(output_file_path + ".tmp", output_file_path)
 
         else:
             if not simulate:
                 with zipfile.ZipFile(output_file_path + ".tmp", mode = "w") as output_file:
-                    output_file.writestr("content.xml", content_as_string)
+                    output_file.writestr("content.xml", document_as_xml_string)
                 os.replace(output_file_path + ".tmp", output_file_path)
 
 
@@ -80,18 +88,3 @@ class OdtWriter:
         if template_file_path is None:
             return odt_operations.create_document()
         return odt_operations.load_document(self._xml_parser, template_file_path)
-
-
-    def _serialize_to_xml(self, document: lxml.etree._ElementTree) -> str:
-        write_options = {
-            "encoding": self.encoding,
-            "pretty_print": self.pretty_print,
-            "xml_declaration": True,
-        }
-
-        content_as_string = lxml.etree.tostring(document, **write_options).decode(self.encoding)
-        content_as_string = content_as_string.replace("<?xml version='1.0' encoding='UTF-8'?>", "<?xml version='1.0' encoding='utf-8'?>")
-        content_as_string = re.sub(r"/text:span>\s+<text:span", "/text:span> <text:span", content_as_string)
-        content_as_string = re.sub(r">\s+<text:line-break/>\s+<", "><text:line-break/><", content_as_string)
-
-        return content_as_string

@@ -20,7 +20,7 @@ def test_create_container_as_xml():
     container_xml = content_writer.create_container_as_xml(os.path.join("EPUB", "content.opf"))
 
     document_as_string_expected = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
   <rootfiles>
     <rootfile full-path="EPUB/content.opf" media-type="application/oebps-package+xml"/>
@@ -29,7 +29,8 @@ def test_create_container_as_xml():
 """
 
     document_as_string_expected = document_as_string_expected.lstrip()
-    document_as_string = lxml.etree.tostring(container_xml, encoding = "utf-8", pretty_print = True, xml_declaration = True).decode("utf-8")
+    document_as_string = lxml.etree.tostring(container_xml,
+        doctype = "<?xml version=\"1.0\" encoding=\"utf-8\"?>", encoding = "utf-8", pretty_print = True).decode("utf-8")
 
     assert document_as_string == document_as_string_expected
 
@@ -58,7 +59,7 @@ def test_convert_package_document_to_xml():
     package_document_as_xml = content_writer.convert_package_document_to_xml(package_document)
 
     document_as_string_expected = """
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="document-identifier">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:identifier id="document-identifier">my-document-identifier</dc:identifier>
@@ -82,6 +83,7 @@ def test_convert_package_document_to_xml():
 """
 
     document_as_string_expected = document_as_string_expected.lstrip()
-    document_as_string = lxml.etree.tostring(package_document_as_xml, encoding = "utf-8", pretty_print = True, xml_declaration = True).decode("utf-8")
+    document_as_string = lxml.etree.tostring(package_document_as_xml,
+        doctype = "<?xml version=\"1.0\" encoding=\"utf-8\"?>", encoding = "utf-8", pretty_print = True).decode("utf-8")
 
     assert document_as_string == document_as_string_expected

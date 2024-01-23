@@ -152,6 +152,9 @@ class OdtReader:
             if tag not in ( "a", "h", "p", "span", "line-break" ):
                 raise ValueError("Unsupported text tag: '%s'" % tag)
 
+            if tag == "line-break":
+                all_text_elements[-1].line_break = True
+
             if current_xml_element.text is not None:
                 if tag in ( "h", "p" ):
                     text_element = TextElement(current_xml_element.text.strip())

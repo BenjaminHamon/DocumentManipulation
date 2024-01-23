@@ -17,7 +17,6 @@ class OdtBuilder:
 
     def __init__(self, xml_document_base: lxml.etree._ElementTree) -> None:
         self._xml_document = xml_document_base
-        self.heading_prefix_style: Optional[str] = None
 
 
     def get_xml_document(self) -> lxml.etree._ElementTree:
@@ -42,12 +41,8 @@ class OdtBuilder:
     def add_heading(self, heading_element: HeadingElement) -> None:
         heading_as_xml = self._create_text_xml_element(None, "h", heading_element.style_collection, None)
 
-        for text_index, text_element in enumerate(heading_element.enumerate_text()):
+        for text_element in heading_element.enumerate_text():
             self.add_text(heading_as_xml, text_element)
-
-            if text_index == 0 and self.heading_prefix_style is not None:
-                if self.heading_prefix_style in text_element.style_collection:
-                    self._create_line_break_element(heading_as_xml)
 
 
     def add_paragraph(self, paragraph_element: ParagraphElement) -> None:
@@ -59,6 +54,8 @@ class OdtBuilder:
 
     def add_text(self, paragraph_as_xml: lxml.etree._Element, text_element: TextElement) -> None:
         self._create_text_xml_element(paragraph_as_xml, "span", text_element.style_collection, text_element.text)
+        if text_element.line_break:
+            self._create_line_break_element(paragraph_as_xml)
 
 
     def _create_text_xml_element(self,

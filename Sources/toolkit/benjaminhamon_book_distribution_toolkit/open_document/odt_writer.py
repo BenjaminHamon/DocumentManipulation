@@ -25,7 +25,6 @@ class OdtWriter:
 
         self.pretty_print = True
         self.encoding = "utf-8"
-        self.heading_prefix_style: Optional[str] = None
 
 
     def write_to_file(self, output_file_path: str, document: lxml.etree._ElementTree, flat_odt: bool = False, simulate: bool = False) -> None:
@@ -41,7 +40,6 @@ class OdtWriter:
         if self.pretty_print:
             document_as_xml_string = self._collapse_body_elements(document_as_xml_string)
         document_as_xml_string = re.sub(r"/text:span>\s*<text:span", "/text:span> <text:span", document_as_xml_string)
-        document_as_xml_string = re.sub(r">\s+<text:line-break/>\s+<", "><text:line-break/><", document_as_xml_string)
 
         if flat_odt:
             if not simulate:
@@ -61,7 +59,6 @@ class OdtWriter:
             template_file_path: Optional[str] = None, flat_odt: bool = False, simulate: bool = False) -> None:
 
         odt_builder = OdtBuilder(self._create_document(template_file_path))
-        odt_builder.heading_prefix_style = self.heading_prefix_style
         odt_builder.add_content(document_content)
 
         self.write_to_file(output_file_path, odt_builder.get_xml_document(), flat_odt = flat_odt, simulate = simulate)
@@ -77,7 +74,6 @@ class OdtWriter:
             title = section.get_heading().get_title()
 
             odt_builder = OdtBuilder(self._create_document(template_file_path))
-            odt_builder.heading_prefix_style = self.heading_prefix_style
             odt_builder.add_section(section)
 
             file_name = document_operations.generate_section_file_name(title, section_index, section_count)

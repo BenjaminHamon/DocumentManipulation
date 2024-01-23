@@ -73,6 +73,7 @@ class OdtReader:
         odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
 
         self._strip_comments(odt_as_xml)
+        self._strip_layout_elements(odt_as_xml)
 
         body_as_xml = xpath_helpers.find_xml_element(odt_as_xml, "office:body/office:text", odt_as_xml.nsmap)
         text_elements = xpath_helpers.try_find_xml_element_collection(body_as_xml, "//*[self::text:h or self::text:p]", odt_as_xml.nsmap)
@@ -99,12 +100,22 @@ class OdtReader:
 
 
     def _strip_comments(self, odt_as_xml: lxml.etree._Element) -> None:
-        comment_tags = [
+        element_tags = [
             lxml.etree.QName(odt_as_xml.nsmap["office"], "annotation"),
             lxml.etree.QName(odt_as_xml.nsmap["office"], "annotation-end"),
         ]
 
-        lxml.etree.strip_elements(odt_as_xml, *comment_tags, with_tail = False)
+        lxml.etree.strip_elements(odt_as_xml, *element_tags, with_tail = False)
+
+
+    def _strip_layout_elements(self, odt_as_xml: lxml.etree._Element) -> None:
+        element_tags = [
+            lxml.etree.QName(odt_as_xml.nsmap["text"], "s"),
+            lxml.etree.QName(odt_as_xml.nsmap["text"], "soft-page-break"),
+        ]
+
+        lxml.etree.strip_elements(odt_as_xml, *element_tags, with_tail = False)
+
 
 
     def _convert_section_element(self, section_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> SectionElement:
@@ -138,7 +149,7 @@ class OdtReader:
         for current_xml_element in text_as_xml.iter(None):
             tag = lxml.etree.QName(current_xml_element).localname
 
-            if tag not in ( "a", "h", "s", "p", "span", "line-break", "soft-page-break" ):
+            if tag not in ( "a", "h", "p", "span", "line-break" ):
                 raise ValueError("Unsupported text tag: '%s'" % tag)
 
             if current_xml_element.text is not None:
@@ -155,13 +166,6 @@ class OdtReader:
                 if tag in ( "a", "h", "p", "span", "line-break" ):
                     text_element = TextElement(current_xml_element.tail.strip())
                     all_text_elements.append(text_element)
-
-                if tag in ( "soft-page-break" ):
-                    if len(all_text_elements) == 0:
-                        text_element = TextElement(current_xml_element.tail.strip())
-                        all_text_elements.append(text_element)
-                    else:
-                        all_text_elements[-1].text += " " + current_xml_element.tail.strip()
 
         return all_text_elements
 

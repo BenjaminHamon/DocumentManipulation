@@ -181,15 +181,17 @@ def test_read_content_from_clean_fodt():
     assert text_elements[0].style_collection == []
 
 
-def test_read_content_from_original_fodt():
+def test_read_content_with_soft_page_breaks():
     fodt_data = """
 <?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>Chapter 1<text:line-break/>The first chapter</text:h>
-      <text:p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum lectus ut nisi faucibus dapibus. Integer tincidunt ante dui. Phasellus ullamcorper metus diam, a lobortis lacus sollicitudin ut. In euismod malesuada orci nec viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vehicula ac arcu imperdiet auctor. Nullam lobortis nec urna vitae feugiat. Nulla metus sem, vehicula in lorem sit amet, interdum ultrices leo. Vivamus at posuere ligula. In fringilla laoreet tellus maximus feugiat. Donec rutrum magna ut tempus accumsan. Vivamus condimentum lacus id magna elementum, a malesuada mauris volutpat. In et purus vel justo ultricies ornare id vitae mi. Etiam bibendum eros ut ligula facilisis, eu vulputate dui aliquam. Phasellus nulla sem, blandit vitae est non, posuere luctus enim.</text:p>
-      <text:p><text:soft-page-break/>Cras eget neque semper, cursus eros at, bibendum nisl. Morbi accumsan nunc pellentesque, pharetra ipsum vel, convallis libero. Morbi condimentum hendrerit congue. <text:soft-page-break/>Ut facilisis dolor et lorem facilisis, sagittis lacinia nibh tempor. Nam imperdiet fermentum sem sit amet porttitor. In consectetur vehicula imperdiet. Aliquam eleifend turpis vitae tincidunt fringilla.</text:p>
+      <text:h>The Section</text:h>
+      <text:p>Some text with a soft page break <text:soft-page-break/>somewhere.</text:p>
+      <text:p>Some text with a soft page break inside-<text:soft-page-break/>dashes.</text:p>
+      <text:p><text:soft-page-break/>Some text with a soft page break at the start.</text:p>
+      <text:p><text:span text:style-name="span-style"><text:soft-page-break/>Some text with a soft page break at the start and a span with a style.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -206,8 +208,8 @@ def test_read_content_from_original_fodt():
 
     section = next(document_content.enumerate_sections())
 
-    assert section.get_heading().get_title() == "Chapter 1 - The first chapter"
-    assert sum(1 for _ in section.enumerate_paragraphs()) == 2
+    assert section.get_heading().get_title() == "The Section"
+    assert sum(1 for _ in section.enumerate_paragraphs()) == 4
     assert sum(1 for _ in section.enumerate_subsections()) == 0
 
     all_paragraphs = list(section.enumerate_paragraphs())
@@ -216,12 +218,26 @@ def test_read_content_from_original_fodt():
     text_elements = list(paragraph.enumerate_text())
 
     assert len(text_elements) == 1
-    assert text_elements[0].text == "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum lectus ut nisi faucibus dapibus. Integer tincidunt ante dui. Phasellus ullamcorper metus diam, a lobortis lacus sollicitudin ut. In euismod malesuada orci nec viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vehicula ac arcu imperdiet auctor. Nullam lobortis nec urna vitae feugiat. Nulla metus sem, vehicula in lorem sit amet, interdum ultrices leo. Vivamus at posuere ligula. In fringilla laoreet tellus maximus feugiat. Donec rutrum magna ut tempus accumsan. Vivamus condimentum lacus id magna elementum, a malesuada mauris volutpat. In et purus vel justo ultricies ornare id vitae mi. Etiam bibendum eros ut ligula facilisis, eu vulputate dui aliquam. Phasellus nulla sem, blandit vitae est non, posuere luctus enim."
+    assert text_elements[0].text == "Some text with a soft page break somewhere."
     assert text_elements[0].style_collection == []
 
     paragraph = all_paragraphs[1]
     text_elements = list(paragraph.enumerate_text())
 
     assert len(text_elements) == 1
-    assert text_elements[0].text == "Cras eget neque semper, cursus eros at, bibendum nisl. Morbi accumsan nunc pellentesque, pharetra ipsum vel, convallis libero. Morbi condimentum hendrerit congue. Ut facilisis dolor et lorem facilisis, sagittis lacinia nibh tempor. Nam imperdiet fermentum sem sit amet porttitor. In consectetur vehicula imperdiet. Aliquam eleifend turpis vitae tincidunt fringilla."
+    assert text_elements[0].text == "Some text with a soft page break inside-dashes."
     assert text_elements[0].style_collection == []
+
+    paragraph = all_paragraphs[2]
+    text_elements = list(paragraph.enumerate_text())
+
+    assert len(text_elements) == 1
+    assert text_elements[0].text == "Some text with a soft page break at the start."
+    assert text_elements[0].style_collection == []
+
+    paragraph = all_paragraphs[3]
+    text_elements = list(paragraph.enumerate_text())
+
+    assert len(text_elements) == 1
+    assert text_elements[0].text == "Some text with a soft page break at the start and a span with a style."
+    assert text_elements[0].style_collection == [ "span-style" ]

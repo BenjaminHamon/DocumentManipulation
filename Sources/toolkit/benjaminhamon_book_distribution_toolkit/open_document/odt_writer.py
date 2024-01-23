@@ -38,7 +38,9 @@ class OdtWriter:
         }
 
         document_as_xml_string = lxml.etree.tostring(document, **write_options).decode(self.encoding)
-        document_as_xml_string = re.sub(r"/text:span>\s+<text:span", "/text:span> <text:span", document_as_xml_string)
+        if self.pretty_print:
+            document_as_xml_string = self._collapse_body_elements(document_as_xml_string)
+        document_as_xml_string = re.sub(r"/text:span>\s*<text:span", "/text:span> <text:span", document_as_xml_string)
         document_as_xml_string = re.sub(r">\s+<text:line-break/>\s+<", "><text:line-break/><", document_as_xml_string)
 
         if flat_odt:
@@ -88,3 +90,37 @@ class OdtWriter:
         if template_file_path is None:
             return odt_operations.create_document()
         return odt_operations.load_document(self._xml_parser, template_file_path)
+
+
+    def _collapse_body_elements(self, document_as_xml_string) -> str:
+        document_as_xml_string_fixed = ""
+        is_body = False
+        is_paragraph = False
+
+        line: str
+        for line in document_as_xml_string.splitlines():
+            line_stripped = line.strip()
+
+            if line_stripped == "<office:body>":
+                is_body = True
+            if line_stripped == "</office:body>":
+                is_body = False
+
+            if is_body:
+                if (line_stripped.startswith("<text:h") or line_stripped.startswith("<text:p")) and not line_stripped.endswith("/>"):
+                    document_as_xml_string_fixed += line
+                    is_paragraph = True
+                    continue
+
+                if (line_stripped.startswith("</text:h") or line_stripped.startswith("</text:p")):
+                    document_as_xml_string_fixed += line_stripped + "\n"
+                    is_paragraph = False
+                    continue
+
+                if is_paragraph:
+                    document_as_xml_string_fixed += line_stripped
+                    continue
+
+            document_as_xml_string_fixed += line + "\n"
+
+        return document_as_xml_string_fixed

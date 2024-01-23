@@ -61,24 +61,12 @@ def test_write_as_single_document_to_fodt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -109,24 +97,12 @@ def test_write_as_single_document_to_odt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -185,15 +161,9 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -215,15 +185,9 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -258,15 +222,9 @@ def test_write_as_many_documents_to_odt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -288,15 +246,9 @@ def test_write_as_many_documents_to_odt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -362,9 +314,7 @@ def test_write_heading_with_prefix(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span text:style-name="Heading prefix">Section 1</text:span><text:line-break/><text:span>The first section</text:span>
-      </text:h>
+      <text:h><text:span text:style-name="Heading prefix">Section 1</text:span><text:line-break/><text:span>The first section</text:span></text:h>
     </office:text>
   </office:body>
 </office:document>

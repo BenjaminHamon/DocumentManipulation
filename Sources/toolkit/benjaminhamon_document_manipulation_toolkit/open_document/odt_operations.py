@@ -22,6 +22,17 @@ def create_document() -> lxml.etree._ElementTree:
 
 
 def load_document(xml_parser: lxml.etree.XMLParser, template_file_path: str) -> lxml.etree._ElementTree:
+    document = load_document_raw(xml_parser, template_file_path)
+
+    body_text_element = get_body_text_element(document)
+    if body_text_element.text is not None:
+        if body_text_element.text == "" or body_text_element.text.isspace():
+            body_text_element.text = None
+
+    return document
+
+
+def load_document_raw(xml_parser: lxml.etree.XMLParser, template_file_path: str) -> lxml.etree._ElementTree:
     if template_file_path.endswith(".fodt"):
         return lxml.etree.parse(template_file_path, xml_parser)
 

@@ -136,6 +136,119 @@ def test_write_as_single_document_to_fodt_with_comments(tmpdir):
     assert actual_content == expected_content
 
 
+def test_write_as_single_document_to_fodt_with_template(tmpdir):
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
+
+    document = create_generic_document()
+    template_file_path = os.path.join(tmpdir, "Working", "Template.fodt")
+    fodt_file_path = os.path.join(tmpdir, "Working", "MyDocument.fodt")
+
+    template_content = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:meta>
+    <meta:user-defined meta:name="Language">English</meta:user-defined>
+  </office:meta>
+  <office:body>
+    <office:text/>
+  </office:body>
+</office:document>
+"""
+
+    template_content = template_content.lstrip()
+
+    os.makedirs(os.path.dirname(fodt_file_path))
+    with open(template_file_path, mode = "w", encoding = "utf-8") as template_file:
+        template_file.write(template_content)
+    odt_writer.write_as_single_document(fodt_file_path, document, [], template_file_path, flat_odt = True, simulate = False)
+
+    assert os.path.exists(fodt_file_path)
+
+    with open(fodt_file_path, mode = "r", encoding = "utf-8") as odt_file:
+        actual_content = odt_file.read()
+
+    expected_content = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:meta>
+    <meta:user-defined meta:name="Language">English</meta:user-defined>
+  </office:meta>
+  <office:body>
+    <office:text>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
+    </office:text>
+  </office:body>
+</office:document>
+"""
+
+    expected_content = expected_content.lstrip()
+
+    assert actual_content == expected_content
+
+
+def test_write_as_single_document_to_fodt_with_template_and_whitespace(tmpdir):
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
+
+    document = create_generic_document()
+    template_file_path = os.path.join(tmpdir, "Working", "Template.fodt")
+    fodt_file_path = os.path.join(tmpdir, "Working", "MyDocument.fodt")
+
+    template_content = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:meta>
+    <meta:user-defined meta:name="Language">English</meta:user-defined>
+  </office:meta>
+  <office:body>
+    <office:text>
+    </office:text>
+  </office:body>
+</office:document>
+"""
+
+    template_content = template_content.lstrip()
+
+    os.makedirs(os.path.dirname(fodt_file_path))
+    with open(template_file_path, mode = "w", encoding = "utf-8") as template_file:
+        template_file.write(template_content)
+    odt_writer.write_as_single_document(fodt_file_path, document, [], template_file_path, flat_odt = True, simulate = False)
+
+    assert os.path.exists(fodt_file_path)
+
+    with open(fodt_file_path, mode = "r", encoding = "utf-8") as odt_file:
+        actual_content = odt_file.read()
+
+    expected_content = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:meta>
+    <meta:user-defined meta:name="Language">English</meta:user-defined>
+  </office:meta>
+  <office:body>
+    <office:text>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
+    </office:text>
+  </office:body>
+</office:document>
+"""
+
+    expected_content = expected_content.lstrip()
+
+    assert actual_content == expected_content
+
+
 def test_write_as_single_document_to_odt(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
     odt_writer = OdtWriter(xml_parser)

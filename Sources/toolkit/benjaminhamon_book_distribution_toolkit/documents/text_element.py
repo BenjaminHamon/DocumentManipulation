@@ -8,3 +8,4 @@ class TextElement(DocumentElement):
         super().__init__()
 
         self.text: str = text
+        self.line_break: bool = False

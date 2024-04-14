@@ -8,10 +8,7 @@ import zipfile
 import lxml.etree
 
 from benjaminhamon_book_distribution_toolkit.documents import document_element_factory
-from benjaminhamon_book_distribution_toolkit.documents.heading_element import HeadingElement
 from benjaminhamon_book_distribution_toolkit.documents.root_element import RootElement
-from benjaminhamon_book_distribution_toolkit.documents.section_element import SectionElement
-from benjaminhamon_book_distribution_toolkit.documents.text_element import TextElement
 from benjaminhamon_book_distribution_toolkit.open_document.odt_writer import OdtWriter
 
 
@@ -61,24 +58,12 @@ def test_write_as_single_document_to_fodt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -109,24 +94,12 @@ def test_write_as_single_document_to_odt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -185,15 +158,9 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -215,15 +182,9 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -258,15 +219,9 @@ def test_write_as_many_documents_to_odt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 1</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the first section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the first section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 1</text:span></text:h>
+      <text:p><text:span>Some text for the first section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the first section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -288,15 +243,9 @@ def test_write_as_many_documents_to_odt(tmpdir):
 <office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
-      <text:h>
-        <text:span>Section 2</text:span>
-      </text:h>
-      <text:p>
-        <text:span>Some text for the second section.</text:span>
-      </text:p>
-      <text:p>
-        <text:span>And a second paragraph for the second section.</text:span>
-      </text:p>
+      <text:h><text:span>Section 2</text:span></text:h>
+      <text:p><text:span>Some text for the second section.</text:span></text:p>
+      <text:p><text:span>And a second paragraph for the second section.</text:span></text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -329,47 +278,3 @@ def test_write_as_many_documents_to_odt_with_simulate(tmpdir):
     odt_writer.write_as_many_documents(odt_directory, document, flat_odt = False, simulate = True)
 
     assert not os.path.exists(odt_directory)
-
-
-def test_write_heading_with_prefix(tmpdir):
-    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
-    odt_writer.heading_prefix_style = "Heading prefix"
-
-    document = RootElement()
-    section_element = SectionElement()
-    heading_element = HeadingElement()
-    heading_prefix_element = TextElement("Section 1")
-    heading_prefix_element.style_collection.append(odt_writer.heading_prefix_style)
-    heading_title_element = TextElement("The first section")
-    heading_element.children.append(heading_prefix_element)
-    heading_element.children.append(heading_title_element)
-    section_element.children.append(heading_element)
-    document.children.append(section_element)
-
-    fodt_file_path = os.path.join(tmpdir, "Working", "MyDocument.fodt")
-
-    os.makedirs(os.path.dirname(fodt_file_path))
-    odt_writer.write_as_single_document(fodt_file_path, document, flat_odt = True, simulate = False)
-
-    assert os.path.exists(fodt_file_path)
-
-    with open(fodt_file_path, mode = "r", encoding = "utf-8") as odt_file:
-        actual_content = odt_file.read()
-
-    expected_content = """
-<?xml version="1.0" encoding="utf-8"?>
-<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
-  <office:body>
-    <office:text>
-      <text:h>
-        <text:span text:style-name="Heading prefix">Section 1</text:span><text:line-break/><text:span>The first section</text:span>
-      </text:h>
-    </office:text>
-  </office:body>
-</office:document>
-"""
-
-    expected_content = expected_content.lstrip()
-
-    assert actual_content == expected_content

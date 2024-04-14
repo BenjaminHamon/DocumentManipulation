@@ -150,7 +150,7 @@ def test_read_content_from_clean_fodt():
     </office:text>
   </office:body>
 </office:document>
-    """
+"""
 
     fodt_data = fodt_data.lstrip().encode("utf-8")
 

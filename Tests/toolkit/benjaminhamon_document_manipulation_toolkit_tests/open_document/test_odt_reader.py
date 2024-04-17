@@ -300,3 +300,31 @@ def test_read_content_with_comments():
     assert isinstance(paragraph.children[2], TextElement)
     assert paragraph.children[2].text == "After the comment."
     assert paragraph.children[2].style_collection == []
+
+
+def test_read_comments():
+    fodt_data = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:body>
+    <office:text>
+      <text:h>The Section</text:h>
+      <text:p>Before the comment. <office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p><text:span>Some comment.</text:span></text:p><text:p><text:span>More text in the comment.</text:span></text:p></office:annotation>Inside the comment.</text:p>
+      <text:p>Inside the comment again. <office:annotation-end office:name="__Annotation__123"/>After the comment.</text:p>
+    </office:text>
+  </office:body>
+</office:document>
+    """
+
+    fodt_data = fodt_data.lstrip().encode("utf-8")
+
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_reader = OdtReader(xml_parser)
+
+    document_comments = odt_reader.read_comments(fodt_data)
+
+    assert len(document_comments) == 1
+    assert document_comments[0].region_identifier == "__Annotation__123"
+    assert document_comments[0].author == "Benjamin Hamon"
+    assert document_comments[0].date == datetime.datetime(2020, 1, 1)
+    assert document_comments[0].text == "Some comment.\nMore text in the comment."

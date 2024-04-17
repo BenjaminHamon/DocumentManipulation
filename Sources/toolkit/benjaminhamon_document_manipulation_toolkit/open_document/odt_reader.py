@@ -7,6 +7,7 @@ import zipfile
 import dateutil.parser
 import lxml.etree
 
+from benjaminhamon_document_manipulation_toolkit.documents.document_comment import DocumentComment
 from benjaminhamon_document_manipulation_toolkit.documents.document_element import DocumentElement
 from benjaminhamon_document_manipulation_toolkit.documents.heading_element import HeadingElement
 from benjaminhamon_document_manipulation_toolkit.documents.paragraph_element import ParagraphElement
@@ -102,6 +103,19 @@ class OdtReader:
         return root_element
 
 
+    def read_comments(self, odt_as_bytes: bytes) -> List[DocumentComment]:
+        odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
+
+        body_as_xml = xpath_helpers.find_xml_element(odt_as_xml, "office:body/office:text", odt_as_xml.nsmap)
+        all_annotation_elements = xpath_helpers.try_find_xml_element_collection(body_as_xml, "//*[self::office:annotation]", odt_as_xml.nsmap)
+
+        all_comments: List[DocumentComment] = []
+        for element in all_annotation_elements:
+            all_comments.append(self._convert_comment_element(element, odt_as_xml.nsmap))
+
+        return all_comments
+
+
     def _strip_annotation_data(self, odt_as_xml: lxml.etree._Element) -> None:
         all_annotation_elements = xpath_helpers.try_find_xml_element_collection(
             odt_as_xml, "//*[self::office:annotation or self::office:annotation-end]", odt_as_xml.nsmap)
@@ -138,6 +152,28 @@ class OdtReader:
         paragraph_element.children.extend(self._get_text(paragraph_as_xml, namespaces))
 
         return paragraph_element
+
+
+    def _convert_comment_element(self, comment_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> DocumentComment:
+        location_identifier = self._get_location_identifier_from_element(comment_as_xml, namespaces)
+
+        creator_element = xpath_helpers.find_xml_element(comment_as_xml, "./dc:creator", namespaces)
+        if creator_element.text is None:
+            raise ValueError("Creator element is empty")
+        author = creator_element.text
+
+        date_element = xpath_helpers.find_xml_element(comment_as_xml, "./dc:date", namespaces)
+        if date_element.text is None:
+            raise ValueError("Date element is empty")
+        date = dateutil.parser.parse(date_element.text).replace(microsecond = 0)
+
+        text = ""
+        all_text_elements = xpath_helpers.try_find_xml_element_collection(comment_as_xml, "./text:p", namespaces)
+        for text_element in all_text_elements:
+            text += "".join(str(x) for x in text_element.itertext() if x is not None) + "\n"
+        text = text.strip()
+
+        return DocumentComment(location_identifier, author, date, text)
 
 
     def _get_text(self, text_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> List[DocumentElement]:

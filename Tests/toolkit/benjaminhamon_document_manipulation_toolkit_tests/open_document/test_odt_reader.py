@@ -8,6 +8,9 @@ import os
 
 import lxml.etree
 
+from benjaminhamon_document_manipulation_toolkit.documents.text_element import TextElement
+from benjaminhamon_document_manipulation_toolkit.documents.text_region_end_element import TextRegionEndElement
+from benjaminhamon_document_manipulation_toolkit.documents.text_region_start_element import TextRegionStartElement
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
 
 
@@ -275,15 +278,25 @@ def test_read_content_with_comments():
     all_paragraphs = list(section.enumerate_paragraphs())
 
     paragraph = all_paragraphs[0]
-    text_elements = list(paragraph.enumerate_text())
 
-    assert len(text_elements) == 1
-    assert text_elements[0].text == "Before the comment. Inside the comment."
-    assert text_elements[0].style_collection == []
+    assert len(paragraph.children) == 3
+    assert isinstance(paragraph.children[0], TextElement)
+    assert paragraph.children[0].text == "Before the comment."
+    assert paragraph.children[0].style_collection == []
+    assert isinstance(paragraph.children[1], TextRegionStartElement)
+    assert paragraph.children[1].identifier == "__Annotation__123"
+    assert isinstance(paragraph.children[2], TextElement)
+    assert paragraph.children[2].text == "Inside the comment."
+    assert paragraph.children[2].style_collection == []
 
     paragraph = all_paragraphs[1]
-    text_elements = list(paragraph.enumerate_text())
 
-    assert len(text_elements) == 1
-    assert text_elements[0].text == "Inside the comment again. After the comment."
-    assert text_elements[0].style_collection == []
+    assert len(paragraph.children) == 3
+    assert isinstance(paragraph.children[0], TextElement)
+    assert paragraph.children[0].text == "Inside the comment again."
+    assert paragraph.children[0].style_collection == []
+    assert isinstance(paragraph.children[1], TextRegionEndElement)
+    assert paragraph.children[1].identifier == "__Annotation__123"
+    assert isinstance(paragraph.children[2], TextElement)
+    assert paragraph.children[2].text == "After the comment."
+    assert paragraph.children[2].style_collection == []

@@ -7,11 +7,14 @@ import zipfile
 import dateutil.parser
 import lxml.etree
 
+from benjaminhamon_document_manipulation_toolkit.documents.document_element import DocumentElement
 from benjaminhamon_document_manipulation_toolkit.documents.heading_element import HeadingElement
 from benjaminhamon_document_manipulation_toolkit.documents.paragraph_element import ParagraphElement
 from benjaminhamon_document_manipulation_toolkit.documents.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.documents.section_element import SectionElement
 from benjaminhamon_document_manipulation_toolkit.documents.text_element import TextElement
+from benjaminhamon_document_manipulation_toolkit.documents.text_region_end_element import TextRegionEndElement
+from benjaminhamon_document_manipulation_toolkit.documents.text_region_start_element import TextRegionStartElement
 from benjaminhamon_document_manipulation_toolkit.xml import xpath_helpers
 
 
@@ -72,7 +75,7 @@ class OdtReader:
     def read_content(self, odt_as_bytes: bytes) -> RootElement:
         odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
 
-        self._strip_comments(odt_as_xml)
+        self._strip_annotation_data(odt_as_xml)
         self._strip_layout_elements(odt_as_xml)
 
         body_as_xml = xpath_helpers.find_xml_element(odt_as_xml, "office:body/office:text", odt_as_xml.nsmap)
@@ -99,13 +102,13 @@ class OdtReader:
         return root_element
 
 
-    def _strip_comments(self, odt_as_xml: lxml.etree._Element) -> None:
-        element_tags = [
-            lxml.etree.QName(odt_as_xml.nsmap["office"], "annotation"),
-            lxml.etree.QName(odt_as_xml.nsmap["office"], "annotation-end"),
-        ]
+    def _strip_annotation_data(self, odt_as_xml: lxml.etree._Element) -> None:
+        all_annotation_elements = xpath_helpers.try_find_xml_element_collection(
+            odt_as_xml, "//*[self::office:annotation or self::office:annotation-end]", odt_as_xml.nsmap)
 
-        lxml.etree.strip_elements(odt_as_xml, *element_tags, with_tail = False)
+        for annotation_element in all_annotation_elements:
+            for annotation_element_child in list(annotation_element):
+                annotation_element.remove(annotation_element_child)
 
 
     def _strip_layout_elements(self, odt_as_xml: lxml.etree._Element) -> None:
@@ -115,7 +118,6 @@ class OdtReader:
         ]
 
         lxml.etree.strip_elements(odt_as_xml, *element_tags, with_tail = False)
-
 
 
     def _convert_section_element(self, section_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> SectionElement:
@@ -138,37 +140,51 @@ class OdtReader:
         return paragraph_element
 
 
-    def _get_text(self, text_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> List[TextElement]:
+    def _get_text(self, text_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> List[DocumentElement]:
 
         # A text XML element from an ODT document will directly contain raw text,
         # but it may also contain child elements such as spans and breaks, and then raw text as tails.
         # e.g. <p>text <span>italic</span> text</p> or <p>text <soft-page-break/>text</p>
 
-        all_text_elements: List[TextElement] = []
+        all_text_elements: List[DocumentElement] = []
+        previous_text_element: Optional[TextElement] = None
 
         for current_xml_element in text_as_xml.iter(None):
             tag = lxml.etree.QName(current_xml_element).localname
 
-            if tag not in ( "a", "h", "p", "span", "line-break" ):
+            if tag not in ( "a", "h", "p", "span", "line-break", "annotation", "annotation-end" ):
                 raise ValueError("Unsupported text tag: '%s'" % tag)
 
-            if tag == "line-break":
-                all_text_elements[-1].line_break = True
+            if tag == "line-break" and previous_text_element is not None:
+                previous_text_element.line_break = True
 
             if current_xml_element.text is not None:
                 if tag in ( "h", "p" ):
                     text_element = TextElement(current_xml_element.text.strip())
                     all_text_elements.append(text_element)
+                    previous_text_element = text_element
 
                 if tag in ( "a", "span" ):
                     text_element = TextElement(current_xml_element.text.strip())
                     text_element.style_collection = self._get_styles_from_element(current_xml_element, namespaces)
                     all_text_elements.append(text_element)
+                    previous_text_element = text_element
+
+            if tag in ( "annotation", "annotation-end"):
+                comment_identifier = self._get_location_identifier_from_element(current_xml_element, namespaces)
+
+                if tag == "annotation":
+                    text_location_element = TextRegionStartElement(comment_identifier)
+                    all_text_elements.append(text_location_element)
+
+                if tag == "annotation-end":
+                    text_location_element = TextRegionEndElement(comment_identifier)
+                    all_text_elements.append(text_location_element)
 
             if current_xml_element.tail is not None and not current_xml_element.tail.isspace():
-                if tag in ( "a", "h", "p", "span", "line-break" ):
-                    text_element = TextElement(current_xml_element.tail.strip())
-                    all_text_elements.append(text_element)
+                text_element = TextElement(current_xml_element.tail.strip())
+                all_text_elements.append(text_element)
+                previous_text_element = text_element
 
         return all_text_elements
 
@@ -182,3 +198,11 @@ class OdtReader:
             style_collection.append(str(odt_style).replace("_20_", " ")) # Spaces in style names are stored as "_20_"
 
         return style_collection
+
+
+    def _get_location_identifier_from_element(self, element_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> str:
+        comment_identifier_attribute_key = lxml.etree.QName(namespaces["office"], "name")
+        comment_identifier = element_as_xml.attrib.get(str(comment_identifier_attribute_key))
+        if comment_identifier is None:
+            raise ValueError("Annotation element is missing an identifier attribute (office:name)")
+        return str(comment_identifier)

@@ -17,13 +17,13 @@ def run_setup() -> None:
     project_configuration = automation_helpers.load_project_configuration(workspace_directory)
 
     setuptools.setup(
-		name = "benjaminhamon-book-distribution-toolkit",
-		description = "Toolkit and scripts for distributing books",
+		name = "benjaminhamon-document-manipulation-toolkit",
+		description = "Toolkit and scripts for manipulating text documents",
         version = project_configuration["ProjectVersionFull"],
         author = project_configuration["Author"],
         author_email = project_configuration["AuthorEmail"],
         url = project_configuration["ProjectUrl"],
-        packages = setuptools.find_packages(include = [ "benjaminhamon_book_distribution_toolkit", "benjaminhamon_book_distribution_toolkit.*" ]),
+        packages = setuptools.find_packages(include = [ "benjaminhamon_document_manipulation_toolkit", "benjaminhamon_document_manipulation_toolkit.*" ]),
         python_requires = "~= 3.9",
 
         install_requires = [

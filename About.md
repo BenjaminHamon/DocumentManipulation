@@ -1,1 +1,1 @@
-This project is open source software. The source code is available on [GitHub](https://github.com/BenjaminHamon/BookDistribution), under the [MIT license](https://github.com/BenjaminHamon/BookDistribution/blob/develop/license.txt).
+This project is open source software. The source code is available on [GitHub](https://github.com/BenjaminHamon/DocumentManipulation), under the [MIT license](https://github.com/BenjaminHamon/BookDistribution/blob/develop/license.txt).

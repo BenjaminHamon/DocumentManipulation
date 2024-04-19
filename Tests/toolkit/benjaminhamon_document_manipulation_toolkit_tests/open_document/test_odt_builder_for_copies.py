@@ -36,7 +36,7 @@ def test_add_copies():
     new_document_as_string = lxml.etree.tostring(new_document, pretty_print = True).decode("utf-8").strip()
 
     expected = """
-<office:document xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
       <draw:frame draw:name="image-1" text:anchor-type="page" text:anchor-page-number="1"/>

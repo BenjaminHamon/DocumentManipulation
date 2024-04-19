@@ -9,6 +9,7 @@ from benjaminhamon_document_manipulation_toolkit.xml import xpath_helpers
 
 def create_document() -> lxml.etree._ElementTree:
     namespaces = {
+        "dc": odt_namespaces.dc_namespace,
         "draw": odt_namespaces.draw_namespace,
         "office": odt_namespaces.office_namespace,
         "text": odt_namespaces.text_namespace,

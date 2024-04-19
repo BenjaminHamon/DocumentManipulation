@@ -108,7 +108,11 @@ class OdtBuilder:
                     self._add_annotation_xml(parent, child, comment)
 
             if isinstance(child, TextRegionEndElement):
-                self._add_annotation_end_xml(parent, child)
+                if child.identifier is None:
+                    raise ValueError("Region element must have an identifier")
+                comment = comment_collection.get(child.identifier)
+                if comment is not None:
+                    self._add_annotation_end_xml(parent, child)
 
         return parent
 
@@ -149,7 +153,8 @@ class OdtBuilder:
             raise ValueError("Region element must have an identifier")
 
         attributes: Dict[str,str] = {}
-        attributes[str(lxml.etree.QName(namespaces["office"], "name"))] = region_start_element.identifier
+        if region_start_element.identifier.startswith("__Annotation__"):
+            attributes[str(lxml.etree.QName(namespaces["office"], "name"))] = region_start_element.identifier
         annotation_xml = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["office"], "annotation"), attrib = attributes)
 
         lxml.etree.SubElement(annotation_xml, lxml.etree.QName(namespaces["dc"], "creator")).text = comment.author

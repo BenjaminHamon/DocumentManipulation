@@ -24,6 +24,7 @@ class OdtReader:
 
     def __init__(self, xml_parser: lxml.etree.XMLParser) -> None:
         self._xml_parser = xml_parser
+        self._region_counter: int = 0
 
 
     def read_fodt(self, odt_file_path: str) -> bytes:
@@ -74,6 +75,8 @@ class OdtReader:
 
 
     def read_content(self, odt_as_bytes: bytes) -> RootElement:
+        self._region_counter = 0
+
         odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
 
         self._strip_annotation_data(odt_as_xml)
@@ -104,6 +107,8 @@ class OdtReader:
 
 
     def read_comments(self, odt_as_bytes: bytes) -> List[DocumentComment]:
+        self._region_counter = 0
+
         odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
 
         body_as_xml = xpath_helpers.find_xml_element(odt_as_xml, "office:body/office:text", odt_as_xml.nsmap)
@@ -155,7 +160,7 @@ class OdtReader:
 
 
     def _convert_comment_element(self, comment_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> DocumentComment:
-        location_identifier = self._get_location_identifier_from_element(comment_as_xml, namespaces)
+        region_identifier = self._get_region_identifier_from_element(comment_as_xml, namespaces)
 
         creator_element = xpath_helpers.find_xml_element(comment_as_xml, "./dc:creator", namespaces)
         if creator_element.text is None:
@@ -173,7 +178,9 @@ class OdtReader:
             text += "".join(str(x) for x in text_element.itertext() if x is not None) + "\n"
         text = text.strip()
 
-        return DocumentComment(location_identifier, author, date, text)
+        self._region_counter += 1
+
+        return DocumentComment(region_identifier, author, date, text)
 
 
     def _get_text(self, text_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> List[DocumentElement]:
@@ -207,14 +214,15 @@ class OdtReader:
                     previous_text_element = text_element
 
             if tag in ( "annotation", "annotation-end"):
-                comment_identifier = self._get_location_identifier_from_element(current_xml_element, namespaces)
+                region_identifier = self._get_region_identifier_from_element(current_xml_element, namespaces)
 
                 if tag == "annotation":
-                    text_location_element = TextRegionStartElement(comment_identifier)
+                    text_location_element = TextRegionStartElement(region_identifier)
                     all_text_elements.append(text_location_element)
+                    self._region_counter += 1
 
                 if tag == "annotation-end":
-                    text_location_element = TextRegionEndElement(comment_identifier)
+                    text_location_element = TextRegionEndElement(region_identifier)
                     all_text_elements.append(text_location_element)
 
             if current_xml_element.tail is not None and not current_xml_element.tail.isspace():
@@ -236,9 +244,9 @@ class OdtReader:
         return style_collection
 
 
-    def _get_location_identifier_from_element(self, element_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> str:
-        comment_identifier_attribute_key = lxml.etree.QName(namespaces["office"], "name")
-        comment_identifier = element_as_xml.attrib.get(str(comment_identifier_attribute_key))
-        if comment_identifier is None:
-            raise ValueError("Annotation element is missing an identifier attribute (office:name)")
-        return str(comment_identifier)
+    def _get_region_identifier_from_element(self, element_as_xml: lxml.etree._Element, namespaces: Dict[Optional[str], str]) -> str:
+        region_identifier_attribute_key = lxml.etree.QName(namespaces["office"], "name")
+        region_identifier = element_as_xml.attrib.get(str(region_identifier_attribute_key))
+        if region_identifier is not None:
+            return str(region_identifier)
+        return "AnnotationWithoutName_" + str(self._region_counter)

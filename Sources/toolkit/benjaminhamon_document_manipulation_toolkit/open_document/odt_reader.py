@@ -203,12 +203,12 @@ class OdtReader:
 
             if current_xml_element.text is not None:
                 if tag in ( "h", "p" ):
-                    text_element = TextElement(current_xml_element.text.strip())
+                    text_element = TextElement(current_xml_element.text)
                     all_text_elements.append(text_element)
                     previous_text_element = text_element
 
                 if tag in ( "a", "span" ):
-                    text_element = TextElement(current_xml_element.text.strip())
+                    text_element = TextElement(current_xml_element.text)
                     text_element.style_collection = self._get_styles_from_element(current_xml_element, namespaces)
                     all_text_elements.append(text_element)
                     previous_text_element = text_element
@@ -226,7 +226,7 @@ class OdtReader:
                     all_text_elements.append(text_location_element)
 
             if current_xml_element.tail is not None and not current_xml_element.tail.isspace():
-                text_element = TextElement(current_xml_element.tail.strip())
+                text_element = TextElement(current_xml_element.tail)
                 all_text_elements.append(text_element)
                 previous_text_element = text_element
 

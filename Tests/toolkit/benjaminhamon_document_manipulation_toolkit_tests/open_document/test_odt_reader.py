@@ -95,7 +95,7 @@ def test_read_content_from_simple_fodt():
     text_elements = list(paragraph.enumerate_text())
 
     assert len(text_elements) == 3
-    assert text_elements[0].text == "This is a sentence with"
+    assert text_elements[0].text == "This is a sentence with "
     assert text_elements[0].style_collection == []
     assert text_elements[1].text == "emphasis"
     assert text_elements[1].style_collection == [ "Emphasis" ]
@@ -124,7 +124,7 @@ def test_read_content_from_simple_odt():
     text_elements = list(paragraph.enumerate_text())
 
     assert len(text_elements) == 3
-    assert text_elements[0].text == "This is a sentence with"
+    assert text_elements[0].text == "This is a sentence with "
     assert text_elements[0].style_collection == []
     assert text_elements[1].text == "emphasis"
     assert text_elements[1].style_collection == [ "Emphasis" ]
@@ -254,7 +254,7 @@ def test_read_content_with_comments():
     <office:text>
       <text:h>The Section</text:h>
       <text:p>Before the comment. <office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p>Some comment</text:p></office:annotation>Inside the comment.</text:p>
-      <text:p>Inside the comment again. <office:annotation-end office:name="__Annotation__123"/>After the comment.</text:p>
+      <text:p>Inside the comment again.<office:annotation-end office:name="__Annotation__123"/> After the comment.</text:p>
     </office:text>
   </office:body>
 </office:document>
@@ -281,7 +281,7 @@ def test_read_content_with_comments():
 
     assert len(paragraph.children) == 3
     assert isinstance(paragraph.children[0], TextElement)
-    assert paragraph.children[0].text == "Before the comment."
+    assert paragraph.children[0].text == "Before the comment. "
     assert paragraph.children[0].style_collection == []
     assert isinstance(paragraph.children[1], TextRegionStartElement)
     assert paragraph.children[1].identifier == "__Annotation__123"
@@ -298,7 +298,7 @@ def test_read_content_with_comments():
     assert isinstance(paragraph.children[1], TextRegionEndElement)
     assert paragraph.children[1].identifier == "__Annotation__123"
     assert isinstance(paragraph.children[2], TextElement)
-    assert paragraph.children[2].text == "After the comment."
+    assert paragraph.children[2].text == " After the comment."
     assert paragraph.children[2].style_collection == []
 
 
@@ -310,7 +310,7 @@ def test_read_comments():
     <office:text>
       <text:h>The Section</text:h>
       <text:p>Before the comment. <office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p><text:span>Some comment.</text:span></text:p><text:p><text:span>More text in the comment.</text:span></text:p></office:annotation>Inside the comment.</text:p>
-      <text:p>Inside the comment again. <office:annotation-end office:name="__Annotation__123"/>After the comment.</text:p>
+      <text:p>Inside the comment again.<office:annotation-end office:name="__Annotation__123"/> After the comment.</text:p>
     </office:text>
   </office:body>
 </office:document>

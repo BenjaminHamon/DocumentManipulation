@@ -453,3 +453,59 @@ def test_write_as_many_documents_to_odt_with_simulate(tmpdir):
     odt_writer.write_as_many_documents(odt_directory, document, [], flat_odt = False, simulate = True)
 
     assert not os.path.exists(odt_directory)
+
+
+def test_collapse_body_elements():
+    document = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:body>
+    <office:text>
+      <text:h>
+        <text:span>The Section</text:span>
+      </text:h>
+      <text:p>
+        <text:span>This paragraph has </text:span>
+        <text:span text:style-name="a_style">styled text</text:span>
+        <text:span> in the middle.</text:span>
+      </text:p>
+      <text:p>
+        <text:span>This paragraph has </text:span>
+        <office:annotation office:name="__Annotation__123">
+          <dc:creator>Benjamin Hamon</dc:creator>
+          <dc:date>2020-01-01T00:00:00</dc:date>
+          <text:p>Here is the comment.</text:p>
+          <text:p>And a second paragraph in the comment.</text:p>
+        </office:annotation>
+        <text:span>some of its text commented</text:span>
+        <office:annotation-end office:name="__Annotation__123"/>
+        <text:span> and then more text.</text:span>
+      </text:p>
+    </office:text>
+  </office:body>
+</office:document>
+"""
+
+    document = document.lstrip()
+
+    document_formatted_expected = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:body>
+    <office:text>
+      <text:h><text:span>The Section</text:span></text:h>
+      <text:p><text:span>This paragraph has </text:span><text:span text:style-name="a_style">styled text</text:span><text:span> in the middle.</text:span></text:p>
+      <text:p><text:span>This paragraph has </text:span><office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p>Here is the comment.</text:p><text:p>And a second paragraph in the comment.</text:p></office:annotation><text:span>some of its text commented</text:span><office:annotation-end office:name="__Annotation__123"/><text:span> and then more text.</text:span></text:p>
+    </office:text>
+  </office:body>
+</office:document>
+"""
+
+    document_formatted_expected = document_formatted_expected.lstrip()
+
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_writer = OdtWriter(xml_parser)
+
+    document_formatted_actual = odt_writer._collapse_body_elements(document) # pylint: disable = protected-access
+
+    assert document_formatted_actual == document_formatted_expected

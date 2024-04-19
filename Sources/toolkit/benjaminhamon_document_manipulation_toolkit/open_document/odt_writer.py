@@ -2,7 +2,6 @@
 
 import logging
 import os
-import re
 from typing import List, Optional
 import zipfile
 
@@ -40,7 +39,6 @@ class OdtWriter:
         document_as_xml_string = lxml.etree.tostring(document, **write_options).decode(self.encoding)
         if self.pretty_print:
             document_as_xml_string = self._collapse_body_elements(document_as_xml_string)
-        document_as_xml_string = re.sub(r"/text:span>\s*<text:span", "/text:span> <text:span", document_as_xml_string)
 
         if flat_odt:
             if not simulate:

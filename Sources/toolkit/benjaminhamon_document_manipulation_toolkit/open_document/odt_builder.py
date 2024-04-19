@@ -1,10 +1,11 @@
 # cspell:words lxml nsmap
 
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import lxml.etree
 
 from benjaminhamon_document_manipulation_toolkit.documents.document_comment import DocumentComment
+from benjaminhamon_document_manipulation_toolkit.documents.document_element import DocumentElement
 from benjaminhamon_document_manipulation_toolkit.documents.heading_element import HeadingElement
 from benjaminhamon_document_manipulation_toolkit.documents.paragraph_element import ParagraphElement
 from benjaminhamon_document_manipulation_toolkit.documents.root_element import RootElement
@@ -42,71 +43,105 @@ class OdtBuilder:
 
 
     def add_heading(self, heading_element: HeadingElement, comment_collection: Dict[str,DocumentComment]) -> None:
-        heading_as_xml = self._create_text_xml_element(None, "h", heading_element.style_collection, None)
-
-        for child in heading_element.children:
-            if isinstance(child, TextElement):
-                self.add_text(heading_as_xml, child)
-            if isinstance(child, TextRegionStartElement):
-                comment = self._get_comment_for_region(child, comment_collection)
-                self._create_annotation_xml_element(heading_as_xml, child, comment)
-            if isinstance(child, TextRegionEndElement):
-                self._create_annotation_end_xml_element(heading_as_xml, child)
+        self._add_heading_xml(odt_operations.get_body_text_element(self._xml_document), heading_element, comment_collection)
 
 
     def add_paragraph(self, paragraph_element: ParagraphElement, comment_collection: Dict[str,DocumentComment]) -> None:
-        paragraph_as_xml = self._create_text_xml_element(None, "p", paragraph_element.style_collection, None)
-
-        for child in paragraph_element.children:
-            if isinstance(child, TextElement):
-                self.add_text(paragraph_as_xml, child)
-            if isinstance(child, TextRegionStartElement):
-                comment = self._get_comment_for_region(child, comment_collection)
-                self._create_annotation_xml_element(paragraph_as_xml, child, comment)
-            if isinstance(child, TextRegionEndElement):
-                self._create_annotation_end_xml_element(paragraph_as_xml, child)
+        self._add_paragraph_xml(odt_operations.get_body_text_element(self._xml_document), paragraph_element, comment_collection)
 
 
-    def add_text(self, paragraph_as_xml: lxml.etree._Element, text_element: TextElement) -> None:
-        self._create_text_xml_element(paragraph_as_xml, "span", text_element.style_collection, text_element.text)
-        if text_element.line_break:
-            self._create_line_break_element(paragraph_as_xml)
-
-
-    def _create_text_xml_element(self,
-            parent: Optional[lxml.etree._Element], tag: str, style_collection: List[str], text: Optional[str]) -> lxml.etree._Element:
+    def _add_heading_xml(self,
+            parent: lxml.etree._Element, heading_element: HeadingElement, comment_collection: Dict[str,DocumentComment]) -> lxml.etree._Element:
 
         namespaces = self._xml_document.getroot().nsmap
-
-        if parent is None:
-            parent = odt_operations.get_body_text_element(self._xml_document)
 
         attributes: Dict[str,str] = {}
-        if len(style_collection) > 1:
-            raise ValueError("Too many styles")
-        if len(style_collection) == 1:
-            attributes[str(lxml.etree.QName(namespaces["text"], "style-name"))] = style_collection[0]
 
-        element = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["text"], tag), attrib = attributes)
-        element.text = text
+        style = self._get_style_from_document_element(heading_element)
+        if style is not None:
+            attributes[str(lxml.etree.QName(namespaces["text"], "style-name"))] = style
 
-        return element
+        heading_xml = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["text"], "h"), attrib = attributes)
+        self._add_text_elements_xml(heading_xml, heading_element, comment_collection)
+
+        return heading_xml
 
 
-    def _create_line_break_element(self, parent: Optional[lxml.etree._Element]) -> lxml.etree._Element:
+    def _add_paragraph_xml(self,
+            parent: lxml.etree._Element, paragraph_element: ParagraphElement, comment_collection: Dict[str,DocumentComment]) -> lxml.etree._Element:
+
         namespaces = self._xml_document.getroot().nsmap
 
-        if parent is None:
-            parent = odt_operations.get_body_text_element(self._xml_document)
+        attributes: Dict[str,str] = {}
+
+        style = self._get_style_from_document_element(paragraph_element)
+        if style is not None:
+            attributes[str(lxml.etree.QName(namespaces["text"], "style-name"))] = style
+
+        paragraph_xml = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["text"], "p"), attrib = attributes)
+        self._add_text_elements_xml(paragraph_xml, paragraph_element, comment_collection)
+
+        return paragraph_xml
+
+
+    def _add_paragraph_xml_from_str(self, parent: lxml.etree._Element, text: str) -> lxml.etree._Element:
+        namespaces = self._xml_document.getroot().nsmap
+
+        paragraph_xml = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["text"], "p"))
+        paragraph_xml.text = text
+
+        return paragraph_xml
+
+
+    def _add_text_elements_xml(self,
+            parent: lxml.etree._Element, document_element: DocumentElement, comment_collection: Dict[str,DocumentComment]) -> lxml.etree._Element:
+
+        for child in document_element.children:
+            if isinstance(child, TextElement):
+                self._add_span_xml(parent, child)
+
+            if isinstance(child, TextRegionStartElement):
+                if child.identifier is None:
+                    raise ValueError("Region element must have an identifier")
+                comment = comment_collection.get(child.identifier)
+                if comment is not None:
+                    self._add_annotation_xml(parent, child, comment)
+
+            if isinstance(child, TextRegionEndElement):
+                self._add_annotation_end_xml(parent, child)
+
+        return parent
+
+
+    def _add_span_xml(self, parent: lxml.etree._Element, text_element: TextElement) -> lxml.etree._Element:
+        namespaces = self._xml_document.getroot().nsmap
+
+        attributes: Dict[str,str] = {}
+
+        style = self._get_style_from_document_element(text_element)
+        if style is not None:
+            attributes[str(lxml.etree.QName(namespaces["text"], "style-name"))] = style
+
+        span_xml = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["text"], "span"), attrib = attributes)
+        span_xml.text = text_element.text
+
+        if text_element.line_break:
+            self._add_line_break_xml(parent)
+
+        return span_xml
+
+
+    def _add_line_break_xml(self, parent: lxml.etree._Element) -> lxml.etree._Element:
+        namespaces = self._xml_document.getroot().nsmap
 
         tag = lxml.etree.QName(namespaces["text"], "line-break")
-        element = lxml.etree.SubElement(parent, tag)
+        line_break_xml = lxml.etree.SubElement(parent, tag)
 
-        return element
+        return line_break_xml
 
 
-    def _create_annotation_xml_element(self,
-            paragraph_as_xml: lxml.etree._Element, region_start_element: TextRegionStartElement, comment: DocumentComment) -> None:
+    def _add_annotation_xml(self,
+            parent: lxml.etree._Element, region_start_element: TextRegionStartElement, comment: DocumentComment) -> lxml.etree._Element:
 
         namespaces = self._xml_document.getroot().nsmap
 
@@ -115,16 +150,18 @@ class OdtBuilder:
 
         attributes: Dict[str,str] = {}
         attributes[str(lxml.etree.QName(namespaces["office"], "name"))] = region_start_element.identifier
-        comment_as_xml = lxml.etree.SubElement(paragraph_as_xml, lxml.etree.QName(namespaces["office"], "annotation"), attrib = attributes)
+        annotation_xml = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["office"], "annotation"), attrib = attributes)
 
-        lxml.etree.SubElement(comment_as_xml, lxml.etree.QName(namespaces["dc"], "creator")).text = comment.author
-        lxml.etree.SubElement(comment_as_xml, lxml.etree.QName(namespaces["dc"], "date")).text = comment.date.isoformat()
+        lxml.etree.SubElement(annotation_xml, lxml.etree.QName(namespaces["dc"], "creator")).text = comment.author
+        lxml.etree.SubElement(annotation_xml, lxml.etree.QName(namespaces["dc"], "date")).text = comment.date.isoformat()
 
         for text_paragraph in comment.text.splitlines():
-            self._create_text_xml_element(comment_as_xml, "p", [], text_paragraph)
+            self._add_paragraph_xml_from_str(annotation_xml, text_paragraph)
+
+        return annotation_xml
 
 
-    def _create_annotation_end_xml_element(self, paragraph_as_xml: lxml.etree._Element, region_end_element: TextRegionEndElement) -> None:
+    def _add_annotation_end_xml(self, parent: lxml.etree._Element, region_end_element: TextRegionEndElement) -> lxml.etree._Element:
         namespaces = self._xml_document.getroot().nsmap
 
         if region_end_element.identifier is None:
@@ -132,10 +169,14 @@ class OdtBuilder:
 
         attributes: Dict[str,str] = {}
         attributes[str(lxml.etree.QName(namespaces["office"], "name"))] = region_end_element.identifier
-        lxml.etree.SubElement(paragraph_as_xml, lxml.etree.QName(namespaces["office"], "annotation-end"), attrib = attributes)
+        annotation_end_xml = lxml.etree.SubElement(parent, lxml.etree.QName(namespaces["office"], "annotation-end"), attrib = attributes)
+
+        return annotation_end_xml
 
 
-    def _get_comment_for_region(self, region_start_element: TextRegionStartElement, comment_collection: Dict[str,DocumentComment]) -> DocumentComment:
-        if region_start_element.identifier is None:
-            raise ValueError("Region element must have an identifier")
-        return comment_collection[region_start_element.identifier]
+    def _get_style_from_document_element(self, document_element: DocumentElement) -> Optional[str]:
+        if len(document_element.style_collection) > 1:
+            raise ValueError("Too many styles")
+        if len(document_element.style_collection) == 1:
+            return document_element.style_collection[0]
+        return None

@@ -88,14 +88,15 @@ class OdtWriter:
         return odt_operations.load_document(self._xml_parser, template_file_path)
 
 
-    def _collapse_body_elements(self, document_as_xml_string) -> str:
+    def _collapse_body_elements(self, document_as_xml_string: str, indent_for_collapsing: int = 6) -> str:
         document_as_xml_string_fixed = ""
         is_body = False
-        is_paragraph = False
+        is_collapsing = False
 
         line: str
         for line in document_as_xml_string.splitlines():
             line_stripped = line.strip()
+            indent = len(line) - len(line.lstrip())
 
             if line_stripped == "<office:body>":
                 is_body = True
@@ -103,17 +104,18 @@ class OdtWriter:
                 is_body = False
 
             if is_body:
-                if (line_stripped.startswith("<text:h") or line_stripped.startswith("<text:p")) and not line_stripped.endswith("/>"):
-                    document_as_xml_string_fixed += line
-                    is_paragraph = True
-                    continue
+                if indent == indent_for_collapsing:
+                    if (line_stripped.startswith("<text:h") or line_stripped.startswith("<text:p")) and not line_stripped.endswith("/>"):
+                        document_as_xml_string_fixed += line
+                        is_collapsing = True
+                        continue
 
-                if (line_stripped.startswith("</text:h") or line_stripped.startswith("</text:p")):
-                    document_as_xml_string_fixed += line_stripped + "\n"
-                    is_paragraph = False
-                    continue
+                    if (line_stripped.startswith("</text:h") or line_stripped.startswith("</text:p")):
+                        document_as_xml_string_fixed += line_stripped + "\n"
+                        is_collapsing = False
+                        continue
 
-                if is_paragraph:
+                if is_collapsing:
                     document_as_xml_string_fixed += line_stripped
                     continue
 

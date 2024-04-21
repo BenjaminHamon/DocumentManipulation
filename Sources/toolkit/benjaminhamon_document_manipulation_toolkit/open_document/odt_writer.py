@@ -3,12 +3,13 @@
 import logging
 import os
 import re
-from typing import Optional
+from typing import List, Optional
 import zipfile
 
 import lxml.etree
 
 from benjaminhamon_document_manipulation_toolkit.documents import document_operations
+from benjaminhamon_document_manipulation_toolkit.documents.document_comment import DocumentComment
 from benjaminhamon_document_manipulation_toolkit.documents.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.open_document import odt_operations
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_builder import OdtBuilder
@@ -55,26 +56,29 @@ class OdtWriter:
 
 
     def write_as_single_document(self, # pylint: disable = too-many-arguments
-            output_file_path: str, document_content: RootElement,
+            output_file_path: str, document_content: RootElement, document_comments: List[DocumentComment],
             template_file_path: Optional[str] = None, flat_odt: bool = False, simulate: bool = False) -> None:
 
+        document_comments_as_dictionary = { comment.region_identifier: comment for comment in document_comments }
+
         odt_builder = OdtBuilder(self._create_document(template_file_path))
-        odt_builder.add_content(document_content)
+        odt_builder.add_content(document_content, document_comments_as_dictionary)
 
         self.write_to_file(output_file_path, odt_builder.get_xml_document(), flat_odt = flat_odt, simulate = simulate)
 
 
     def write_as_many_documents(self, # pylint: disable = too-many-arguments
-            output_directory: str, document_content: RootElement,
+            output_directory: str, document_content: RootElement, document_comments: List[DocumentComment],
             template_file_path: Optional[str] = None, flat_odt: bool = False, simulate: bool = False) -> None:
 
+        document_comments_as_dictionary = { comment.region_identifier: comment for comment in document_comments }
         section_count = document_content.get_section_count()
 
         for section_index, section in enumerate(document_content.enumerate_sections()):
             title = section.get_heading().get_title()
 
             odt_builder = OdtBuilder(self._create_document(template_file_path))
-            odt_builder.add_section(section)
+            odt_builder.add_section(section, document_comments_as_dictionary)
 
             file_name = document_operations.generate_section_file_name(title, section_index, section_count)
             odt_file_path = os.path.join(output_directory, file_name + (".fodt" if flat_odt else ".odt"))
@@ -88,14 +92,15 @@ class OdtWriter:
         return odt_operations.load_document(self._xml_parser, template_file_path)
 
 
-    def _collapse_body_elements(self, document_as_xml_string) -> str:
+    def _collapse_body_elements(self, document_as_xml_string: str, indent_for_collapsing: int = 6) -> str:
         document_as_xml_string_fixed = ""
         is_body = False
-        is_paragraph = False
+        is_collapsing = False
 
         line: str
         for line in document_as_xml_string.splitlines():
             line_stripped = line.strip()
+            indent = len(line) - len(line.lstrip())
 
             if line_stripped == "<office:body>":
                 is_body = True
@@ -103,17 +108,18 @@ class OdtWriter:
                 is_body = False
 
             if is_body:
-                if (line_stripped.startswith("<text:h") or line_stripped.startswith("<text:p")) and not line_stripped.endswith("/>"):
-                    document_as_xml_string_fixed += line
-                    is_paragraph = True
-                    continue
+                if indent == indent_for_collapsing:
+                    if (line_stripped.startswith("<text:h") or line_stripped.startswith("<text:p")) and not line_stripped.endswith("/>"):
+                        document_as_xml_string_fixed += line
+                        is_collapsing = True
+                        continue
 
-                if (line_stripped.startswith("</text:h") or line_stripped.startswith("</text:p")):
-                    document_as_xml_string_fixed += line_stripped + "\n"
-                    is_paragraph = False
-                    continue
+                    if (line_stripped.startswith("</text:h") or line_stripped.startswith("</text:p")):
+                        document_as_xml_string_fixed += line_stripped + "\n"
+                        is_collapsing = False
+                        continue
 
-                if is_paragraph:
+                if is_collapsing:
                     document_as_xml_string_fixed += line_stripped
                     continue
 

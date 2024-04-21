@@ -8,6 +8,9 @@ import os
 
 import lxml.etree
 
+from benjaminhamon_document_manipulation_toolkit.documents.text_element import TextElement
+from benjaminhamon_document_manipulation_toolkit.documents.text_region_end_element import TextRegionEndElement
+from benjaminhamon_document_manipulation_toolkit.documents.text_region_start_element import TextRegionStartElement
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
 
 
@@ -241,3 +244,87 @@ def test_read_content_with_soft_page_breaks():
     assert len(text_elements) == 1
     assert text_elements[0].text == "Some text with a soft page break at the start and a span with a style."
     assert text_elements[0].style_collection == [ "span-style" ]
+
+
+def test_read_content_with_comments():
+    fodt_data = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:body>
+    <office:text>
+      <text:h>The Section</text:h>
+      <text:p>Before the comment. <office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p>Some comment</text:p></office:annotation>Inside the comment.</text:p>
+      <text:p>Inside the comment again. <office:annotation-end office:name="__Annotation__123"/>After the comment.</text:p>
+    </office:text>
+  </office:body>
+</office:document>
+    """
+
+    fodt_data = fodt_data.lstrip().encode("utf-8")
+
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_reader = OdtReader(xml_parser)
+
+    document_content = odt_reader.read_content(fodt_data)
+
+    assert sum(1 for _ in document_content.enumerate_sections()) == 1
+
+    section = next(document_content.enumerate_sections())
+
+    assert section.get_heading().get_title() == "The Section"
+    assert sum(1 for _ in section.enumerate_paragraphs()) == 2
+    assert sum(1 for _ in section.enumerate_subsections()) == 0
+
+    all_paragraphs = list(section.enumerate_paragraphs())
+
+    paragraph = all_paragraphs[0]
+
+    assert len(paragraph.children) == 3
+    assert isinstance(paragraph.children[0], TextElement)
+    assert paragraph.children[0].text == "Before the comment."
+    assert paragraph.children[0].style_collection == []
+    assert isinstance(paragraph.children[1], TextRegionStartElement)
+    assert paragraph.children[1].identifier == "__Annotation__123"
+    assert isinstance(paragraph.children[2], TextElement)
+    assert paragraph.children[2].text == "Inside the comment."
+    assert paragraph.children[2].style_collection == []
+
+    paragraph = all_paragraphs[1]
+
+    assert len(paragraph.children) == 3
+    assert isinstance(paragraph.children[0], TextElement)
+    assert paragraph.children[0].text == "Inside the comment again."
+    assert paragraph.children[0].style_collection == []
+    assert isinstance(paragraph.children[1], TextRegionEndElement)
+    assert paragraph.children[1].identifier == "__Annotation__123"
+    assert isinstance(paragraph.children[2], TextElement)
+    assert paragraph.children[2].text == "After the comment."
+    assert paragraph.children[2].style_collection == []
+
+
+def test_read_comments():
+    fodt_data = """
+<?xml version="1.0" encoding="utf-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:body>
+    <office:text>
+      <text:h>The Section</text:h>
+      <text:p>Before the comment. <office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p><text:span>Some comment.</text:span></text:p><text:p><text:span>More text in the comment.</text:span></text:p></office:annotation>Inside the comment.</text:p>
+      <text:p>Inside the comment again. <office:annotation-end office:name="__Annotation__123"/>After the comment.</text:p>
+    </office:text>
+  </office:body>
+</office:document>
+    """
+
+    fodt_data = fodt_data.lstrip().encode("utf-8")
+
+    xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
+    odt_reader = OdtReader(xml_parser)
+
+    document_comments = odt_reader.read_comments(fodt_data)
+
+    assert len(document_comments) == 1
+    assert document_comments[0].region_identifier == "__Annotation__123"
+    assert document_comments[0].author == "Benjamin Hamon"
+    assert document_comments[0].date == datetime.datetime(2020, 1, 1)
+    assert document_comments[0].text == "Some comment.\nMore text in the comment."

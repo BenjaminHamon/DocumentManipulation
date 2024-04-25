@@ -1,6 +1,8 @@
 {
 	"$schema": "./schema.json",
 
+	"isort.args": [ "--settings-file", ".isort.cfg" ],
+
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
 
 	"python.analysis.extraPaths": [ "./Automation/Setup" ],

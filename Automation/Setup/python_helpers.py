@@ -56,11 +56,21 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
 
     run_python_command([ python_system_executable, "-m", "venv", venv_directory ], simulate = simulate)
 
-    if platform.system() in [ "Darwin", "Linux" ] and not os.path.exists(os.path.join(venv_directory, "scripts")) and not simulate:
-        os.symlink("bin", os.path.join(venv_directory, "scripts"))
+    if platform.system() == "Darwin":
+        raise NotImplementedError("MacOS is not supported")
 
-    if os.path.exists("pip.ini") and not simulate:
-        shutil.copy("pip.ini", os.path.join(".venv", "pip.ini"))
+    elif platform.system() == "Linux":
+        if not os.path.exists(os.path.join(venv_directory, "scripts")) and not simulate:
+            os.symlink("bin", os.path.join(venv_directory, "scripts"))
+        if os.path.exists("pip.conf") and not simulate:
+            shutil.copy("pip.conf", os.path.join(".venv", "pip.conf"))
+
+    elif platform.system() == "Windows":
+        if os.path.exists("pip.conf") and not simulate:
+            shutil.copy("pip.conf", os.path.join(".venv", "pip.ini"))
+
+    else:
+        raise NotImplementedError("Unsupported system: '%s'" % platform.system())
 
     install_python_packages(venv_python_executable, [ "pip", "wheel" ], simulate = simulate)
 

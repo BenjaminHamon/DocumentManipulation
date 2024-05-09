@@ -9,11 +9,11 @@ from benjaminhamon_document_manipulation_toolkit.epub.epub_landmark import EpubL
 from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation_item import EpubNavigationItem
 
 
-class EpubNavigationBuilder:
+class EpubNavigationXhtmlBuilder:
 
 
     def __init__(self, title: str) -> None:
-        self._xhtml_document = EpubNavigationBuilder._create_document(title)
+        self._xhtml_document = EpubNavigationXhtmlBuilder._create_document(title)
 
 
     @staticmethod

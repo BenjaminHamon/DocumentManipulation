@@ -42,7 +42,7 @@ def test_convert_package_document_to_xml():
 
     package_document.add_minimal_metadata("my-document-identifier", "My Document Title", "en-US", datetime.datetime(2020, 1, 1))
     package_document.add_metadata_item(EpubMetadataItem("dc:creator", "My Document Author", xhtml_identifier = "author",
-        refine_collection = [ EpubMetadataRefine("role", "aut", "marc:relators") ]))
+        refines = [ EpubMetadataRefine("role", "aut", "marc:relators") ]))
 
 
     package_document.add_manifest_item(

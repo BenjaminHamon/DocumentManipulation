@@ -12,7 +12,7 @@ from benjaminhamon_document_manipulation_toolkit.epub import epub_xhtml_helpers
 from benjaminhamon_document_manipulation_toolkit.epub.epub_content_writer import EpubContentWriter
 
 
-logger = logging.getLogger("EpubBuilder")
+logger = logging.getLogger("EpubPackageBuilder")
 
 
 class EpubPackageBuilder:

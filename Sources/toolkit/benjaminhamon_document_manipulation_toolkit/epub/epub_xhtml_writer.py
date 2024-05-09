@@ -8,7 +8,7 @@ import lxml.etree
 
 from benjaminhamon_document_manipulation_toolkit.documents import document_operations
 from benjaminhamon_document_manipulation_toolkit.documents.root_element import RootElement
-from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_builder import EpubXhtmlBuilder
+from benjaminhamon_document_manipulation_toolkit.epub.epub_content_xhtml_builder import EpubContentXhtmlBuilder
 
 
 logger = logging.getLogger("EpubXhtmlWriter")
@@ -55,7 +55,7 @@ class EpubXhtmlWriter:
         for section_index, section in enumerate(document_content.enumerate_sections()):
             title = section.get_heading().get_title()
 
-            xhtml_builder = EpubXhtmlBuilder(title, template_file_path)
+            xhtml_builder = EpubContentXhtmlBuilder(title, template_file_path)
             xhtml_builder.add_content_from_section(section)
 
             file_name = document_operations.generate_section_file_name(title, section_index, section_count)

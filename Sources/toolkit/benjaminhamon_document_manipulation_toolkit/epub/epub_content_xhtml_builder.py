@@ -1,3 +1,5 @@
+# cspell:words lxml
+
 from typing import Optional
 
 import lxml.etree
@@ -11,11 +13,11 @@ from benjaminhamon_document_manipulation_toolkit.documents.text_element import T
 from benjaminhamon_document_manipulation_toolkit.epub import epub_xhtml_helpers
 
 
-class EpubXhtmlBuilder:
+class EpubContentXhtmlBuilder:
 
 
     def __init__(self, title: str, template_file_path: Optional[str] = None) -> None:
-        self._xhtml_document = EpubXhtmlBuilder._create_document(title, template_file_path)
+        self._xhtml_document = EpubContentXhtmlBuilder._create_document(title, template_file_path)
 
 
     @staticmethod

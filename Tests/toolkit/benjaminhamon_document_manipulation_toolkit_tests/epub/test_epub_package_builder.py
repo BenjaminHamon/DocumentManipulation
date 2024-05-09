@@ -4,9 +4,11 @@ import os
 import zipfile
 
 from benjaminhamon_document_manipulation_toolkit.epub import epub_xhtml_helpers
+from benjaminhamon_document_manipulation_toolkit.epub.epub_content_configuration import EpubContentConfiguration
 from benjaminhamon_document_manipulation_toolkit.epub.epub_content_writer import EpubContentWriter
+from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation import EpubNavigation
+from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation_item import EpubNavigationItem
 from benjaminhamon_document_manipulation_toolkit.epub.epub_package_builder import EpubPackageBuilder
-from benjaminhamon_document_manipulation_toolkit.epub.epub_package_configuration import EpubPackageConfiguration
 from benjaminhamon_document_manipulation_toolkit.epub.epub_package_document import EpubPackageDocument
 
 
@@ -64,19 +66,28 @@ def test_create_package(tmpdir):
     os.makedirs(source_directory)
     content_writer.write_xml(os.path.join(source_directory, "my_first_section.xhtml"), epub_xhtml_helpers.create_xhtml())
     content_writer.write_xml(os.path.join(source_directory, "my_second_section.xhtml"), epub_xhtml_helpers.create_xhtml())
+    container_file_path = os.path.join(source_directory, "container.xml")
+    package_document_file_path = os.path.join(source_directory, "content.opf")
+    toc_file_path = os.path.join(source_directory, "toc.xhtml")
 
     package_document = EpubPackageDocument()
-    epub_package_configuration = EpubPackageConfiguration(package_document)
+    epub_content_configuration = EpubContentConfiguration()
+    epub_navigation = EpubNavigation(
+        [ EpubNavigationItem("my_first_section.xhtml", "first section"), EpubNavigationItem("my_second_section.xhtml", "second section") ], [])
 
-    epub_package_configuration.content_file_mappings = [
-        (os.path.join(source_directory, "my_first_section.xhtml"), "my_first_section.xhtml"),
-        (os.path.join(source_directory, "my_second_section.xhtml"),"my_second_section.xhtml"),
+    content_writer.write_package_document_file(package_document_file_path, package_document)
+    content_writer.write_navigation_file(toc_file_path, epub_navigation)
+    content_writer.write_container_file(container_file_path, os.path.join("EPUB", "content.opf"))
+
+    epub_content_configuration.file_mappings = [
+        (container_file_path, os.path.join("META-INF", "container.xml")),
+        (package_document_file_path, os.path.join("EPUB", "content.opf")),
+        (os.path.join(source_directory, "my_first_section.xhtml"), os.path.join("EPUB", "my_first_section.xhtml")),
+        (os.path.join(source_directory, "my_second_section.xhtml"),os.path.join("EPUB", "my_second_section.xhtml")),
+        (toc_file_path, os.path.join("EPUB", "toc.xhtml")),
     ]
 
-    content_writer.generate_package_files(source_directory, epub_package_configuration, simulate = False)
-    content_file_mappings = package_builder.load_file_mappings(source_directory)
-
-    package_builder.stage_files(staging_directory, content_file_mappings, simulate = False)
+    package_builder.stage_files(staging_directory, epub_content_configuration.file_mappings, simulate = False)
     package_builder.create_package(package_file_path, staging_directory, simulate = False)
 
     assert os.path.exists(package_file_path)

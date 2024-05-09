@@ -1,20 +1,17 @@
-# cspell:words dcterms idref itemref lxml nsmap oebps opendocument rootfile rootfiles
+# cspell:words idref itemref lxml nsmap oebps rootfile rootfiles
 
 import datetime
 import logging
 import os
-from typing import Any, Dict, List, Tuple
 import urllib.parse
+from typing import Any, Dict, List
 
 import lxml.etree
-import yaml
 
 from benjaminhamon_document_manipulation_toolkit.epub import epub_namespaces
-from benjaminhamon_document_manipulation_toolkit.epub.epub_landmark import EpubLandmark
 from benjaminhamon_document_manipulation_toolkit.epub.epub_metadata_item import EpubMetadataItem
-from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation_builder import EpubNavigationBuilder
-from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation_item import EpubNavigationItem
-from benjaminhamon_document_manipulation_toolkit.epub.epub_package_configuration import EpubPackageConfiguration
+from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation import EpubNavigation
+from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation_xhtml_builder import EpubNavigationXhtmlBuilder
 from benjaminhamon_document_manipulation_toolkit.epub.epub_package_document import EpubPackageDocument
 from benjaminhamon_document_manipulation_toolkit.xml import xml_operations
 
@@ -31,58 +28,26 @@ class EpubContentWriter:
         self.version = "3.0"
 
 
-    def generate_package_files(self,
-            output_directory: str, configuration: EpubPackageConfiguration, simulate: bool = False) -> None:
-
-        container_file_path = os.path.join(output_directory, "container.xml")
-        package_document_file_path = os.path.join(output_directory, "content.opf")
-        file_mapping_listing_file_path = os.path.join(output_directory, "FileMappings.yaml")
-        toc_file_path = os.path.join(output_directory, "toc.xhtml")
-
-        self.generate_package_document(package_document_file_path, configuration.package_document, simulate = simulate)
-        self.generate_file_mapping_listing(file_mapping_listing_file_path, configuration.content_file_mappings, simulate = simulate)
-        self.generate_navigation(toc_file_path, configuration.navigation_items, configuration.landmarks, simulate = simulate)
-        self.generate_container(container_file_path, simulate = simulate)
-
-
-    def generate_package_document(self,
+    def write_package_document_file(self,
             package_document_file_path: str, package_document: EpubPackageDocument, simulate: bool = False) -> None:
 
         package_document_as_xml = self.convert_package_document_to_xml(package_document)
         self.write_xml(package_document_file_path, package_document_as_xml, simulate = simulate)
 
 
-    def generate_file_mapping_listing(self,
-            file_mapping_listing_file_path: str, file_mapping_collection: List[Tuple[str,str]], simulate: bool = False) -> None:
+    def write_navigation_file(self,
+            toc_file_path: str, navigation: EpubNavigation, simulate: bool = False) -> None:
 
-        file_mappings_for_serialization: List[Dict[str,str]] = []
+        xhtml_builder = EpubNavigationXhtmlBuilder("Table of Contents")
+        xhtml_builder.add_table_of_contents(navigation.navigation_items)
+        xhtml_builder.add_landmarks(navigation.landmarks)
 
-        for source, destination in file_mapping_collection:
-            source = os.path.normpath(source).replace("\\", "/")
-            destination = os.path.normpath(destination).replace("\\", "/")
-            file_mappings_for_serialization.append({ "source": source, "destination": destination })
-
-        logger.debug("Writing '%s'", file_mapping_listing_file_path)
-
-        if not simulate:
-            with open(file_mapping_listing_file_path, mode = "w", encoding = "utf-8") as mappings_file:
-                yaml.safe_dump(file_mappings_for_serialization, mappings_file, sort_keys = False)
-
-
-    def generate_navigation(self,
-            toc_file_path: str, item_collection: List[EpubNavigationItem], landmark_collection: List[EpubLandmark], simulate: bool = False) -> None:
-
-        navigation_builder = EpubNavigationBuilder("Table of Contents")
-        navigation_builder.add_table_of_contents(item_collection)
-        navigation_builder.add_landmarks(landmark_collection)
-
-        navigation_document = navigation_builder.get_xhtml_document()
+        navigation_document = xhtml_builder.get_xhtml_document()
 
         self.write_xml(toc_file_path, navigation_document, simulate = simulate)
 
 
-    def generate_container(self, container_file_path: str, simulate: bool = False) -> None:
-        package_document_file_path = os.path.join("EPUB", "content.opf")
+    def write_container_file(self, container_file_path: str, package_document_file_path: str, simulate: bool = False) -> None:
         container_as_xml = self.create_container_as_xml(package_document_file_path)
         self.write_xml(container_file_path, container_as_xml, simulate = simulate)
 
@@ -202,19 +167,20 @@ class EpubContentWriter:
             if metadata_item.xhtml_identifier is not None:
                 entry_as_xml.attrib["id"] = metadata_item.xhtml_identifier
 
-            for refine in metadata_item.refine_collection:
-                if metadata_item.xhtml_identifier is None:
-                    raise ValueError("Metadata refine must target an item with a XHTML identifier")
+            if metadata_item.refines is not None:
+                for refine in metadata_item.refines:
+                    if metadata_item.xhtml_identifier is None:
+                        raise ValueError("Metadata refine must target an item with a XHTML identifier")
 
-                attributes = {
-                    "refines": "#" + metadata_item.xhtml_identifier,
-                    "property": refine.key,
-                }
+                    attributes = {
+                        "refines": "#" + metadata_item.xhtml_identifier,
+                        "property": refine.property,
+                    }
 
-                if refine.scheme is not None:
-                    attributes["scheme"] = refine.scheme
+                    if refine.scheme is not None:
+                        attributes["scheme"] = refine.scheme
 
-                refine_as_xml = lxml.etree.SubElement(metadata_as_xml, "meta", attrib = attributes)
-                refine_as_xml.text = value_to_str(refine.value)
+                    refine_as_xml = lxml.etree.SubElement(metadata_as_xml, "meta", attrib = attributes)
+                    refine_as_xml.text = value_to_str(refine.value)
 
         return metadata_as_xml

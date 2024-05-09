@@ -29,18 +29,16 @@ class EpubContentWriter:
 
 
     def write_package_document_file(self,
-            package_document_file_path: str, package_document: EpubPackageDocument, simulate: bool = False) -> None:
+            package_document_file_path: str, package_document: EpubPackageDocument, reference_base: str, simulate: bool = False) -> None:
 
-        package_document_as_xml = self.convert_package_document_to_xml(package_document)
+        package_document_as_xml = self.convert_package_document_to_xml(package_document, reference_base)
         self.write_xml(package_document_file_path, package_document_as_xml, simulate = simulate)
 
 
-    def write_navigation_file(self,
-            toc_file_path: str, navigation: EpubNavigation, simulate: bool = False) -> None:
-
+    def write_navigation_file(self, toc_file_path: str, navigation: EpubNavigation, reference_base: str, simulate: bool = False) -> None:
         xhtml_builder = EpubNavigationXhtmlBuilder("Table of Contents")
-        xhtml_builder.add_table_of_contents(navigation.navigation_items)
-        xhtml_builder.add_landmarks(navigation.landmarks)
+        xhtml_builder.add_table_of_contents(navigation.navigation_items, reference_base)
+        xhtml_builder.add_landmarks(navigation.landmarks, reference_base)
 
         navigation_document = xhtml_builder.get_xhtml_document()
 
@@ -93,7 +91,7 @@ class EpubContentWriter:
         return lxml.etree.ElementTree(container_element)
 
 
-    def convert_package_document_to_xml(self, package_document: EpubPackageDocument) -> lxml.etree._ElementTree:
+    def convert_package_document_to_xml(self, package_document: EpubPackageDocument, reference_base: str) -> lxml.etree._ElementTree:
         namespaces = {
             None: epub_namespaces.opf_default_namespace,
         }
@@ -102,16 +100,16 @@ class EpubContentWriter:
         package_as_xml.append(self.convert_package_document_metadata_to_xml(package_document.get_metadata_items()))
 
         identifier_item = package_document.get_identifier()
-        if identifier_item is not None:
-            if identifier_item.xhtml_identifier is None:
-                raise ValueError("Metadata dc:identifier must have a XHTML identifier")
+        if identifier_item is not None and identifier_item.xhtml_identifier is not None:
             package_as_xml.attrib["unique-identifier"] = identifier_item.xhtml_identifier
 
         manifest_as_xml = lxml.etree.SubElement(package_as_xml, "manifest")
         for manifest_item in package_document.get_manifest_items():
+            reference_relative = os.path.relpath(manifest_item.reference, reference_base).replace("\\", "/")
+
             attributes = {
                 "id": manifest_item.identifier,
-                "href": urllib.parse.quote(manifest_item.reference.replace("\\", "/")),
+                "href": urllib.parse.quote(reference_relative),
                 "media-type": manifest_item.media_type,
             }
 

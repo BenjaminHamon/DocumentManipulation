@@ -24,7 +24,9 @@ def test_update_xhtml_links(tmpdir):
 <?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
-    <link href="../styles/default.css" rel="stylesheet" type="text/css"/>
+    <link href="https://www.example.com/Styles/Examples.css" rel="stylesheet" type="text/css"/>
+    <link href="../Styles/Generic.css" rel="stylesheet" type="text/css"/>
+    <link href="../Styles/LocalEnvironment.css" rel="stylesheet" type="text/css"/>
   </head>
   <body/>
 </html>
@@ -35,7 +37,10 @@ def test_update_xhtml_links(tmpdir):
         xhtml_file.write(xhtml_file_content_initial.lstrip())
 
     package_builder.update_xhtml_links(
-        staging_directory, [ ("EPUB/content/file.xhtml", "EPUB/content/file.xhtml") ], [ ("EPUB/styles/default.css", "EPUB/styles/final.css") ])
+        staging_directory = staging_directory,
+        content_files = [ ("Sources/Xhtml/File.xhtml", "EPUB/Content/File.xhtml") ],
+        link_mappings = [ ("Sources/Styles/Generic.css", "EPUB/Resources/Generic.css"),
+                           ("Sources/Styles/LocalEnvironment.css", "EPUB/Resources/TargetEnvironment.css") ])
 
     with open(os.path.join(staging_directory, "EPUB", "content", "file.xhtml"), mode = "r", encoding = "utf-8") as xhtml_file:
         xhtml_file_content_final = xhtml_file.read()
@@ -44,7 +49,9 @@ def test_update_xhtml_links(tmpdir):
 <?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
-    <link href="../styles/final.css" rel="stylesheet" type="text/css"/>
+    <link href="https://www.example.com/Styles/Examples.css" rel="stylesheet" type="text/css"/>
+    <link href="../Resources/Generic.css" rel="stylesheet" type="text/css"/>
+    <link href="../Resources/TargetEnvironment.css" rel="stylesheet" type="text/css"/>
   </head>
   <body/>
 </html>
@@ -62,6 +69,9 @@ def test_create_package(tmpdir):
     source_directory = os.path.join(tmpdir, "Sources")
     staging_directory = os.path.join(tmpdir, "Working")
     package_file_path = os.path.join(tmpdir, "Output", "package.epub")
+    container_file_path = os.path.join(source_directory, "container.xml")
+    package_document_file_path = os.path.join(source_directory, "content.opf")
+    toc_file_path = os.path.join(source_directory, "toc.xhtml")
 
     os.makedirs(source_directory)
     content_writer.write_xml(os.path.join(source_directory, "my_first_section.xhtml"), epub_xhtml_helpers.create_xhtml())
@@ -75,8 +85,8 @@ def test_create_package(tmpdir):
     epub_navigation = EpubNavigation(
         [ EpubNavigationItem("my_first_section.xhtml", "first section"), EpubNavigationItem("my_second_section.xhtml", "second section") ], [])
 
-    content_writer.write_package_document_file(package_document_file_path, package_document)
-    content_writer.write_navigation_file(toc_file_path, epub_navigation)
+    content_writer.write_package_document_file(package_document_file_path, package_document, "EPUB")
+    content_writer.write_navigation_file(toc_file_path, epub_navigation, "EPUB")
     content_writer.write_container_file(container_file_path, os.path.join("EPUB", "content.opf"))
 
     epub_content_configuration.file_mappings = [
@@ -90,16 +100,21 @@ def test_create_package(tmpdir):
     package_builder.stage_files(staging_directory, epub_content_configuration.file_mappings, simulate = False)
     package_builder.create_package(package_file_path, staging_directory, simulate = False)
 
+    file_collection_expected = [
+        "EPUB/content.opf",
+        "EPUB/my_first_section.xhtml",
+        "EPUB/my_second_section.xhtml",
+        "EPUB/toc.xhtml",
+        "META-INF/container.xml",
+        "mimetype",
+    ]
+
     assert os.path.exists(package_file_path)
 
     with zipfile.ZipFile(package_file_path, mode = "r") as package_file:
         assert package_file.testzip() is None
 
         file_collection = [ x.filename for x in package_file.filelist ]
+        file_collection.sort()
 
-        assert "EPUB/my_first_section.xhtml" in file_collection
-        assert "EPUB/my_second_section.xhtml" in file_collection
-        assert "EPUB/toc.xhtml" in file_collection
-        assert "EPUB/content.opf" in file_collection
-        assert "META-INF/container.xml" in file_collection
-        assert "mimetype" in file_collection
+        assert file_collection == file_collection_expected

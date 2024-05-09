@@ -40,10 +40,10 @@ def test_convert_package_document_to_xml():
 
     package_document = EpubPackageDocument()
 
-    package_document.add_minimal_metadata("my-document-identifier", "My Document Title", "en-US", datetime.datetime(2020, 1, 1))
+    package_document.add_minimal_metadata("my-document-identifier", "My Document Title", "en-US")
+    package_document.add_modified(datetime.datetime(2020, 1, 1))
     package_document.add_metadata_item(EpubMetadataItem("dc:creator", "My Document Author", xhtml_identifier = "author",
         refines = [ EpubMetadataRefine("role", "aut", "marc:relators") ]))
-
 
     package_document.add_manifest_item(
         EpubManifestItem("toc_xhtml", "toc.xhtml", media_type = "application/xhtml+xml", properties = [ "nav" ]))
@@ -56,7 +56,7 @@ def test_convert_package_document_to_xml():
     package_document.add_spine_item(EpubSpineItem("my_first_section_xhtml"))
     package_document.add_spine_item(EpubSpineItem("my_second_section_xhtml"))
 
-    package_document_as_xml = content_writer.convert_package_document_to_xml(package_document)
+    package_document_as_xml = content_writer.convert_package_document_to_xml(package_document, ".")
 
     document_as_string_expected = """
 <?xml version="1.0" encoding="utf-8"?>

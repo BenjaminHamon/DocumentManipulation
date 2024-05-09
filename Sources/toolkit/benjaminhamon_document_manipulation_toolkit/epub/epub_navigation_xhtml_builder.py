@@ -1,5 +1,6 @@
 # cspell:words lxml nsmap
 
+import os
 from typing import List
 
 import lxml.etree
@@ -31,7 +32,7 @@ class EpubNavigationXhtmlBuilder:
         return self._xhtml_document
 
 
-    def add_table_of_contents(self, item_collection: List[EpubNavigationItem]) -> None:
+    def add_table_of_contents(self, item_collection: List[EpubNavigationItem], reference_base: str) -> None:
         body_element = epub_xhtml_helpers.find_xhtml_element(self._xhtml_document.getroot(), "./x:body")
 
         nav_element = epub_xhtml_helpers.create_xhtml_subelement(body_element, "nav",
@@ -42,11 +43,12 @@ class EpubNavigationXhtmlBuilder:
         list_element = epub_xhtml_helpers.create_xhtml_subelement(nav_element, "ol")
 
         for item in item_collection:
+            reference_relative = os.path.relpath(item.reference, reference_base).replace("\\", "/")
             list_item_element = epub_xhtml_helpers.create_xhtml_subelement(list_element, "li")
-            epub_xhtml_helpers.create_xhtml_subelement(list_item_element, "a", attributes = { "href": item.reference }, text = item.display_name)
+            epub_xhtml_helpers.create_xhtml_subelement(list_item_element, "a", attributes = { "href": reference_relative }, text = item.display_name)
 
 
-    def add_landmarks(self, item_collection: List[EpubLandmark]) -> None:
+    def add_landmarks(self, item_collection: List[EpubLandmark], reference_base: str) -> None:
         body_element = epub_xhtml_helpers.find_xhtml_element(self._xhtml_document.getroot(), "./x:body")
 
         nav_element = epub_xhtml_helpers.create_xhtml_subelement(body_element, "nav",
@@ -57,6 +59,7 @@ class EpubNavigationXhtmlBuilder:
         list_element = epub_xhtml_helpers.create_xhtml_subelement(nav_element, "ol")
 
         for item in item_collection:
+            reference_relative = os.path.relpath(item.reference, reference_base).replace("\\", "/")
             list_item_element = epub_xhtml_helpers.create_xhtml_subelement(list_element, "li")
-            attributes = { lxml.etree.QName(body_element.nsmap["epub"], "type"): item.epub_type, "href": item.reference }
+            attributes = { lxml.etree.QName(body_element.nsmap["epub"], "type"): item.epub_type, "href": reference_relative }
             epub_xhtml_helpers.create_xhtml_subelement(list_item_element, "a", attributes = attributes, text = item.display_name)

@@ -37,12 +37,12 @@ def test_full():
     xhtml_builder.add_table_of_contents([
         EpubNavigationItem("my_first_section.xhtml", "My first section"),
         EpubNavigationItem("my_second_section.xhtml", "My second section"),
-    ])
+    ], ".")
 
     xhtml_builder.add_landmarks([
         EpubLandmark("toc", "toc.xhtml", "Table of Contents"),
         EpubLandmark("bodymatter", "my_first_section.xhtml", "Start of Content"),
-    ])
+    ], ".")
 
 
     document_as_string_expected = """

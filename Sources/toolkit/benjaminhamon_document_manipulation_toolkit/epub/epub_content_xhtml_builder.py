@@ -1,5 +1,6 @@
 # cspell:words lxml
 
+import os
 from typing import Optional
 
 import lxml.etree
@@ -41,6 +42,23 @@ class EpubContentXhtmlBuilder:
 
     def get_xhtml_document(self) -> lxml.etree._ElementTree:
         return self._xhtml_document
+
+
+    def update_links(self, old_path: str, new_path: str) -> None:
+        xml_root = self._xhtml_document.getroot()
+        link_elements = epub_xhtml_helpers.try_find_xhtml_element_collection(xml_root, "//x:link")
+
+        for element in link_elements:
+            link_reference = str(element.attrib["href"])
+            relative_to_cwd = os.path.join(os.path.dirname(old_path), link_reference)
+            relative_to_new_path = os.path.normpath(os.path.relpath(relative_to_cwd, os.path.dirname(new_path)))
+            element.attrib["href"] = relative_to_new_path.replace("\\", "/")
+
+
+    def add_style_sheet(self, relative_css_file_path: str) -> None:
+        head_as_xml = epub_xhtml_helpers.find_xhtml_element(self._xhtml_document.getroot(), "./x:head")
+        attributes = { "href": relative_css_file_path, "rel": "stylesheet", "type": "text/css" }
+        epub_xhtml_helpers.create_xhtml_subelement(head_as_xml, "link", attributes = attributes)
 
 
     def add_content(self, root_element: RootElement) -> None:

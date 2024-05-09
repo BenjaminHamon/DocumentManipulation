@@ -46,16 +46,22 @@ class EpubXhtmlWriter:
         raise NotImplementedError
 
 
-    def write_as_many_documents(self,
+    def write_as_many_documents(self, # pylint: disable = too-many-arguments
             output_directory: str, document_content: RootElement,
-            template_file_path: Optional[str] = None, simulate: bool = False) -> None:
+            template_file_path: Optional[str] = None, css_file_path: Optional[str] = None, simulate: bool = False) -> None:
 
         section_count = document_content.get_section_count()
+        if css_file_path is not None:
+            relative_css_file_path = os.path.relpath(css_file_path, output_directory).replace("\\", "/")
 
         for section_index, section in enumerate(document_content.enumerate_sections()):
             title = section.get_heading().get_title()
 
             xhtml_builder = EpubContentXhtmlBuilder(title, template_file_path)
+            if template_file_path is not None:
+                xhtml_builder.update_links(template_file_path, os.path.join(output_directory, "New.xhtml"))
+            if css_file_path is not None:
+                xhtml_builder.add_style_sheet(relative_css_file_path)
             xhtml_builder.add_content_from_section(section)
 
             file_name = document_operations.generate_section_file_name(title, section_index, section_count)

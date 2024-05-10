@@ -1,7 +1,7 @@
 # cspell:words dcterms
 
 import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from benjaminhamon_document_manipulation_toolkit.epub.epub_manifest_item import EpubManifestItem
 from benjaminhamon_document_manipulation_toolkit.epub.epub_metadata_item import EpubMetadataItem
@@ -33,10 +33,13 @@ class EpubPackageDocument:
         return list(self._spine)
 
 
-    def add_minimal_metadata(self, identifier: str, title: str, language: str, modified: datetime.datetime) -> None:
+    def add_minimal_metadata(self, identifier: str, title: str, language: str) -> None:
         self.add_metadata_item(EpubMetadataItem("dc:identifier", identifier, xhtml_identifier = "document-identifier"))
         self.add_metadata_item(EpubMetadataItem("dc:title", title))
         self.add_metadata_item(EpubMetadataItem("dc:language", language))
+
+
+    def add_modified(self, modified: Union[str,datetime.datetime]) -> None:
         self.add_metadata_item(EpubMetadataItem("dcterms:modified", modified, is_meta = True))
 
 

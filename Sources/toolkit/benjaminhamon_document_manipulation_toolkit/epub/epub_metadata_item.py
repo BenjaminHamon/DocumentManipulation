@@ -10,4 +10,6 @@ class EpubMetadataItem:
     value: Any
     is_meta: bool = False
     xhtml_identifier: Optional[str] = None
-    refine_collection: List[EpubMetadataRefine] = dataclasses.field(default_factory = list)
+    language: Optional[str] = None
+    directionality: Optional[str] = None
+    refines: Optional[List[EpubMetadataRefine]] = None

@@ -4,6 +4,6 @@ from typing import Any, Optional
 
 @dataclasses.dataclass(frozen = True)
 class EpubMetadataRefine:
-    key: str
+    property: str
     value: Any
     scheme: Optional[str] = None

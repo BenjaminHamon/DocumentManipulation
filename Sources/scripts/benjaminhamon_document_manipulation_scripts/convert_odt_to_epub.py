@@ -147,6 +147,7 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
         destination_directory = intermediate_xhtml_section_directory,
         template_file_path = odt_to_epub_configuration.xhtml_section_template_file_path,
         style_sheet_file_path = odt_to_epub_configuration.style_sheet_file_path,
+        style_map_file_path = odt_to_epub_configuration.style_map_file_path,
         section_regex = odt_to_epub_configuration.source_section_regex,
         simulate = simulate)
 

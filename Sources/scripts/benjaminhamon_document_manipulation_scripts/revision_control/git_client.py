@@ -53,7 +53,7 @@ class GitClient(RevisionControlClient):
 
     def get_revision_date(self, revision: str) -> datetime.datetime:
         date_as_string = self.get_revision_property(revision, "committer_date")
-        return datetime.datetime.utcfromtimestamp(int(date_as_string)).replace(tzinfo = datetime.timezone.utc, microsecond = 0)
+        return datetime.datetime.fromtimestamp(int(date_as_string), datetime.timezone.utc).replace(microsecond = 0)
 
 
     def get_revision_property(self, revision: str, property_name: str) -> str:

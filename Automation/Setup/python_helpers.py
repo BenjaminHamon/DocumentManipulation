@@ -56,7 +56,7 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
 
     run_python_command([ python_system_executable, "-m", "venv", venv_directory ], simulate = simulate)
 
-    if platform.system() == "Darwin":
+    if platform.system() == "Darwin": # pylint: disable = no-else-raise
         raise NotImplementedError("MacOS is not supported")
 
     elif platform.system() == "Linux":

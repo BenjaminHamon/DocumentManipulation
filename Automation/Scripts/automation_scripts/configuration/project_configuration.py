@@ -48,6 +48,11 @@ class ProjectConfiguration:
     def list_python_packages(self) -> List[PythonPackage]:
         return [
             PythonPackage(
+                identifier = "benjaminhamon-document-manipulation-application",
+                path_to_sources = os.path.join("Sources", "application"),
+                path_to_tests = os.path.join("Tests", "application")),
+
+            PythonPackage(
                 identifier = "benjaminhamon-document-manipulation-scripts",
                 path_to_sources = os.path.join("Sources", "scripts"),
                 path_to_tests = os.path.join("Tests", "scripts")),

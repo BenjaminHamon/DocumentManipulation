@@ -5,7 +5,12 @@
 
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
 
-	"python.analysis.extraPaths": [ "./Automation/Setup" ],
+	"python.analysis.extraPaths": [
+		"./Automation/Setup",
+		"./Sources/scripts/",
+		"./Sources/toolkit/",
+	],
+
 	"python.analysis.typeCheckingMode": "basic",
 
 	"python.testing.pytestEnabled": true,

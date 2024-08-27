@@ -24,7 +24,7 @@ def main() -> None:
 
 
 def parse_arguments() -> argparse.Namespace:
-    argument_parser = argparse.ArgumentParser(description = "Rewrite an odt file into a lean and clean fodt file")
+    argument_parser = argparse.ArgumentParser(description = "Rewrite an odt file into a lean and clean fodt file.")
     argument_parser.add_argument("--source", required = True, metavar = "<path>", help = "path to the odt or fodt source file")
     argument_parser.add_argument("--destination", required = True, metavar = "<path>", help = "path to the fodt file to write")
     argument_parser.add_argument("--template", metavar = "<path>", help = "path to the fodt file to use as the template")

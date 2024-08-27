@@ -58,6 +58,15 @@ def log_script_information(simulate: bool = False) -> None:
 def list_commands() -> List[str]:
     return [
         "benjaminhamon_document_manipulation_application.commands.info_command.InfoCommand",
+        "benjaminhamon_document_manipulation_application.commands.convert_odt_to_epub_command.ConvertOdtToEpubCommand",
+        "benjaminhamon_document_manipulation_application.commands.convert_odt_to_xhtml_command.ConvertOdtToXhtmlCommand",
+        "benjaminhamon_document_manipulation_application.commands.create_epub_package_command.CreateEpubPackageCommand",
+        "benjaminhamon_document_manipulation_application.commands.generate_epub_files_command.GenerateEpubFilesCommand",
+        "benjaminhamon_document_manipulation_application.commands.generate_information_as_xhtml_command.GenerateInformationAsXhtmlCommand",
+        "benjaminhamon_document_manipulation_application.commands.info_command.InfoCommand",
+        "benjaminhamon_document_manipulation_application.commands.rewrite_odt_command.RewriteOdtCommand",
+        "benjaminhamon_document_manipulation_application.commands.split_odt_command.SplitOdtCommand",
+        "benjaminhamon_document_manipulation_application.commands.stage_files_for_epub_package_command.StageFilesForEpubPackageCommand",
     ]
 
 

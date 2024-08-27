@@ -34,7 +34,7 @@ def parse_arguments() -> argparse.Namespace:
             raise argparse.ArgumentTypeError("invalid key value parameter: '%s'" % argument_value)
         return (key_value[0], key_value[1])
 
-    argument_parser = argparse.ArgumentParser(description = "Generate files for an EPUB package")
+    argument_parser = argparse.ArgumentParser(description = "Stage files for creating an epub package.")
     argument_parser.add_argument("--configuration", required = True, metavar = "<path>", help = "path to the epub content configuration")
     argument_parser.add_argument("--destination", required = True, metavar = "<path>", help = "path to the directory where to create the new files")
     argument_parser.add_argument("--parameters", nargs = "*", type = parse_key_value_parameter, default = [],

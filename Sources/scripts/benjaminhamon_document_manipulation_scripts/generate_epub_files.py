@@ -26,7 +26,7 @@ def main() -> None:
 
 
 def parse_arguments() -> argparse.Namespace:
-    argument_parser = argparse.ArgumentParser(description = "Generate files for an EPUB package")
+    argument_parser = argparse.ArgumentParser(description = "Generate files for an epub package.")
     argument_parser.add_argument("--configuration", required = True, metavar = "<path>", help = "path to the epub configuration")
     argument_parser.add_argument("--destination", required = True, metavar = "<path>", help = "path to the directory where to create the new files")
     argument_parser.add_argument("--overwrite", action = "store_true", help = "overwrite the files if they exist")

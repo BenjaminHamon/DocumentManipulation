@@ -8,13 +8,22 @@ import benjaminhamon_document_manipulation_application
 from benjaminhamon_document_manipulation_application import application_helpers
 from benjaminhamon_document_manipulation_application.application_command import ApplicationCommand
 from benjaminhamon_document_manipulation_application.asyncio_extensions.asyncio_context import AsyncioContext
+from benjaminhamon_document_manipulation_application.commands.convert_odt_to_epub_command import ConvertOdtToEpubCommand
+from benjaminhamon_document_manipulation_application.commands.convert_odt_to_xhtml_command import ConvertOdtToXhtmlCommand
+from benjaminhamon_document_manipulation_application.commands.create_epub_package_command import CreateEpubPackageCommand
+from benjaminhamon_document_manipulation_application.commands.generate_epub_files_command import GenerateEpubFilesCommand
+from benjaminhamon_document_manipulation_application.commands.generate_information_as_xhtml_command import GenerateInformationAsXhtmlCommand
+from benjaminhamon_document_manipulation_application.commands.info_command import InfoCommand
+from benjaminhamon_document_manipulation_application.commands.rewrite_odt_command import RewriteOdtCommand
+from benjaminhamon_document_manipulation_application.commands.split_odt_command import SplitOdtCommand
+from benjaminhamon_document_manipulation_application.commands.stage_files_for_epub_package_command import StageFilesForEpubPackageCommand
+
 
 logger = logging.getLogger("Main")
 
 
 def main() -> None:
-    command_collection = list_commands()
-
+    command_collection = create_command_collection()
     argument_parser = create_argument_parser(command_collection)
     arguments = argument_parser.parse_args()
     command_instance: ApplicationCommand = arguments.command_instance
@@ -28,14 +37,13 @@ def main() -> None:
     asyncio_context.run(command_instance.run_async(arguments, simulate = arguments.simulate))
 
 
-def create_argument_parser(command_collection: List[str]) -> argparse.ArgumentParser:
+def create_argument_parser(command_collection: List[ApplicationCommand]) -> argparse.ArgumentParser:
     main_parser = application_helpers.create_argument_parser()
 
     subparsers = main_parser.add_subparsers(title = "commands", metavar = "<command>")
     subparsers.required = True
 
-    for command in command_collection:
-        command_instance = application_helpers.create_command_instance(command)
+    for command_instance in command_collection:
         command_parser = command_instance.configure_argument_parser(subparsers)
         command_parser.set_defaults(command_instance = command_instance)
 
@@ -55,18 +63,17 @@ def log_script_information(simulate: bool = False) -> None:
     logger.debug("")
 
 
-def list_commands() -> List[str]:
+def create_command_collection() -> List[ApplicationCommand]:
     return [
-        "benjaminhamon_document_manipulation_application.commands.info_command.InfoCommand",
-        "benjaminhamon_document_manipulation_application.commands.convert_odt_to_epub_command.ConvertOdtToEpubCommand",
-        "benjaminhamon_document_manipulation_application.commands.convert_odt_to_xhtml_command.ConvertOdtToXhtmlCommand",
-        "benjaminhamon_document_manipulation_application.commands.create_epub_package_command.CreateEpubPackageCommand",
-        "benjaminhamon_document_manipulation_application.commands.generate_epub_files_command.GenerateEpubFilesCommand",
-        "benjaminhamon_document_manipulation_application.commands.generate_information_as_xhtml_command.GenerateInformationAsXhtmlCommand",
-        "benjaminhamon_document_manipulation_application.commands.info_command.InfoCommand",
-        "benjaminhamon_document_manipulation_application.commands.rewrite_odt_command.RewriteOdtCommand",
-        "benjaminhamon_document_manipulation_application.commands.split_odt_command.SplitOdtCommand",
-        "benjaminhamon_document_manipulation_application.commands.stage_files_for_epub_package_command.StageFilesForEpubPackageCommand",
+        ConvertOdtToEpubCommand(),
+        ConvertOdtToXhtmlCommand(),
+        CreateEpubPackageCommand(),
+        GenerateEpubFilesCommand(),
+        GenerateInformationAsXhtmlCommand(),
+        InfoCommand(),
+        RewriteOdtCommand(),
+        SplitOdtCommand(),
+        StageFilesForEpubPackageCommand(),
     ]
 
 

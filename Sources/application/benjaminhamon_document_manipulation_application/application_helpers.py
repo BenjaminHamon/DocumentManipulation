@@ -1,12 +1,10 @@
 # cspell:words levelname
 
 import argparse
-import importlib
 import logging
 import sys
 from typing import Optional
 
-from benjaminhamon_document_manipulation_application.application_command import ApplicationCommand
 from benjaminhamon_document_manipulation_application.logging import logging_helpers
 
 
@@ -50,15 +48,3 @@ def create_argument_parser() -> argparse.ArgumentParser:
         metavar = "<level>", help = "set the logging level for the log file (%s)" % ", ".join(logging_helpers.all_log_levels))
 
     return argument_parser
-
-
-def create_command_instance(class_fully_qualified_name: str) -> ApplicationCommand:
-    module_full_name, class_name = class_fully_qualified_name.rsplit(".", 1)
-    module = importlib.import_module(module_full_name)
-    class_from_module = getattr(module, class_name)
-
-    command_instance = class_from_module()
-    if not isinstance(command_instance, ApplicationCommand):
-        raise ValueError("The class '%s' does not implement the ApplicationCommand interface" % class_fully_qualified_name)
-
-    return command_instance

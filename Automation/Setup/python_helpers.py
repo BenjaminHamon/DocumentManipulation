@@ -41,8 +41,6 @@ def find_system_python_executable(python_versions: List[str]) -> Optional[str]:
 
 
 def setup_virtual_environment(python_system_executable: str, venv_directory: str, simulate: bool) -> None:
-    logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
-
     venv_python_executable = get_venv_executable(venv_directory, "python")
     if sys.executable.lower() == os.path.abspath(venv_python_executable).lower():
         raise RuntimeError("Active python is the target virtual environment")

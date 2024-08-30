@@ -91,8 +91,6 @@ class _PackageCommand(AutomationCommand):
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         python_executable = sys.executable
         project_configuration: ProjectConfiguration = kwargs["configuration"]
-
-        version = project_configuration.project_version.full_identifier
         all_python_packages = project_configuration.list_python_packages()
 
         process_runner = ProcessRunner(ProcessSpawner(is_console = True))
@@ -100,11 +98,10 @@ class _PackageCommand(AutomationCommand):
 
         logger.info("Building python distribution packages")
         for python_package in all_python_packages:
-            output_directory = os.path.join("Artifacts", "Distributions", python_package.identifier)
+            output_directory = os.path.join("Artifacts", "Distributions")
             log_file_path = os.path.join("Artifacts", "Logs", "BuildDistributionPackage_%s.log" % python_package.identifier)
 
-            await python_package_builder.build_distribution_package(
-                python_package, version, output_directory, log_file_path, simulate = simulate)
+            await python_package_builder.build_distribution_package(python_package, output_directory, log_file_path, simulate = simulate)
 
 
 class _UploadCommand(AutomationCommand):

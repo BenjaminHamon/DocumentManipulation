@@ -33,7 +33,7 @@ def main() -> None:
 
         python_system_executable = python_helpers.find_and_check_system_python_executable(python_versions)
         venv_python_executable = python_helpers.get_venv_python_executable(venv_directory)
-        python_package_collection = [ "Automation/Scripts[dev]" ] + python_helpers.list_python_packages("Sources")
+        python_package_collection = [ "Automation/Scripts" ] + python_helpers.list_python_packages("Sources")
 
         python_helpers.setup_virtual_environment(python_system_executable, venv_directory, simulate = arguments.simulate)
         python_helpers.install_python_packages(venv_python_executable, python_package_collection, simulate = arguments.simulate)

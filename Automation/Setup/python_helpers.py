@@ -83,7 +83,7 @@ def get_venv_python_executable(venv_directory: str) -> str:
 
 def list_python_packages(source_directory: str) -> List[str]:
     package_collection: List[str] = []
-    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "setup.py")):
+    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "pyproject.toml")):
         package_collection.append(os.path.dirname(setup_file_path))
 
     return package_collection

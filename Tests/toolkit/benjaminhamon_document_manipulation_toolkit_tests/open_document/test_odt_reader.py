@@ -133,6 +133,8 @@ def test_read_content_from_simple_odt():
 
 
 def test_read_content_from_clean_fodt():
+
+# cspell:disable
     fodt_data = """
 <?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
@@ -151,6 +153,7 @@ def test_read_content_from_clean_fodt():
   </office:body>
 </office:document>
 """
+# cspell:enable
 
     fodt_data = fodt_data.lstrip().encode("utf-8")
 
@@ -173,14 +176,18 @@ def test_read_content_from_clean_fodt():
     text_elements = list(paragraph.enumerate_text())
 
     assert len(text_elements) == 1
+# cspell:disable
     assert text_elements[0].text == "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum lectus ut nisi faucibus dapibus. Integer tincidunt ante dui. Phasellus ullamcorper metus diam, a lobortis lacus sollicitudin ut. In euismod malesuada orci nec viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vehicula ac arcu imperdiet auctor. Nullam lobortis nec urna vitae feugiat. Nulla metus sem, vehicula in lorem sit amet, interdum ultrices leo. Vivamus at posuere ligula. In fringilla laoreet tellus maximus feugiat. Donec rutrum magna ut tempus accumsan. Vivamus condimentum lacus id magna elementum, a malesuada mauris volutpat. In et purus vel justo ultricies ornare id vitae mi. Etiam bibendum eros ut ligula facilisis, eu vulputate dui aliquam. Phasellus nulla sem, blandit vitae est non, posuere luctus enim."
+# cspell:enable
     assert text_elements[0].style_collection == []
 
     paragraph = all_paragraphs[1]
     text_elements = list(paragraph.enumerate_text())
 
     assert len(text_elements) == 1
+# cspell:disable
     assert text_elements[0].text == "Cras eget neque semper, cursus eros at, bibendum nisl. Morbi accumsan nunc pellentesque, pharetra ipsum vel, convallis libero. Morbi condimentum hendrerit congue. Ut facilisis dolor et lorem facilisis, sagittis lacinia nibh tempor. Nam imperdiet fermentum sem sit amet porttitor. In consectetur vehicula imperdiet. Aliquam eleifend turpis vitae tincidunt fringilla."
+# cspell:enable
     assert text_elements[0].style_collection == []
 
 

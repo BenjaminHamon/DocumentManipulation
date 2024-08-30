@@ -1,4 +1,3 @@
-import glob
 import logging
 import os
 import platform
@@ -42,9 +41,7 @@ def find_system_python_executable(python_versions: List[str]) -> Optional[str]:
 
 
 def setup_virtual_environment(python_system_executable: str, venv_directory: str, simulate: bool) -> None:
-    logger.info("Setting up python virtual environment (Path: %s)", venv_directory)
-
-    venv_python_executable = get_venv_python_executable(venv_directory)
+    venv_python_executable = get_venv_executable(venv_directory, "python")
     if sys.executable.lower() == os.path.abspath(venv_python_executable).lower():
         raise RuntimeError("Active python is the target virtual environment")
 
@@ -72,21 +69,13 @@ def setup_virtual_environment(python_system_executable: str, venv_directory: str
     else:
         raise NotImplementedError("Unsupported system: '%s'" % platform.system())
 
-    install_python_packages(venv_python_executable, [ "pip", "wheel" ], simulate = simulate)
+    install_python_packages(venv_python_executable, [ "pip", "setuptools", "wheel" ], simulate = simulate)
 
 
-def get_venv_python_executable(venv_directory: str) -> str:
+def get_venv_executable(venv_directory: str, executable: str) -> str:
     if platform.system() == "Windows":
-        return os.path.join(venv_directory, "scripts", "python.exe")
-    return os.path.join(venv_directory, "bin", "python")
-
-
-def list_python_packages(source_directory: str) -> List[str]:
-    package_collection: List[str] = []
-    for setup_file_path in glob.glob(os.path.join(source_directory, "*", "setup.py")):
-        package_collection.append(os.path.dirname(setup_file_path))
-
-    return package_collection
+        return os.path.join(venv_directory, "scripts", executable + ".exe")
+    return os.path.join(venv_directory, "bin", executable)
 
 
 def install_python_packages(python_executable: str,

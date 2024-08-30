@@ -1,3 +1,5 @@
+# cspell:words lxml
+
 [BASIC]
 const-naming-style = snake_case
 

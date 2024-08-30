@@ -1,13 +1,19 @@
 ---
 
-# cspell:words pycache venv
+# cspell:words fodt pycache venv
 
 ignorePaths:
-- ".venv/**"
-- "**/__pycache__/**"
-- "**/*.egg-info/**"
+  - ".venv/**"
+  - "**/__pycache__/**"
+  - "**/*.egg-info/**"
+  - "Artifacts/**"
+  - "Sources/*/build/**"
+  - "Tests/**/*.fodt"
 
 words:
-- benjaminhamon
-- bhamon
-- hamon
+  - benjaminhamon
+  - bhamon
+  - hamon
+
+enableFiletypes:
+  - toml

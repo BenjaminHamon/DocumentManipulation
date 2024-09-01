@@ -6,7 +6,7 @@
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
 
 	"python.analysis.extraPaths": [
-		"./Automation/Setup",
+		"./Automation/Scripts",
 		"./Sources/scripts/",
 		"./Sources/toolkit/",
 	],

@@ -5,6 +5,7 @@ from bhamon_development_toolkit.automation.project_version import ProjectVersion
 from bhamon_development_toolkit.python.python_package import PythonPackage
 
 from automation_scripts.toolkit.applications.application_metadata import ApplicationMetadata
+from automation_scripts.toolkit.applications.application_package_configuration import ApplicationPackageConfiguration
 
 
 class ProjectConfiguration:
@@ -73,6 +74,36 @@ class ProjectConfiguration:
             version_identifier_full = self.project_version.full_identifier,
             product_copyright = self.copyright,
         )
+
+
+    def get_application_package_configuration(self, identifier: str) -> ApplicationPackageConfiguration:
+        if identifier == "LinuxApplication":
+            return ApplicationPackageConfiguration(
+                configuration_identifier = identifier,
+                target_operating_system = "Linux",
+                target_application_environment = "Linux",
+                files_to_include = [
+                    ("About.md", "About.md"),
+                    ("Artifacts/Binaries/Linux/DocumentManipulation", "DocumentManipulation"),
+                    ("Documentation/Application/ReadMe.md", "ReadMe.md"),
+                    ("License.txt", "License.txt"),
+                ],
+            )
+
+        if identifier == "WindowsApplication":
+            return ApplicationPackageConfiguration(
+                configuration_identifier = identifier,
+                target_operating_system = "Windows",
+                target_application_environment = "Windows",
+                files_to_include = [
+                    ("About.md", "About.md"),
+                    ("Artifacts/Binaries/Windows/DocumentManipulation.exe", "DocumentManipulation.exe"),
+                    ("Documentation/Application/ReadMe.md", "ReadMe.md"),
+                    ("License.txt", "License.txt"),
+                ],
+            )
+
+        raise ValueError("Unknown configuration identifier: '%s'" % identifier)
 
 
     def get_application_module_path(self) -> str:

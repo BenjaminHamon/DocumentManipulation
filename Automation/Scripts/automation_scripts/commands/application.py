@@ -12,12 +12,14 @@ from bhamon_development_toolkit.automation.automation_command_group import Autom
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
 from bhamon_development_toolkit.python.python_package import PythonPackage
+from bhamon_development_toolkit.security.interactive_credentials_provider import InteractiveCredentialsProvider
 
 from automation_scripts.configuration.project_configuration import ProjectConfiguration
 from automation_scripts.configuration.project_environment import ProjectEnvironment
 from automation_scripts.toolkit.python import python_helpers
 from automation_scripts.toolkit.python.pyinstaller_runner import PyInstallerRunner
 from automation_scripts.toolkit.python.python_application_builder import PythonApplicationBuilder
+from automation_scripts.toolkit.web.web_client import WebClient
 
 
 logger = logging.getLogger("Main")
@@ -33,6 +35,7 @@ class ApplicationCommand(AutomationCommandGroup):
             _BuildBinariesCommand,
             _StageForPackageCommand,
             _CreatePackageCommand,
+            _UploadPackageCommand,
         ]
 
         self.add_commands(local_parser, command_collection)
@@ -188,6 +191,58 @@ class _CreatePackageCommand(AutomationCommand):
             os.replace(package_path + ".tmp.zip", package_path + ".zip")
 
         logger.debug("Package path: '%s'", package_path + ".zip")
+
+
+    async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
+        self.run(arguments, simulate = simulate, **kwargs)
+
+
+class _UploadPackageCommand(AutomationCommand):
+
+
+    def configure_argument_parser(self, subparsers: argparse._SubParsersAction, **kwargs) -> argparse.ArgumentParser:
+        parser = subparsers.add_parser("upload-package", help = "upload the application package")
+        parser.add_argument("--configuration", default = platform.system() + "Application",
+            metavar = "<configuration>", help = "set the application package configuration")
+        return parser
+
+
+    def check_requirements(self, arguments: argparse.Namespace, **kwargs) -> None:
+        pass
+
+
+    def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None: # pylint: disable = too-many-locals
+        project_environment: ProjectEnvironment = kwargs["environment"]
+        project_configuration: ProjectConfiguration = kwargs["configuration"]
+        application_configuration_identifier: str = arguments.configuration
+
+        package_name = application_configuration_identifier + "_" + project_configuration.project_version.full_identifier
+        package_path = os.path.join("Artifacts", "Distributions", package_name + ".zip")
+
+        artifact_parameters = project_configuration.get_artifact_default_parameters()
+        artifact_parameters["configuration"] = application_configuration_identifier
+        artifact_name = "{project}_{version}+{revision}_{configuration}".format(**artifact_parameters)
+        artifact_path = os.path.join("Artifacts", "Repository", artifact_name + ".zip")
+
+        logger.info("Copying to local artifact repository")
+        logger.debug("+ %s => %s", package_path, artifact_path)
+
+        if not simulate:
+            os.makedirs(os.path.dirname(artifact_path), exist_ok = True)
+            shutil.copy(package_path, artifact_path + ".tmp")
+            os.replace(artifact_path + ".tmp", artifact_path)
+
+        repository_url = project_environment.get_application_package_repository_url() + "/" + project_configuration.project_identifier
+        artifact_remote_url = repository_url + "/" + artifact_name + ".zip"
+
+        credentials_provider = InteractiveCredentialsProvider()
+        credentials = credentials_provider.get_credentials(repository_url)
+        web_client = WebClient(authentication = (credentials.username, credentials.secret))
+
+        logger.info("Uploading to remote repository (URL: '%s')", repository_url)
+        if not simulate:
+            web_client.upload_file(artifact_remote_url, artifact_path)
+        logger.debug("Application package URL: '%s'", artifact_remote_url)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

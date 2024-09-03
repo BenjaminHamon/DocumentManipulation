@@ -16,6 +16,10 @@ class ProjectEnvironment:
         return os.path.join(sys.base_prefix, "python.exe")
 
 
+    def get_application_package_repository_url(self) -> str:
+        return "https://nexus.benjaminhamon.com/repository/application"
+
+
     def get_python_package_repository_url(self, target_environment: str) -> str:
         if target_environment == "Development":
             return "https://nexus.benjaminhamon.com/repository/python-packages-development"

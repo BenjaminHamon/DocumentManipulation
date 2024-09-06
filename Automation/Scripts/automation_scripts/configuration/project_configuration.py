@@ -4,6 +4,9 @@ from typing import List
 from bhamon_development_toolkit.automation.project_version import ProjectVersion
 from bhamon_development_toolkit.python.python_package import PythonPackage
 
+from automation_scripts.toolkit.applications.application_metadata import ApplicationMetadata
+from automation_scripts.toolkit.applications.application_package_configuration import ApplicationPackageConfiguration
+
 
 class ProjectConfiguration:
 
@@ -48,6 +51,11 @@ class ProjectConfiguration:
     def list_python_packages(self) -> List[PythonPackage]:
         return [
             PythonPackage(
+                identifier = "benjaminhamon-document-manipulation-application",
+                path_to_sources = os.path.join("Sources", "application"),
+                path_to_tests = os.path.join("Tests", "application")),
+
+            PythonPackage(
                 identifier = "benjaminhamon-document-manipulation-scripts",
                 path_to_sources = os.path.join("Sources", "scripts"),
                 path_to_tests = os.path.join("Tests", "scripts")),
@@ -57,3 +65,48 @@ class ProjectConfiguration:
                 path_to_sources = os.path.join("Sources", "toolkit"),
                 path_to_tests = os.path.join("Tests", "toolkit")),
         ]
+
+
+    def get_application_metadata(self) -> ApplicationMetadata:
+        return ApplicationMetadata(
+            product_identifier = self.project_identifier,
+            version_identifier = self.project_version.identifier,
+            version_identifier_full = self.project_version.full_identifier,
+            product_copyright = self.copyright,
+        )
+
+
+    def get_application_package_configuration(self, identifier: str) -> ApplicationPackageConfiguration:
+        if identifier == "LinuxApplication":
+            return ApplicationPackageConfiguration(
+                configuration_identifier = identifier,
+                target_operating_system = "Linux",
+                target_application_environment = "Linux",
+                files_to_include = [
+                    ("About.md", "About.md"),
+                    ("Artifacts/Binaries/Linux/DocumentManipulation", "DocumentManipulation"),
+                    ("Documentation/Application/ReadMe.md", "ReadMe.md"),
+                    ("License.txt", "License.txt"),
+                ],
+            )
+
+        if identifier == "WindowsApplication":
+            return ApplicationPackageConfiguration(
+                configuration_identifier = identifier,
+                target_operating_system = "Windows",
+                target_application_environment = "Windows",
+                files_to_include = [
+                    ("About.md", "About.md"),
+                    ("Artifacts/Binaries/Windows/DocumentManipulation.exe", "DocumentManipulation.exe"),
+                    ("Documentation/Application/ReadMe.md", "ReadMe.md"),
+                    ("License.txt", "License.txt"),
+                ],
+            )
+
+        raise ValueError("Unknown configuration identifier: '%s'" % identifier)
+
+
+    def get_application_module_path(self) -> str:
+        all_python_packages = self.list_python_packages()
+        application_python_package = next(x for x in all_python_packages if x.identifier == "benjaminhamon-document-manipulation-application")
+        return os.path.join(application_python_package.path_to_sources, application_python_package.name_for_file_system, "application.py")

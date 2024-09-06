@@ -41,7 +41,7 @@ def parse_arguments() -> argparse.Namespace:
             raise argparse.ArgumentTypeError("invalid key value parameter: '%s'" % argument_value)
         return (key_value[0], key_value[1])
 
-    argument_parser = argparse.ArgumentParser(description = "Generate document information as xhtml")
+    argument_parser = argparse.ArgumentParser(description = "Generate document information as xhtml.")
     argument_parser.add_argument("--information", metavar = "<path>", help = "path to an information yaml file")
     argument_parser.add_argument("--metadata", metavar = "<path>", help = "path to a metadata yaml file")
     argument_parser.add_argument("--destination", required = True, metavar = "<path>", help = "path to the file to create")

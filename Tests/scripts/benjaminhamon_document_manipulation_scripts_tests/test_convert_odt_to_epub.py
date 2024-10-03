@@ -182,9 +182,10 @@ def _assert_output(workspace_directory: str) -> None: # pylint: disable = too-ma
         assert os.path.exists(package_file_path)
 
         file_collection_expected = [
-            "EPUB/Content/1_-_Chapter_1.xhtml",
-            "EPUB/Content/2_-_Chapter_2.xhtml",
-            "EPUB/Content/3_-_Chapter_3.xhtml",
+            "EPUB/Content/1_-_Information.xhtml",
+            "EPUB/Content/2_-_Chapter_1.xhtml",
+            "EPUB/Content/3_-_Chapter_2.xhtml",
+            "EPUB/Content/4_-_Chapter_3.xhtml",
             "EPUB/Resources/Styles.css",
             "EPUB/content.opf",
             "EPUB/toc.xhtml",
@@ -246,15 +247,17 @@ def _assert_output(workspace_directory: str) -> None: # pylint: disable = too-ma
   </metadata>
   <manifest>
     <item id="toc" href="toc.xhtml" media-type="application/xhtml+xml" properties="nav"/>
-    <item id="1___Chapter_1_xhtml" href="Content/1_-_Chapter_1.xhtml" media-type="application/xhtml+xml"/>
-    <item id="2___Chapter_2_xhtml" href="Content/2_-_Chapter_2.xhtml" media-type="application/xhtml+xml"/>
-    <item id="3___Chapter_3_xhtml" href="Content/3_-_Chapter_3.xhtml" media-type="application/xhtml+xml"/>
+    <item id="1___Information_xhtml" href="Content/1_-_Information.xhtml" media-type="application/xhtml+xml"/>
+    <item id="2___Chapter_1_xhtml" href="Content/2_-_Chapter_1.xhtml" media-type="application/xhtml+xml"/>
+    <item id="3___Chapter_2_xhtml" href="Content/3_-_Chapter_2.xhtml" media-type="application/xhtml+xml"/>
+    <item id="4___Chapter_3_xhtml" href="Content/4_-_Chapter_3.xhtml" media-type="application/xhtml+xml"/>
     <item id="Styles_css" href="Resources/Styles.css" media-type="text/css"/>
   </manifest>
   <spine>
-    <itemref idref="1___Chapter_1_xhtml" linear="yes"/>
-    <itemref idref="2___Chapter_2_xhtml" linear="yes"/>
-    <itemref idref="3___Chapter_3_xhtml" linear="yes"/>
+    <itemref idref="1___Information_xhtml" linear="yes"/>
+    <itemref idref="2___Chapter_1_xhtml" linear="yes"/>
+    <itemref idref="3___Chapter_2_xhtml" linear="yes"/>
+    <itemref idref="4___Chapter_3_xhtml" linear="yes"/>
   </spine>
 </package>
 """
@@ -281,13 +284,16 @@ def _assert_output(workspace_directory: str) -> None: # pylint: disable = too-ma
       <h1>Table of Contents</h1>
       <ol>
         <li>
-          <a href="Content/1_-_Chapter_1.xhtml">Chapter 1</a>
+          <a href="Content/1_-_Information.xhtml">Information</a>
         </li>
         <li>
-          <a href="Content/2_-_Chapter_2.xhtml">Chapter 2</a>
+          <a href="Content/2_-_Chapter_1.xhtml">Chapter 1</a>
         </li>
         <li>
-          <a href="Content/3_-_Chapter_3.xhtml">Chapter 3</a>
+          <a href="Content/3_-_Chapter_2.xhtml">Chapter 2</a>
+        </li>
+        <li>
+          <a href="Content/4_-_Chapter_3.xhtml">Chapter 3</a>
         </li>
       </ol>
     </nav>
@@ -304,8 +310,45 @@ def _assert_output(workspace_directory: str) -> None: # pylint: disable = too-ma
         assert toc_data == toc_data_expected
 
     def assert_xhtml() -> None:
+        xhtml_file_path = "EPUB/Content/1_-_Information.xhtml"
+        with zipfile.ZipFile(package_file_path, mode = "r") as package_file:
+            with package_file.open(xhtml_file_path, mode = "r") as xhtml_file:
+                with io.TextIOWrapper(xhtml_file, encoding = "utf-8") as xhtml_text_file:
+                    xhtml_data = xhtml_text_file.read()
+
+        xhtml_data_expected = """
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Information</title>
+  </head>
+  <body>
+    <section id="book-information">
+      <div id="title-information">
+        <div class="book-title">Some Title</div>
+        <div class="book-author">written by Some Author</div>
+      </div>
+      <div id="edition-information">
+        <div>Draft 01-Jan-2020</div>
+      </div>
+      <div id="version-information">
+        <div>Version 1.0.0</div>
+      </div>
+      <div id="copyright-notice">
+        <div>Copyright © 2020 Some Author</div>
+        <div>All rights reserved</div>
+      </div>
+    </section>
+  </body>
+</html>
+"""
+
+        xhtml_data_expected = xhtml_data_expected.lstrip()
+
+        assert xhtml_data == xhtml_data_expected
+
         for chapter_number in [ 1, 2, 3 ]:
-            xhtml_file_path = "EPUB/Content/{chapter_number}_-_Chapter_{chapter_number}.xhtml".format(chapter_number = chapter_number)
+            xhtml_file_path = "EPUB/Content/{index}_-_Chapter_{chapter_number}.xhtml".format(index = chapter_number + 1, chapter_number = chapter_number)
             with zipfile.ZipFile(package_file_path, mode = "r") as package_file:
                 with package_file.open(xhtml_file_path, mode = "r") as xhtml_file:
                     with io.TextIOWrapper(xhtml_file, encoding = "utf-8") as xhtml_text_file:

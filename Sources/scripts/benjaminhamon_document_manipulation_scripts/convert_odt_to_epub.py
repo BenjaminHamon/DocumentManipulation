@@ -103,7 +103,7 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
         if not overwrite:
             raise RuntimeError("Destination already exists")
 
-    odt_to_epub_configuration = serializer.deserialize_from_file(configuration_file_path, OdtToEpubConfiguration)
+    odt_to_epub_configuration: OdtToEpubConfiguration = serializer.deserialize_from_file(configuration_file_path, OdtToEpubConfiguration)
     if odt_to_epub_configuration.source_file_path is None:
         raise ValueError("source_file_path is required")
 
@@ -141,6 +141,8 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
             extra_information = extra_information,
             now = now,
             simulate = simulate)
+
+        odt_to_epub_configuration.content_files_before.insert(0, os.path.join(intermediate_xhtml_extra_directory, "Information.xhtml"))
 
     convert_odt_to_xhtml(
         source_file_path_collection = [ intermediate_fodt_file_path ],

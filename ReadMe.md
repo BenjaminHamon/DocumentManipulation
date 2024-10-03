@@ -1,4 +1,4 @@
-<!-- cspell:words epub pylint pytest -->
+<!-- cspell:words epub pylint pytest venv -->
 
 # Document Manipulation
 
@@ -14,6 +14,6 @@ It is free and open source software. See [About](About.md) for more information.
 
 ## Development
 
-The project is developed using Python and should support the usual workflows with `pip`, `pylint` and `pytest`. It is highly recommended to use a Python virtual environment.
+The project is developed using Python and supports the usual workflows with `pip`, `pylint` and `pytest`. It is highly recommended to use a Python virtual environment.
 
-Additionally, there are commands to automate development related tasks, as can be found under [Automation](Automation). The script `Automation/Setup/setup.py` sets up a local workspace with a Python virtual environment. After that's done, the commands can be executed through the `Automation/Scripts/automation_scripts/run_command.py` script, which you might want to run as a module using `python -m automation_scripts.run_command`. Use the scripts with the `--help` option for information, as well as the `--simulate` option if you wish to check a command's behavior before actually running it.
+Additionally, there are commands to automate development related tasks, as can be found under [Automation](Automation). Use the `Automation/Setup/setup.py` script for a quick setup. Following that, the commands will be available through `.venv-automation/scripts/automation`, or `automation` directly after activating the `venv-automation` virtual environment. This executable corresponds to the `Automation/Scripts/automation_scripts/run_command.py` script. Use the `--help` option for information, and the `--simulate` option if you wish to check a command's behavior before actually running it.

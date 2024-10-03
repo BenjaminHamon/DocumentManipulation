@@ -63,22 +63,21 @@ class EpubPackageBuilder:
                 link_element_collection = epub_xhtml_helpers.try_find_xhtml_element_collection(document.getroot(), "./x:head/x:link")
 
                 for link_element in link_element_collection:
-                    link_old_value = str(link_element.attrib["href"])
-                    is_relative = urllib.parse.urlparse(link_old_value).netloc == ""
+                    link_value = str(link_element.attrib["href"])
+                    link_components = urllib.parse.urlparse(link_value)
 
-                    link_new_value = link_old_value
+                    if link_components.scheme == "" and link_components.netloc == "": # Relative path
+                        link_value_updated = os.path.normpath(os.path.join(os.path.dirname(source), link_value))
+                        matching_mapping = next((x for x in link_mappings if os.path.normpath(x[0]) == link_value_updated), None)
+                        if matching_mapping is not None:
+                            link_value_updated = os.path.join(staging_directory, matching_mapping[1])
+                        link_value_updated = os.path.relpath(link_value_updated, os.path.dirname(destination))
+                        link_element.attrib["href"] = link_value_updated.replace("\\", "/")
 
-                    if is_relative:
-                        link_new_value = os.path.normpath(os.path.join(os.path.dirname(source), link_old_value))
-
-                    matching_mapping = next((x for x in link_mappings if os.path.normpath(x[0]) == link_new_value), None)
-                    if matching_mapping is not None:
-                        link_new_value = os.path.join(staging_directory, matching_mapping[1])
-
-                    if is_relative:
-                        link_new_value = os.path.relpath(link_new_value, os.path.dirname(destination))
-
-                    link_element.attrib["href"] = link_new_value.replace("\\", "/")
+                    else:
+                        matching_mapping = next((x for x in link_mappings if x[0] == link_value), None)
+                        if matching_mapping is not None:
+                            link_element.attrib["href"] = matching_mapping[1]
 
                 self._content_writer.write_xml(destination, document, simulate = simulate)
 

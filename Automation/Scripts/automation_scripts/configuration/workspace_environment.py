@@ -1,17 +1,4 @@
-import sys
-
-
-class ProjectEnvironment:
-
-
-    def get_python_executable(self) -> str:
-        return sys.executable
-
-
-    def get_python_system_executable(self) -> str:
-        if hasattr(sys, "_base_executable"):
-            return sys._base_executable # type: ignore # pylint: disable = protected-access
-        raise RuntimeError("Unable to resolve the system Python executable")
+class WorkspaceEnvironment:
 
 
     def get_application_package_repository_url(self) -> str:

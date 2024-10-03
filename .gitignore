@@ -24,6 +24,7 @@ __pycache__/
 
 # Python virtual environment
 .venv/
+.venv-automation/
 
 # Visual Studio Code
 /.vscode/settings.json

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "benjaminhamon-document-manipulation-application"
-dynamic = [ "version" ]
+version = "1.0.0+development"
 description = "Toolkit for manipulating text documents"
 requires-python = ">= 3.9"
 
@@ -44,6 +44,3 @@ dev = [
 
 [tool.setuptools]
 license-files = [ "../../About.md", "../../License.txt" ]
-
-[tool.setuptools.dynamic]
-version = { attr = "benjaminhamon_document_manipulation_application.__metadata__.__version__" }

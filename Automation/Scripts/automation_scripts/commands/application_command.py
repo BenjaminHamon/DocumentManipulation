@@ -11,14 +11,14 @@ from bhamon_development_toolkit.automation.automation_command import AutomationC
 from bhamon_development_toolkit.automation.automation_command_group import AutomationCommandGroup
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
 from bhamon_development_toolkit.processes.process_spawner import ProcessSpawner
+from bhamon_development_toolkit.python import python_helpers
+from bhamon_development_toolkit.python.pyinstaller_runner import PyInstallerRunner
+from bhamon_development_toolkit.python.python_application_builder import PythonApplicationBuilder
+from bhamon_development_toolkit.python.python_environment import PythonEnvironment
 from bhamon_development_toolkit.python.python_package import PythonPackage
 from bhamon_development_toolkit.security.interactive_credentials_provider import InteractiveCredentialsProvider
 
-from automation_scripts.configuration.project_configuration import ProjectConfiguration
-from automation_scripts.configuration.project_environment import ProjectEnvironment
-from automation_scripts.toolkit.python import python_helpers
-from automation_scripts.toolkit.python.pyinstaller_runner import PyInstallerRunner
-from automation_scripts.toolkit.python.python_application_builder import PythonApplicationBuilder
+from automation_scripts.configuration.automation_configuration import AutomationConfiguration
 from automation_scripts.toolkit.web.web_client import WebClient
 
 
@@ -63,19 +63,15 @@ class _BuildBinariesCommand(AutomationCommand):
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
-        project_configuration: ProjectConfiguration = kwargs["configuration"]
-        project_environment: ProjectEnvironment = kwargs["environment"]
+        automation_configuration: AutomationConfiguration = kwargs["configuration"]
 
         application_configuration_identifier = platform.system()
         output_directory = os.path.join("Artifacts", "Binaries", application_configuration_identifier)
         intermediate_directory = os.path.join("Artifacts", "Binaries-Intermediate", application_configuration_identifier)
         log_file_path = os.path.join("Artifacts", "Logs", "PyInstaller_%s.log" % application_configuration_identifier)
 
-        python_system_executable = project_environment.get_python_system_executable()
         pyinstaller_venv_directory = os.path.join(intermediate_directory, ".venv")
         application_builder = self._create_application_builder(pyinstaller_venv_directory)
-
-        all_python_packages = project_configuration.list_python_packages()
 
         if not simulate:
             if os.path.exists(output_directory):
@@ -84,35 +80,40 @@ class _BuildBinariesCommand(AutomationCommand):
 
         # Set up a new virtual environment since pyinstaller fails to discover editable installs when using pyproject.toml
         # See https://github.com/pyinstaller/pyinstaller/issues/7524
-        self._setup_virtual_environment(python_system_executable, pyinstaller_venv_directory, all_python_packages, simulate = simulate)
+        self._setup_virtual_environment(
+            pyinstaller_venv_directory, automation_configuration.python_development_configuration.package_collection, simulate = simulate)
+
+        application_module_path \
+            = automation_configuration.application_development_configuration.get_module_path(automation_configuration.python_development_configuration)
+        application_metadata = automation_configuration.application_development_configuration.get_metadata(automation_configuration.project_metadata)
 
         await application_builder.build_application(
-            application_source_file_path = project_configuration.get_application_module_path(),
-            executable_name = project_configuration.project_identifier,
+            application_source_file_path = application_module_path,
+            executable_name = automation_configuration.project_metadata.identifier,
             output_directory = output_directory,
             intermediate_directory = intermediate_directory,
-            application_metadata = project_configuration.get_application_metadata(),
+            application_metadata = application_metadata,
             log_file_path = log_file_path,
             simulate = simulate)
 
 
     def _create_application_builder(self, pyinstaller_venv_directory: str) -> PythonApplicationBuilder:
-        pyinstaller_executable = python_helpers.get_venv_executable(pyinstaller_venv_directory, "pyinstaller")
+        python_system_executable = python_helpers.resolve_system_python_executable()
+        python_environment = PythonEnvironment(python_system_executable, pyinstaller_venv_directory)
+        pyinstaller_executable = python_environment.get_venv_executable("pyinstaller")
         process_runner = ProcessRunner(ProcessSpawner(is_console = True))
         pyinstaller_runner = PyInstallerRunner(process_runner, pyinstaller_executable)
         return PythonApplicationBuilder(pyinstaller_runner)
 
 
-    def _setup_virtual_environment(self,
-            python_system_executable: str, pyinstaller_venv_directory: str, all_python_packages: List[PythonPackage], simulate: bool) -> None:
+    def _setup_virtual_environment(self, pyinstaller_venv_directory: str, all_python_packages: List[PythonPackage], simulate: bool) -> None:
+        python_system_executable = python_helpers.resolve_system_python_executable()
+        python_environment = PythonEnvironment(python_system_executable, pyinstaller_venv_directory)
+        package_collection_for_pip = [ python_package.path_to_sources for python_package in all_python_packages ]
 
-        pyinstaller_venv_executable = python_helpers.get_venv_python_executable(pyinstaller_venv_directory)
-
-        python_helpers.setup_virtual_environment(python_system_executable, pyinstaller_venv_directory, simulate = simulate)
-        python_helpers.install_python_packages(pyinstaller_venv_executable, [ "pyinstaller ~= 6.10.0" ], simulate = simulate)
-
-        python_package_path_collection = [ python_package.path_to_sources for python_package in all_python_packages ]
-        python_helpers.install_python_packages(pyinstaller_venv_executable, python_package_path_collection, simulate = simulate)
+        python_environment.setup_virtual_environment(simulate = simulate)
+        python_environment.install_python_packages([ "pyinstaller ~= 6.10.0" ], simulate = simulate)
+        python_environment.install_python_packages(package_collection_for_pip, simulate = simulate)
 
 
 class _StageForPackageCommand(AutomationCommand):
@@ -130,10 +131,11 @@ class _StageForPackageCommand(AutomationCommand):
 
 
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
-        project_configuration: ProjectConfiguration = kwargs["configuration"]
+        automation_configuration: AutomationConfiguration = kwargs["configuration"]
         application_configuration_identifier: str = arguments.configuration
 
-        application_configuration = project_configuration.get_application_package_configuration(application_configuration_identifier)
+        application_configuration \
+            = automation_configuration.application_development_configuration.get_package_configuration(application_configuration_identifier)
         staging_directory = os.path.join("Artifacts", "Distributions-Staging", application_configuration_identifier)
 
         if not simulate:
@@ -177,11 +179,11 @@ class _CreatePackageCommand(AutomationCommand):
 
 
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
-        project_configuration: ProjectConfiguration = kwargs["configuration"]
+        automation_configuration: AutomationConfiguration = kwargs["configuration"]
         application_configuration_identifier: str = arguments.configuration
 
         staging_directory = os.path.join("Artifacts", "Distributions-Staging", application_configuration_identifier)
-        package_name = application_configuration_identifier + "_" + project_configuration.project_version.full_identifier
+        package_name = application_configuration_identifier + "_" + automation_configuration.project_metadata.version.full_identifier
         package_path = os.path.join("Artifacts", "Distributions", package_name)
 
         logger.info("Creating application package (Configuration: '%s')", application_configuration_identifier)
@@ -212,14 +214,13 @@ class _UploadPackageCommand(AutomationCommand):
 
 
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None: # pylint: disable = too-many-locals
-        project_environment: ProjectEnvironment = kwargs["environment"]
-        project_configuration: ProjectConfiguration = kwargs["configuration"]
+        automation_configuration: AutomationConfiguration = kwargs["configuration"]
         application_configuration_identifier: str = arguments.configuration
 
-        package_name = application_configuration_identifier + "_" + project_configuration.project_version.full_identifier
+        package_name = application_configuration_identifier + "_" + automation_configuration.project_metadata.version.full_identifier
         package_path = os.path.join("Artifacts", "Distributions", package_name + ".zip")
 
-        artifact_parameters = project_configuration.get_artifact_default_parameters()
+        artifact_parameters = automation_configuration.get_artifact_default_parameters()
         artifact_parameters["configuration"] = application_configuration_identifier
         artifact_name = "{project}_{version}+{revision}_{configuration}".format(**artifact_parameters)
         artifact_path = os.path.join("Artifacts", "Repository", artifact_name + ".zip")
@@ -232,7 +233,8 @@ class _UploadPackageCommand(AutomationCommand):
             shutil.copy(package_path, artifact_path + ".tmp")
             os.replace(artifact_path + ".tmp", artifact_path)
 
-        repository_url = project_environment.get_application_package_repository_url() + "/" + project_configuration.project_identifier
+        repository_url = automation_configuration.workspace_environment.get_application_package_repository_url()
+        repository_url += "/" + automation_configuration.project_metadata.identifier
         artifact_remote_url = repository_url + "/" + artifact_name + ".zip"
 
         credentials_provider = InteractiveCredentialsProvider()

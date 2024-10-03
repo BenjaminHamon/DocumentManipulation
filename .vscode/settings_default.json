@@ -3,14 +3,21 @@
 
 	"isort.args": [ "--settings-file", ".isort.cfg" ],
 
+	// For sources
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
 
 	"python.analysis.extraPaths": [
-		"./Automation/Scripts",
 		"./Sources/application/",
 		"./Sources/scripts/",
 		"./Sources/toolkit/",
 	],
+
+	// // For automation
+	// "python.defaultInterpreterPath": "${workspaceFolder}/.venv-automation/scripts/python",
+
+	// "python.analysis.extraPaths": [
+	// 	"./Automation/Scripts",
+	// ],
 
 	"python.analysis.typeCheckingMode": "basic",
 

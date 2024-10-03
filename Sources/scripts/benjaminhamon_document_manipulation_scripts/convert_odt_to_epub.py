@@ -5,7 +5,6 @@ import datetime
 import glob
 import os
 import shutil
-import tempfile
 from typing import List, Mapping, Optional
 
 from benjaminhamon_document_manipulation_scripts import script_helpers
@@ -40,7 +39,7 @@ def main() -> None:
         serializer = create_serializer(os.path.splitext(arguments.configuration)[1].lstrip(".")),
         configuration_file_path = os.path.normpath(arguments.configuration),
         destination_file_path = os.path.normpath(arguments.destination),
-        intermediate_directory = os.path.normpath(arguments.intermediate) if arguments.intermediate is not None else None,
+        intermediate_directory = os.path.normpath(arguments.intermediate),
         extra_information = dict(arguments.extra),
         overwrite = arguments.overwrite)
 
@@ -53,13 +52,18 @@ def parse_arguments() -> argparse.Namespace:
             raise argparse.ArgumentTypeError("invalid key value parameter: '%s'" % argument_value)
         return (key_value[0], key_value[1])
 
-    argument_parser = argparse.ArgumentParser(description = "Convert an odt file to an epub package.")
-    argument_parser.add_argument("--configuration", required = True, metavar = "<path>", help = "path to the epub configuration")
-    argument_parser.add_argument("--destination", required = True, metavar = "<path>", help = "path to the epub package to create")
-    argument_parser.add_argument("--intermediate", metavar = "<path>", help = "path to the directory where to create the intermediate files")
+    argument_parser = argparse.ArgumentParser(
+        description = "Convert an odt file to an epub package.")
+    argument_parser.add_argument("--configuration", required = True,
+        metavar = "<path>", help = "path to the epub configuration")
+    argument_parser.add_argument("--destination", required = True,
+        metavar = "<path>", help = "path to the epub package to create")
+    argument_parser.add_argument("--intermediate", required = True,
+        metavar = "<path>", help = "path to the directory where to create the intermediate files")
     argument_parser.add_argument("--extra", nargs = "*", type = parse_key_value_parameter, default = [],
         metavar = "<key=value>", help = "provide extra information as key value pairs")
-    argument_parser.add_argument("--overwrite", action = "store_true", help = "overwrite the destination file in case it already exists")
+    argument_parser.add_argument("--overwrite", action = "store_true",
+        help = "overwrite the destination file in case it already exists")
 
     argument_parser.add_argument("--verbosity", choices = script_helpers.all_logging_levels, default = "info", type = str.lower,
         metavar = "<level>", help = "set the logging level (%s)" % ", ".join(script_helpers.all_logging_levels))
@@ -83,7 +87,7 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
         serializer: Serializer,
         configuration_file_path: str,
         destination_file_path: str,
-        intermediate_directory: Optional[str],
+        intermediate_directory: str,
         extra_information: Mapping[str,str],
         now: Optional[datetime.datetime] = None,
         overwrite: bool = False,
@@ -105,14 +109,10 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
 
     metadata_items = load_metadata(serializer, odt_to_epub_configuration)
 
-    if intermediate_directory is not None:
-        if not simulate:
-            if os.path.exists(intermediate_directory):
-                shutil.rmtree(intermediate_directory)
-            os.makedirs(intermediate_directory)
-
-    if intermediate_directory is None:
-        intermediate_directory = tempfile.mkdtemp()
+    if not simulate:
+        if os.path.exists(intermediate_directory):
+            shutil.rmtree(intermediate_directory)
+        os.makedirs(intermediate_directory)
 
     intermediate_fodt_file_path = os.path.join(intermediate_directory, "FullText.fodt")
     intermediate_xhtml_extra_directory = os.path.join(intermediate_directory, "ExtraAsXhtml")

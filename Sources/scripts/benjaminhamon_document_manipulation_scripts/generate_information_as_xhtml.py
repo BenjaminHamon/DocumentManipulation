@@ -88,25 +88,16 @@ def generate_information_as_xhtml( # pylint: disable = too-many-arguments, too-m
     format_parameters: Mapping[str,str] = {}
 
     if information_file_path is not None:
-        document_information: dict = serializer.deserialize_from_file(information_file_path, dict)
-        format_parameters.update(document_information)
+        format_parameters.update(get_parameters_from_document_information(serializer, information_file_path))
 
     if dc_metadata_file_path is not None:
         format_parameters.update(get_parameters_from_dc_metadata(serializer, dc_metadata_file_path))
 
-    format_parameters["date"] = now.strftime("%d-%b-%Y")
-
     if revision_control is not None:
         revision_control_client = create_revision_control_client(revision_control)
+        format_parameters.update(get_parameters_from_revision_control(revision_control_client))
 
-        branch = revision_control_client.get_current_branch()
-        if branch is not None:
-            format_parameters["branch"] = branch
-
-        format_parameters["revision"] = revision_control_client.get_current_revision()
-        format_parameters["revision_short"] = revision_control_client.convert_revision_to_short(format_parameters["revision"])
-        format_parameters["revision_date"] = revision_control_client.get_revision_date(format_parameters["revision"]).replace(tzinfo = None).isoformat() + "Z"
-
+    format_parameters["date"] = now.strftime("%d-%b-%Y")
     format_parameters.update(extra_information)
 
     xhtml_writer = EpubXhtmlWriter()
@@ -161,6 +152,20 @@ def get_parameters_from_dc_metadata(serializer: Serializer, dc_metadata_file_pat
         data["publication_date"] = dc_metadata.dates[0]
     if dc_metadata.rights is not None and len(dc_metadata.rights) > 0:
         data["copyright"] = dc_metadata.rights[0]
+
+    return data
+
+
+def get_parameters_from_revision_control(revision_control_client: RevisionControlClient) -> dict:
+    data = {}
+
+    branch = revision_control_client.get_current_branch()
+    if branch is not None:
+        data["branch"] = branch
+
+    data["revision"] = revision_control_client.get_current_revision()
+    data["revision_short"] = revision_control_client.convert_revision_to_short(data["revision"])
+    data["revision_date"] = revision_control_client.get_revision_date(data["revision"]).replace(tzinfo = None).isoformat() + "Z"
 
     return data
 

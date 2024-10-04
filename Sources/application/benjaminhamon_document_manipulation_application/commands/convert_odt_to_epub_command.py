@@ -22,13 +22,18 @@ class ConvertOdtToEpubCommand(ApplicationCommand):
                 raise argparse.ArgumentTypeError("invalid key value parameter: '%s'" % argument_value)
             return (key_value[0], key_value[1])
 
-        argument_parser = subparsers.add_parser("convert-odt-to-epub", help = "convert an odt file to an epub package")
-        argument_parser.add_argument("--configuration", required = True, metavar = "<path>", help = "path to the epub configuration")
-        argument_parser.add_argument("--destination", required = True, metavar = "<path>", help = "path to the epub package to create")
-        argument_parser.add_argument("--intermediate", metavar = "<path>", help = "path to the directory where to create the intermediate files")
+        argument_parser = subparsers.add_parser("convert-odt-to-epub",
+            help = "convert an odt file to an epub package")
+        argument_parser.add_argument("--configuration", required = True,
+            metavar = "<path>", help = "path to the epub configuration")
+        argument_parser.add_argument("--destination", required = True,
+            metavar = "<path>", help = "path to the epub package to create")
+        argument_parser.add_argument("--intermediate", required = True,
+            metavar = "<path>", help = "path to the directory where to create the intermediate files")
         argument_parser.add_argument("--extra", nargs = "*", type = parse_key_value_parameter, default = [],
             metavar = "<key=value>", help = "provide extra information as key value pairs")
-        argument_parser.add_argument("--overwrite", action = "store_true", help = "overwrite the destination file in case it already exists")
+        argument_parser.add_argument("--overwrite", action = "store_true",
+            help = "overwrite the destination file in case it already exists")
 
         return argument_parser
 
@@ -42,7 +47,7 @@ class ConvertOdtToEpubCommand(ApplicationCommand):
             serializer = create_serializer(os.path.splitext(arguments.configuration)[1].lstrip(".")),
             configuration_file_path = os.path.normpath(arguments.configuration),
             destination_file_path = os.path.normpath(arguments.destination),
-            intermediate_directory = os.path.normpath(arguments.intermediate) if arguments.intermediate is not None else None,
+            intermediate_directory = os.path.normpath(arguments.intermediate),
             extra_information = dict(arguments.extra),
             overwrite = arguments.overwrite)
 

@@ -57,7 +57,7 @@ class EpubContentXhtmlBuilder:
 
     def add_style_sheet(self, relative_css_file_path: str) -> None:
         head_as_xml = epub_xhtml_helpers.find_xhtml_element(self._xhtml_document.getroot(), "./x:head")
-        attributes = { "href": relative_css_file_path, "rel": "stylesheet", "type": "text/css" }
+        attributes = { "href": relative_css_file_path.replace("\\", "/"), "rel": "stylesheet", "type": "text/css" }
         epub_xhtml_helpers.create_xhtml_subelement(head_as_xml, "link", attributes = attributes)
 
 

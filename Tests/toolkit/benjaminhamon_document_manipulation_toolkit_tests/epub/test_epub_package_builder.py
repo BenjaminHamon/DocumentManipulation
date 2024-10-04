@@ -38,9 +38,12 @@ def test_update_xhtml_links(tmpdir):
 
     package_builder.update_xhtml_links(
         staging_directory = staging_directory,
-        content_files = [ ("Sources/Xhtml/File.xhtml", "EPUB/Content/File.xhtml") ],
-        link_mappings = [ ("Sources/Styles/Generic.css", "EPUB/Resources/Generic.css"),
-                           ("Sources/Styles/LocalEnvironment.css", "EPUB/Resources/TargetEnvironment.css") ])
+        content_files = [
+            ("Sources/Xhtml/File.xhtml", "EPUB/Content/File.xhtml") ],
+        link_mappings = [
+            ("https://www.example.com/Styles/Examples.css", "https://www.example.com/Styles/ExamplesModified.css"),
+            ("Sources/Styles/Generic.css", "EPUB/Resources/Generic.css"),
+            ("Sources/Styles/LocalEnvironment.css", "EPUB/Resources/TargetEnvironment.css") ])
 
     with open(os.path.join(staging_directory, "EPUB", "content", "file.xhtml"), mode = "r", encoding = "utf-8") as xhtml_file:
         xhtml_file_content_final = xhtml_file.read()
@@ -49,7 +52,7 @@ def test_update_xhtml_links(tmpdir):
 <?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
-    <link href="https://www.example.com/Styles/Examples.css" rel="stylesheet" type="text/css"/>
+    <link href="https://www.example.com/Styles/ExamplesModified.css" rel="stylesheet" type="text/css"/>
     <link href="../Resources/Generic.css" rel="stylesheet" type="text/css"/>
     <link href="../Resources/TargetEnvironment.css" rel="stylesheet" type="text/css"/>
   </head>

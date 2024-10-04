@@ -22,6 +22,7 @@ class OdtToEpubConfiguration: # pylint: disable = too-many-instance-attributes
     source_section_regex: Optional[str] = None
     fodt_template_file_path: Optional[str] = None
     cover_file: Optional[str] = None
+    cover_svg_template_file_path: Optional[str] = None
 
     # Content conversion
     xhtml_section_template_file_path: Optional[str] = None

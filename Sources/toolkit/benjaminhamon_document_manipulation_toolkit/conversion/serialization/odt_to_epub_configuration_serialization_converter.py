@@ -54,6 +54,7 @@ class OdtToEpubConfigurationSerializationConverter(SerializationConverter):
         odt_to_epub_configuration.source_section_regex = obj_as_serializable.get("source_section_regex", None)
         odt_to_epub_configuration.fodt_template_file_path = self._path_converter.convert_from_serializable(obj_as_serializable.get("fodt_template_file_path", None))
         odt_to_epub_configuration.cover_file = self._path_converter.convert_from_serializable(obj_as_serializable.get("cover_file", None))
+        odt_to_epub_configuration.cover_svg_template_file_path = self._path_converter.convert_from_serializable(obj_as_serializable.get("cover_svg_template_file_path", None))
 
         # Content conversion
         odt_to_epub_configuration.xhtml_section_template_file_path = self._path_converter.convert_from_serializable(obj_as_serializable.get("xhtml_section_template_file_path", None))

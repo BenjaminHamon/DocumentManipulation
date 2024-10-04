@@ -113,6 +113,9 @@ def generate_cover( # pylint: disable = too-many-arguments, too-many-locals
     format_parameters["date"] = now.strftime("%d-%b-%Y")
     format_parameters.update(extra_information)
 
+    for index, line in enumerate(format_parameters["title"].split("-")):
+        format_parameters["title_multiline_%s" % index] = line
+
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
     svg_document = lxml.etree.parse(template_file_path, xml_parser)
     xml_operations.format_text_in_xml(svg_document.getroot(), format_parameters)

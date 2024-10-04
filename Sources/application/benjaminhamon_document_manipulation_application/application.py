@@ -12,6 +12,7 @@ from benjaminhamon_document_manipulation_application.commands.convert_odt_to_epu
 from benjaminhamon_document_manipulation_application.commands.convert_odt_to_xhtml_command import ConvertOdtToXhtmlCommand
 from benjaminhamon_document_manipulation_application.commands.create_epub_package_command import CreateEpubPackageCommand
 from benjaminhamon_document_manipulation_application.commands.generate_epub_files_command import GenerateEpubFilesCommand
+from benjaminhamon_document_manipulation_application.commands.generate_cover_command import GenerateCoverCommand
 from benjaminhamon_document_manipulation_application.commands.generate_information_as_xhtml_command import GenerateInformationAsXhtmlCommand
 from benjaminhamon_document_manipulation_application.commands.info_command import InfoCommand
 from benjaminhamon_document_manipulation_application.commands.rewrite_odt_command import RewriteOdtCommand
@@ -68,6 +69,7 @@ def create_command_collection() -> List[ApplicationCommand]:
         ConvertOdtToEpubCommand(),
         ConvertOdtToXhtmlCommand(),
         CreateEpubPackageCommand(),
+        GenerateCoverCommand(),
         GenerateEpubFilesCommand(),
         GenerateInformationAsXhtmlCommand(),
         InfoCommand(),

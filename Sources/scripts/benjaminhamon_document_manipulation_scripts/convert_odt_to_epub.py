@@ -10,6 +10,7 @@ from typing import List, Mapping, Optional
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import convert_odt_to_xhtml
 from benjaminhamon_document_manipulation_scripts.create_epub_package import create_epub_package
+from benjaminhamon_document_manipulation_scripts.generate_cover import generate_cover
 from benjaminhamon_document_manipulation_scripts.generate_epub_files import generate_epub_files
 from benjaminhamon_document_manipulation_scripts.generate_information_as_xhtml import generate_information_as_xhtml
 from benjaminhamon_document_manipulation_scripts.rewrite_odt import rewrite_odt
@@ -115,6 +116,7 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
         os.makedirs(intermediate_directory)
 
     intermediate_fodt_file_path = os.path.join(intermediate_directory, "FullText.fodt")
+    intermediate_cover_file_path = os.path.join(intermediate_directory, "Cover.jpeg")
     intermediate_xhtml_extra_directory = os.path.join(intermediate_directory, "ExtraAsXhtml")
     intermediate_xhtml_section_directory = os.path.join(intermediate_directory, "SectionsAsXhtml")
     intermediate_epub_generation_file_path = os.path.join(intermediate_directory, "EpubGenerationConfiguration.yaml")
@@ -143,6 +145,21 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
             simulate = simulate)
 
         odt_to_epub_configuration.content_files_before.insert(0, os.path.join(intermediate_xhtml_extra_directory, "Information.xhtml"))
+
+    if odt_to_epub_configuration.cover_svg_template_file_path is not None:
+        generate_cover(
+            serializer = serializer,
+            information_file_path = odt_to_epub_configuration.information_file_path,
+            dc_metadata_file_path = odt_to_epub_configuration.dc_metadata_file_path,
+            destination_file_path = intermediate_cover_file_path,
+            template_file_path = odt_to_epub_configuration.cover_svg_template_file_path,
+            image_format = "jpeg",
+            revision_control = odt_to_epub_configuration.revision_control,
+            extra_information = extra_information,
+            now = now,
+            simulate = simulate)
+
+        odt_to_epub_configuration.cover_file = intermediate_cover_file_path
 
     convert_odt_to_xhtml(
         source_file_path_collection = [ intermediate_fodt_file_path ],

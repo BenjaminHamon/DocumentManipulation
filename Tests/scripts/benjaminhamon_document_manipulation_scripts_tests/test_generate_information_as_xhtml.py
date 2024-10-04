@@ -62,7 +62,7 @@ def _setup_workspace(workspace_directory: str) -> None:
 title: "Some Title"
 author: "Some Author"
 publisher: "Some Publisher"
-version: "1.0.0"
+version_identifier: "1.0.0"
 copyright: "Copyright © 2020 Some Author"
 """
 
@@ -90,7 +90,7 @@ copyright: "Copyright © 2020 Some Author"
         <div>Draft {date}</div>
       </div>
       <div id="version-information">
-        <div>Version {version}</div>
+        <div>Version {version_identifier}</div>
       </div>
       <div id="copyright-notice">
         <div>{copyright}</div>

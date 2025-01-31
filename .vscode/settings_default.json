@@ -3,6 +3,9 @@
 
 	"isort.args": [ "--settings-file", ".isort.cfg" ],
 
+	"python.analysis.typeCheckingMode": "basic",
+	"python.testing.pytestEnabled": true,
+
 	// For sources
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
 
@@ -12,6 +15,8 @@
 		"./Sources/toolkit/",
 	],
 
+	"python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Tests" ],
+
 	// // For automation
 	// "python.defaultInterpreterPath": "${workspaceFolder}/.venv-automation/scripts/python",
 
@@ -19,8 +24,5 @@
 	// 	"./Automation/Scripts",
 	// ],
 
-	"python.analysis.typeCheckingMode": "basic",
-
-	"python.testing.pytestEnabled": true,
-	"python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Automation", "Tests" ],
+	// "python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Automation" ],
 }

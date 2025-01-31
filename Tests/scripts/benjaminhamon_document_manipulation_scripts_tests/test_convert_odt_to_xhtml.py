@@ -3,6 +3,7 @@
 import os
 
 from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import convert_odt_to_xhtml
+from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import create_serializer
 
 
 def test_convert_odt_to_xhtml(tmpdir):
@@ -14,6 +15,7 @@ def test_convert_odt_to_xhtml(tmpdir):
     _setup_workspace(workspace_directory)
 
     convert_odt_to_xhtml(
+        serializer = create_serializer("yaml"),
         source_file_path_collection = [ source_file_path ],
         destination_directory = output_directory,
         style_sheet_file_path = css_file_path,
@@ -33,6 +35,7 @@ def test_convert_odt_to_xhtml_with_simulate(tmpdir):
     _setup_workspace(workspace_directory)
 
     convert_odt_to_xhtml(
+        serializer = create_serializer("yaml"),
         source_file_path_collection = [ source_file_path ],
         destination_directory = output_directory,
         style_sheet_file_path = css_file_path,

@@ -54,9 +54,8 @@ def split_odt(
     odt_reader = OdtReader(xml_parser)
     odt_writer = OdtWriter(xml_parser)
 
-    odt_content = _read_source(odt_reader, source_file_path)
-    document_content = odt_reader.read_content(odt_content)
-    document_comments = odt_reader.read_comments(odt_content)
+    document_content = odt_reader.read_content_from_file(source_file_path)
+    document_comments = odt_reader.read_comments_from_file(source_file_path)
 
     if not simulate:
         if os.path.exists(destination_directory):
@@ -66,12 +65,6 @@ def split_odt(
     odt_writer.write_as_many_documents(
         destination_directory, document_content, document_comments,
         template_file_path = template_file_path, flat_odt = True, simulate = simulate)
-
-
-def _read_source(odt_reader: OdtReader, source_file_path: str) -> bytes:
-    if source_file_path.endswith(".fodt"):
-        return odt_reader.read_fodt(source_file_path)
-    return odt_reader.read_odt(source_file_path, "content.xml")
 
 
 if __name__ == "__main__":

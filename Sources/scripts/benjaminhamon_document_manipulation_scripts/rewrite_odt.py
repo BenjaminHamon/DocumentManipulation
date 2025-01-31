@@ -53,9 +53,8 @@ def rewrite_odt(
     odt_reader = OdtReader(xml_parser)
     odt_writer = OdtWriter(xml_parser)
 
-    odt_content = odt_reader.read_fodt(source_file_path)
-    document_content = odt_reader.read_content(odt_content)
-    document_comments = odt_reader.read_comments(odt_content)
+    document_content = odt_reader.read_content_from_file(source_file_path)
+    document_comments = odt_reader.read_comments_from_file(source_file_path)
 
     odt_writer.write_as_single_document(
         destination_file_path, document_content, document_comments,

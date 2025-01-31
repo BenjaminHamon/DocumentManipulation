@@ -6,6 +6,7 @@ import os
 
 from benjaminhamon_document_manipulation_application.application_command import ApplicationCommand
 from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import convert_odt_to_xhtml
+from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import create_serializer
 
 
 logger = logging.getLogger("Main")
@@ -33,6 +34,7 @@ class ConvertOdtToXhtmlCommand(ApplicationCommand):
 
     def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
         convert_odt_to_xhtml(
+            serializer = create_serializer(os.path.splitext(arguments.style_sheet)[1].lstrip(".") if arguments.style_sheet is not None else "yaml"),
             source_file_path_collection = [ os.path.normpath(path) for path in arguments.source ],
             destination_directory = os.path.normpath(arguments.output),
             template_file_path = os.path.normpath(arguments.template) if arguments.template is not None else None,

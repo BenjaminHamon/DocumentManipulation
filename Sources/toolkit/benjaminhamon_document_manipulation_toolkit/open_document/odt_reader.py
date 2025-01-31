@@ -16,10 +16,11 @@ from benjaminhamon_document_manipulation_toolkit.documents.elements.section_elem
 from benjaminhamon_document_manipulation_toolkit.documents.elements.text_element import TextElement
 from benjaminhamon_document_manipulation_toolkit.documents.elements.text_region_end_element import TextRegionEndElement
 from benjaminhamon_document_manipulation_toolkit.documents.elements.text_region_start_element import TextRegionStartElement
+from benjaminhamon_document_manipulation_toolkit.interfaces.document_reader import DocumentReader
 from benjaminhamon_document_manipulation_toolkit.xml import xpath_helpers
 
 
-class OdtReader:
+class OdtReader(DocumentReader):
 
 
     def __init__(self, xml_parser: lxml.etree.XMLParser) -> None:
@@ -27,18 +28,13 @@ class OdtReader:
         self._region_counter: int = 0
 
 
-    def read_fodt(self, odt_file_path: str) -> bytes:
-        with open(odt_file_path, mode = "rb") as fodt_file:
-            return fodt_file.read()
+    def read_metadata_from_file(self, document_file_path: str) -> dict:
+        document_data = self._read_odt(document_file_path, "meta.xml")
+        return self.read_metadata_from_string(document_data)
 
 
-    def read_odt(self, odt_file_path: str, content_file_path: str) -> bytes:
-        with zipfile.ZipFile(odt_file_path, mode = "r") as odt_file:
-            return odt_file.read(content_file_path)
-
-
-    def read_metadata(self, odt_as_bytes: bytes) -> dict:
-        odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
+    def read_metadata_from_string(self, document_data: str) -> dict:
+        odt_as_xml = lxml.etree.fromstring(document_data, self._xml_parser)
         metadata_as_xml = odt_as_xml.find("office:meta", namespaces = odt_as_xml.nsmap) # type: ignore
 
         if metadata_as_xml is None:
@@ -74,10 +70,15 @@ class OdtReader:
         return metadata
 
 
-    def read_content(self, odt_as_bytes: bytes) -> RootElement:
+    def read_content_from_file(self, document_file_path: str) -> RootElement:
+        document_data = self._read_odt(document_file_path, "content.xml")
+        return self.read_content_from_string(document_data)
+
+
+    def read_content_from_string(self, document_data: str) -> RootElement:
         self._region_counter = 0
 
-        odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
+        odt_as_xml = lxml.etree.fromstring(document_data, self._xml_parser)
 
         self._strip_annotation_data(odt_as_xml)
         self._strip_layout_elements(odt_as_xml)
@@ -106,10 +107,15 @@ class OdtReader:
         return root_element
 
 
-    def read_comments(self, odt_as_bytes: bytes) -> List[DocumentComment]:
+    def read_comments_from_file(self, document_file_path: str) -> List[DocumentComment]:
+        document_data = self._read_odt(document_file_path, "content.xml")
+        return self.read_comments_from_string(document_data)
+
+
+    def read_comments_from_string(self, document_data: str) -> List[DocumentComment]:
         self._region_counter = 0
 
-        odt_as_xml = lxml.etree.fromstring(odt_as_bytes, self._xml_parser)
+        odt_as_xml = lxml.etree.fromstring(document_data, self._xml_parser)
 
         body_as_xml = xpath_helpers.find_xml_element(odt_as_xml, "office:body/office:text", odt_as_xml.nsmap)
         all_annotation_elements = xpath_helpers.try_find_xml_element_collection(body_as_xml, "//*[self::office:annotation]", odt_as_xml.nsmap)
@@ -119,6 +125,26 @@ class OdtReader:
             all_comments.append(self._convert_comment_element(element, odt_as_xml.nsmap))
 
         return all_comments
+
+
+    def _read_odt(self, odt_file_path: str, file_path_in_archive: str) -> str:
+
+        def strip_encoding_declaration(xml_data: str) -> str:
+            if not xml_data.startswith("<?xml "):
+                return xml_data
+
+            xml_data_start_index = xml_data.index("<", 1)
+            return xml_data[xml_data_start_index:]
+
+        if odt_file_path.endswith(".fodt"):
+            with open(odt_file_path, mode = "r", encoding = "utf-8") as fodt_file:
+                return strip_encoding_declaration(fodt_file.read())
+
+        if odt_file_path.endswith(".odt"):
+            with zipfile.ZipFile(odt_file_path, mode = "r") as odt_file:
+                return strip_encoding_declaration(odt_file.read(file_path_in_archive).decode("utf-8"))
+
+        raise ValueError("File extension should be fodt or odt: '%s'" % odt_file_path)
 
 
     def _strip_annotation_data(self, odt_as_xml: lxml.etree._Element) -> None:

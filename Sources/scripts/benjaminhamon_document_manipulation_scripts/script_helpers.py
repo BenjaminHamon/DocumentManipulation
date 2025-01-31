@@ -7,6 +7,7 @@ from typing import Dict, Mapping, Optional
 from benjaminhamon_document_manipulation_scripts.revision_control.git_client import GitClient
 from benjaminhamon_document_manipulation_scripts.revision_control.revision_control_client import RevisionControlClient
 from benjaminhamon_document_manipulation_toolkit.documents import metadata_operations
+from benjaminhamon_document_manipulation_toolkit.documents.document_definition import DocumentDefinition
 from benjaminhamon_document_manipulation_toolkit.documents.document_information import DocumentInformation
 from benjaminhamon_document_manipulation_toolkit.metadata.dc_metadata import DcMetadata
 from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
@@ -36,6 +37,23 @@ def configure_logging(verbosity: str) -> None:
         format = "[{levelname}][{name}] {message}",
         datefmt = "%Y-%m-%dT%H:%M:%S",
         style = "{")
+
+
+def load_document_definition(
+        serializer: Serializer, definition_file_path: Optional[str], source_file_path: Optional[str]) -> DocumentDefinition:
+
+    if definition_file_path is None and source_file_path is None:
+        raise ValueError("Exactly one of 'definition_file_path' and 'source_file_path' must be set")
+    if definition_file_path is not None and source_file_path is not None:
+        raise ValueError("Exactly one of 'definition_file_path' and 'source_file_path' must be set")
+
+    if definition_file_path is not None:
+        return serializer.deserialize_from_file(definition_file_path, DocumentDefinition)
+
+    if source_file_path is not None:
+        return DocumentDefinition(source_file_path = source_file_path, content_section_identifiers = [ "*" ])
+
+    raise RuntimeError("Unreachable")
 
 
 def gather_document_metadata( # pylint: disable = too-many-arguments

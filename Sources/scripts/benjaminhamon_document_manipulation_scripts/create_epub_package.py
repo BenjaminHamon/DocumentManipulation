@@ -39,7 +39,7 @@ def create_epub_package(
 
     if os.path.exists(destination_file_path):
         if not overwrite:
-            raise RuntimeError("Destination already exists")
+            raise RuntimeError("Destination already exists: '%s'" % destination_file_path)
 
     content_writer = EpubContentWriter()
     package_builder = EpubPackageBuilder(content_writer)

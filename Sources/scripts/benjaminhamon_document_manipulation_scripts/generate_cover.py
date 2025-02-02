@@ -96,7 +96,7 @@ def generate_cover( # pylint: disable = too-many-arguments, too-many-locals
 
     if os.path.exists(destination_file_path):
         if not overwrite:
-            raise RuntimeError("Destination already exists")
+            raise RuntimeError("Destination already exists: '%s'" % destination_file_path)
 
     format_parameters: Mapping[str,str] = {}
 

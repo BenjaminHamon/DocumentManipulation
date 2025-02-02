@@ -55,7 +55,7 @@ def generate_epub_files(
 
     if os.path.exists(destination_directory):
         if not overwrite:
-            raise RuntimeError("Destination already exists")
+            raise RuntimeError("Destination already exists: '%s'" % destination_directory)
 
     epub_generation_configuration: EpubGenerationConfiguration \
         = serializer.deserialize_from_file(configuration_file_path, EpubGenerationConfiguration)

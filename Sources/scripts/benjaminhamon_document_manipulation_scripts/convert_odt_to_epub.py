@@ -102,7 +102,7 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
 
     if os.path.exists(destination_file_path):
         if not overwrite:
-            raise RuntimeError("Destination already exists")
+            raise RuntimeError("Destination already exists: '%s'" % destination_file_path)
 
     odt_to_epub_configuration: OdtToEpubConfiguration = serializer.deserialize_from_file(configuration_file_path, OdtToEpubConfiguration)
     if odt_to_epub_configuration.source_file_path is None:

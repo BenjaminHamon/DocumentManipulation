@@ -64,7 +64,7 @@ def convert_odt_to_xhtml( # pylint: disable = too-many-arguments
 
     if os.path.exists(destination_directory):
         if not overwrite:
-            raise RuntimeError("Destination already exists")
+            raise RuntimeError("Destination already exists: '%s'" % destination_directory)
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
     odt_reader = OdtReader(xml_parser)

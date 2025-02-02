@@ -69,7 +69,7 @@ def stage_files_for_epub_package( # pylint: disable = too-many-arguments
 
     if os.path.exists(destination_directory):
         if not overwrite:
-            raise RuntimeError("Destination already exists")
+            raise RuntimeError("Destination already exists: '%s'" % destination_directory)
 
     content_writer = EpubContentWriter()
     package_builder = EpubPackageBuilder(content_writer)

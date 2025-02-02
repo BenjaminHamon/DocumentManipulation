@@ -28,12 +28,12 @@ class YamlSerializer(Serializer):
     def serialize_to_file(self, obj: Any, file_path: str) -> None:
         obj_as_serializable = self._convert_to_serializable(obj)
         with open(file_path, mode = "w", encoding = self.encoding) as data_file:
-            yaml.safe_dump(obj_as_serializable, data_file, indent = self.indent, width = self.max_width, sort_keys = self.sort_keys)
+            yaml.safe_dump(obj_as_serializable, data_file, allow_unicode = True, indent = self.indent, width = self.max_width, sort_keys = self.sort_keys)
 
 
     def serialize_to_string(self, obj: Any) -> str:
         obj_as_serializable = self._convert_to_serializable(obj)
-        return yaml.safe_dump(obj_as_serializable, indent = self.indent, width = self.max_width, sort_keys = self.sort_keys)
+        return yaml.safe_dump(obj_as_serializable, allow_unicode = True, indent = self.indent, width = self.max_width, sort_keys = self.sort_keys)
 
 
     def deserialize_from_file(self, file_path: str, obj_type: type) -> Any:

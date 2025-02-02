@@ -42,5 +42,8 @@ dev = [
 [project.urls]
 "Source" = "https://github.com/BenjaminHamon/DocumentManipulation"
 
+[project.scripts]
+DocumentManipulation = "benjaminhamon_document_manipulation_application.application:main"
+
 [tool.setuptools]
 license-files = [ "../../About.md", "../../License.txt" ]

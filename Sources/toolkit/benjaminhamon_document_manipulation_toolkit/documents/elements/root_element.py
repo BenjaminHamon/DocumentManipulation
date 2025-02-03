@@ -1,7 +1,7 @@
 from typing import Iterator
 
-from benjaminhamon_document_manipulation_toolkit.documents.document_element import DocumentElement
-from benjaminhamon_document_manipulation_toolkit.documents.section_element import SectionElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.document_element import DocumentElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.section_element import SectionElement
 
 
 class RootElement(DocumentElement):

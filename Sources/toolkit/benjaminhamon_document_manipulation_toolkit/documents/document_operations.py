@@ -1,7 +1,7 @@
 from typing import Dict, Iterator, Optional
 
 from benjaminhamon_document_manipulation_toolkit import convert_helpers
-from benjaminhamon_document_manipulation_toolkit.documents.document_element import DocumentElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.document_element import DocumentElement
 
 
 def enumerate_all_elements(element: DocumentElement) -> Iterator[DocumentElement]:

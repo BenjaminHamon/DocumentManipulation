@@ -11,7 +11,7 @@ import yaml
 
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_toolkit.documents import document_operations
-from benjaminhamon_document_manipulation_toolkit.documents.root_element import RootElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import EpubXhtmlWriter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
 

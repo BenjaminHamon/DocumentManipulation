@@ -7,7 +7,7 @@ from typing import Optional
 import lxml.etree
 
 from benjaminhamon_document_manipulation_toolkit.documents import document_operations
-from benjaminhamon_document_manipulation_toolkit.documents.root_element import RootElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.epub.epub_content_xhtml_builder import EpubContentXhtmlBuilder
 
 

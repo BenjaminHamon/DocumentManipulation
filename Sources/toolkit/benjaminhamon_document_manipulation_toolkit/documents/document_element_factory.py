@@ -1,9 +1,9 @@
 from typing import List
 
-from benjaminhamon_document_manipulation_toolkit.documents.heading_element import HeadingElement
-from benjaminhamon_document_manipulation_toolkit.documents.paragraph_element import ParagraphElement
-from benjaminhamon_document_manipulation_toolkit.documents.section_element import SectionElement
-from benjaminhamon_document_manipulation_toolkit.documents.text_element import TextElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.heading_element import HeadingElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.paragraph_element import ParagraphElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.section_element import SectionElement
+from benjaminhamon_document_manipulation_toolkit.documents.elements.text_element import TextElement
 
 
 def create_section(heading: str, text: List[List[str]]) -> SectionElement:

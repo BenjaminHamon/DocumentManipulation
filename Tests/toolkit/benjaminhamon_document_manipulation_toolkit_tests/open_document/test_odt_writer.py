@@ -13,6 +13,7 @@ from benjaminhamon_document_manipulation_toolkit.documents.elements.document_com
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.documents.elements.text_region_end_element import TextRegionEndElement
 from benjaminhamon_document_manipulation_toolkit.documents.elements.text_region_start_element import TextRegionStartElement
+from benjaminhamon_document_manipulation_toolkit.open_document.document_to_odt_converter import DocumentToOdtConverter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_writer import OdtWriter
 
 
@@ -44,7 +45,7 @@ def create_generic_document() -> RootElement:
 
 def test_write_as_single_document_to_fodt(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     fodt_file_path = os.path.join(tmpdir, "Working", "MyDocument.fodt")
@@ -108,7 +109,7 @@ def test_write_as_single_document_to_fodt_with_comments(tmpdir):
   <office:body>
     <office:text>
       <text:h><text:span>The Section</text:span></text:h>
-      <text:p><text:span>Before the comment.</text:span><office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p>Some comment.</text:p><text:p>More text in the comment.</text:p></office:annotation><text:span>Inside the comment.</text:span></text:p>
+      <text:p><text:span>Before the comment.</text:span><office:annotation office:name="__Annotation__123"><dc:creator>Benjamin Hamon</dc:creator><dc:date>2020-01-01T00:00:00</dc:date><text:p><text:span>Some comment.</text:span></text:p><text:p><text:span>More text in the comment.</text:span></text:p></office:annotation><text:span>Inside the comment.</text:span></text:p>
       <text:p><text:span>Inside the comment again.</text:span><office:annotation-end office:name="__Annotation__123"/><text:span>After the comment.</text:span></text:p>
     </office:text>
   </office:body>
@@ -118,7 +119,7 @@ def test_write_as_single_document_to_fodt_with_comments(tmpdir):
         return expected_content.lstrip()
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_document()
     comment = insert_comment(document)
@@ -138,7 +139,7 @@ def test_write_as_single_document_to_fodt_with_comments(tmpdir):
 
 def test_write_as_single_document_to_fodt_with_template(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     template_file_path = os.path.join(tmpdir, "Working", "Template.fodt")
@@ -194,7 +195,7 @@ def test_write_as_single_document_to_fodt_with_template(tmpdir):
 
 def test_write_as_single_document_to_fodt_with_template_and_whitespace(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     template_file_path = os.path.join(tmpdir, "Working", "Template.fodt")
@@ -251,7 +252,7 @@ def test_write_as_single_document_to_fodt_with_template_and_whitespace(tmpdir):
 
 def test_write_as_single_document_to_odt(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     odt_file_path = os.path.join(tmpdir, "Working", "MyDocument.odt")
@@ -287,7 +288,7 @@ def test_write_as_single_document_to_odt(tmpdir):
 
 def test_write_as_single_document_to_fodt_with_simulate(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     fodt_file_path = os.path.join(tmpdir, "Working", "MyDocument.fodt")
 
@@ -299,7 +300,7 @@ def test_write_as_single_document_to_fodt_with_simulate(tmpdir):
 
 def test_write_as_single_document_to_odt_with_simulate(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     odt_file_path = os.path.join(tmpdir, "Working", "MyDocument.odt")
 
@@ -311,7 +312,7 @@ def test_write_as_single_document_to_odt_with_simulate(tmpdir):
 
 def test_write_as_many_documents_to_fodt(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -372,7 +373,7 @@ def test_write_as_many_documents_to_fodt(tmpdir):
 
 def test_write_as_many_documents_to_odt(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -433,7 +434,7 @@ def test_write_as_many_documents_to_odt(tmpdir):
 
 def test_write_as_many_documents_to_fodt_with_simulate(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -445,7 +446,7 @@ def test_write_as_many_documents_to_fodt_with_simulate(tmpdir):
 
 def test_write_as_many_documents_to_odt_with_simulate(tmpdir):
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document = create_generic_document()
     odt_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -504,7 +505,7 @@ def test_collapse_body_elements():
     document_formatted_expected = document_formatted_expected.lstrip()
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_writer = OdtWriter(xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document_formatted_actual = odt_writer._collapse_body_elements(document) # pylint: disable = protected-access
 

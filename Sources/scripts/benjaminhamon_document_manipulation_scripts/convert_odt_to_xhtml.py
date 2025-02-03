@@ -13,6 +13,7 @@ from benjaminhamon_document_manipulation_toolkit.documents import document_opera
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import EpubXhtmlWriter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
+from benjaminhamon_document_manipulation_toolkit.open_document.odt_to_document_converter import OdtToDocumentConverter
 from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
 from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
@@ -74,7 +75,7 @@ def convert_odt_to_xhtml( # pylint: disable = too-many-arguments
             raise RuntimeError("Destination already exists: '%s'" % destination_directory)
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
     xhtml_writer = EpubXhtmlWriter()
 
     document_content = read_source(odt_reader, source_file_path_collection, section_regex)

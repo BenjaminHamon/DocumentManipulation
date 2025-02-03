@@ -8,7 +8,9 @@ from typing import Optional
 import lxml.etree
 
 from benjaminhamon_document_manipulation_scripts import script_helpers
+from benjaminhamon_document_manipulation_toolkit.open_document.document_to_odt_converter import DocumentToOdtConverter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
+from benjaminhamon_document_manipulation_toolkit.open_document.odt_to_document_converter import OdtToDocumentConverter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_writer import OdtWriter
 
 
@@ -51,8 +53,8 @@ def split_odt(
             raise RuntimeError("Destination already exists: '%s'" % destination_directory)
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
-    odt_writer = OdtWriter(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
+    odt_writer = OdtWriter(DocumentToOdtConverter(), xml_parser)
 
     document_content = odt_reader.read_content_from_file(source_file_path)
     document_comments = odt_reader.read_comments_from_file(source_file_path)

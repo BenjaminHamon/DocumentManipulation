@@ -45,7 +45,8 @@ def load_document_raw(xml_parser: lxml.etree.XMLParser, template_file_path: str)
 
 
 def get_body_text_element(xml_document: lxml.etree._ElementTree) -> lxml.etree._Element:
-    return xpath_helpers.find_xml_element(xml_document.getroot(), "./office:body/office:text", xml_document.getroot().nsmap)
+    namespaces = xpath_helpers.sanitize_namespaces_for_xpath(xml_document.getroot().nsmap)
+    return xpath_helpers.find_xml_element(xml_document.getroot(), "./office:body/office:text", namespaces)
 
 
 def remove_content(xml_document: lxml.etree._ElementTree) -> None:

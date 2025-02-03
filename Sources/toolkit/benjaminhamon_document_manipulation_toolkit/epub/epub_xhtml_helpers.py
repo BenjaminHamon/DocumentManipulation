@@ -46,7 +46,7 @@ def create_xhtml_subelement(
 def try_find_xhtml_element_collection(element: lxml.etree._Element, xpath: str) -> List[lxml.etree._Element]:
 
     # XPath cannot work with the default namespace, thus we pass an explicit namespace for XHTML
-    namespaces: Dict[Optional[str],str] = { "x": epub_namespaces.xhtml_default_namespace }
+    namespaces: Dict[str,str] = { "x": epub_namespaces.xhtml_default_namespace }
 
     return xpath_helpers.try_find_xml_element_collection(element, xpath, namespaces)
 
@@ -54,7 +54,7 @@ def try_find_xhtml_element_collection(element: lxml.etree._Element, xpath: str) 
 def try_find_xhtml_element(element: lxml.etree._Element, xpath: str) -> Optional[lxml.etree._Element]:
 
     # XPath cannot work with the default namespace, thus we pass an explicit namespace for XHTML
-    namespaces: Dict[Optional[str],str] = { "x": epub_namespaces.xhtml_default_namespace }
+    namespaces: Dict[str,str] = { "x": epub_namespaces.xhtml_default_namespace }
 
     return xpath_helpers.try_find_xml_element(element, xpath, namespaces)
 
@@ -62,7 +62,7 @@ def try_find_xhtml_element(element: lxml.etree._Element, xpath: str) -> Optional
 def find_xhtml_element(element: lxml.etree._Element, xpath: str) -> lxml.etree._Element:
 
     # XPath cannot work with the default namespace, thus we pass an explicit namespace for XHTML
-    namespaces: Dict[Optional[str],str] = { "x": epub_namespaces.xhtml_default_namespace }
+    namespaces: Dict[str,str] = { "x": epub_namespaces.xhtml_default_namespace }
 
     return xpath_helpers.find_xml_element(element, xpath, namespaces)
 

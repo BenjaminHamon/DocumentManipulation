@@ -15,6 +15,7 @@
 		"./Sources/toolkit/",
 	],
 
+	"pylint.interpreter": [ "${workspaceFolder}/.venv/scripts/python" ],
 	"python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Tests" ],
 
 	// // For automation
@@ -24,5 +25,6 @@
 	// 	"./Automation/Scripts",
 	// ],
 
+	// "pylint.interpreter": [ "${workspaceFolder}/.venv-automation/scripts/python" ],
 	// "python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Automation" ],
 }

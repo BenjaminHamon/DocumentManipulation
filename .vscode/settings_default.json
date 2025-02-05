@@ -4,11 +4,13 @@
 	"isort.args": [ "--settings-file", ".isort.cfg" ],
 
 	"python.analysis.typeCheckingMode": "basic",
+	"python.analysis.diagnosticMode": "workspace",
 	"python.testing.pytestEnabled": true,
 
 	// For sources
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
 
+	"python.analysis.include": [ "Sources", "Tests" ],
 	"python.analysis.extraPaths": [
 		"./Sources/application/",
 		"./Sources/scripts/",
@@ -21,6 +23,7 @@
 	// // For automation
 	// "python.defaultInterpreterPath": "${workspaceFolder}/.venv-automation/scripts/python",
 
+	// "python.analysis.include": [ "Automation" ],
 	// "python.analysis.extraPaths": [
 	// 	"./Automation/Scripts",
 	// ],

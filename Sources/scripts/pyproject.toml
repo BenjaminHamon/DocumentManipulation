@@ -1,4 +1,4 @@
-# cspell:words asyncio lxml pylint pytest setuptools
+# cspell:words asyncio pylint pytest setuptools
 
 [build-system]
 requires = [ "setuptools >= 64" ]
@@ -27,9 +27,6 @@ classifiers = [
 
 dependencies = [
     "benjaminhamon-document-manipulation-toolkit ~= 1.0.0",
-    "lxml ~= 5.3.0",
-    "lxml-stubs ~= 0.5.1",
-    "PyYAML ~= 6.0.2",
 ]
 
 [project.optional-dependencies]

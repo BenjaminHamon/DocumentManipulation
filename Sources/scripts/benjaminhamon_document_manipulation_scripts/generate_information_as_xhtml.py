@@ -3,13 +3,18 @@ import datetime
 import os
 from typing import Mapping, Optional
 
+import lxml.etree
+import lxml.html
+
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_scripts.revision_control.git_client import GitClient
 from benjaminhamon_document_manipulation_scripts.revision_control.revision_control_client import RevisionControlClient
 from benjaminhamon_document_manipulation_toolkit.documents.document_information import DocumentInformation
 from benjaminhamon_document_manipulation_toolkit.documents.serialization import document_information_serialization_converter
-from benjaminhamon_document_manipulation_toolkit.epub.epub_content_xhtml_builder import EpubContentXhtmlBuilder
+from benjaminhamon_document_manipulation_toolkit.epub import epub_xhtml_helpers
+from benjaminhamon_document_manipulation_toolkit.epub.document_to_xhtml_converter import DocumentToXhtmlConverter
 from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import EpubXhtmlWriter
+from benjaminhamon_document_manipulation_toolkit.html import html_operations
 from benjaminhamon_document_manipulation_toolkit.metadata.dc_metadata import DcMetadata
 from benjaminhamon_document_manipulation_toolkit.metadata.serialization import dc_metadata_serialization_converter
 from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
@@ -93,10 +98,13 @@ def generate_information_as_xhtml( # pylint: disable = too-many-arguments, too-m
         date = now,
         extra_metadata = extra_information)
 
-    xhtml_writer = EpubXhtmlWriter()
-    xhtml_builder = EpubContentXhtmlBuilder("Information", template_file_path)
-    xhtml_builder.update_links(template_file_path, destination_file_path)
-    xhtml_document = xhtml_builder.get_xhtml_document()
+    xhtml_parser = lxml.html.XHTMLParser(remove_blank_text = True)
+    xhtml_writer = EpubXhtmlWriter(DocumentToXhtmlConverter(), xhtml_parser)
+
+    xhtml_document = epub_xhtml_helpers.create_xhtml_base("Information", xhtml_parser, template_file_path)
+    for link_element in epub_xhtml_helpers.try_find_xhtml_element_collection(xhtml_document.getroot(), "//x:link"):
+        html_operations.update_link(link_element, template_file_path, destination_file_path)
+
     xml_operations.format_text_in_xml(xhtml_document.getroot(), document_metadata)
     xhtml_writer.write_to_file(destination_file_path, xhtml_document, simulate = simulate)
 

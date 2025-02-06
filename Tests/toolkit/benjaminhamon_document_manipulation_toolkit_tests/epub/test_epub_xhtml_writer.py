@@ -2,8 +2,11 @@
 
 import os
 
+import lxml.html.html5parser
+
 from benjaminhamon_document_manipulation_toolkit.documents import document_element_factory
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
+from benjaminhamon_document_manipulation_toolkit.epub.document_to_xhtml_converter import DocumentToXhtmlConverter
 from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import EpubXhtmlWriter
 
 
@@ -34,14 +37,16 @@ def create_document() -> RootElement:
 
 
 def test_write_as_many_documents(tmpdir):
-    xhtml_writer = EpubXhtmlWriter()
+    xhtml_parser = lxml.html.XHTMLParser(remove_blank_text = True)
+    xhtml_writer = EpubXhtmlWriter(DocumentToXhtmlConverter(), xhtml_parser)
 
+    metadata = { "title": "The Title" }
     document = create_document()
     css_file_path = os.path.join(tmpdir, "Sources", "Styles.css")
     xhtml_directory = os.path.join(tmpdir, "Working", "MyDocument")
 
     os.makedirs(xhtml_directory)
-    xhtml_writer.write_as_many_documents(xhtml_directory, document, css_file_path = css_file_path, simulate = False)
+    xhtml_writer.write_as_many_documents(xhtml_directory, metadata, document, css_file_path = css_file_path, simulate = False)
 
     assert len(os.listdir(xhtml_directory)) == 2
 
@@ -115,8 +120,10 @@ def test_write_as_many_documents(tmpdir):
 
 
 def test_write_as_many_documents_with_template(tmpdir):
-    xhtml_writer = EpubXhtmlWriter()
+    xhtml_parser = lxml.html.XHTMLParser(remove_blank_text = True)
+    xhtml_writer = EpubXhtmlWriter(DocumentToXhtmlConverter(), xhtml_parser)
 
+    metadata = { "title": "The Title" }
     document = create_document()
     template_file_path = os.path.join(tmpdir, "Sources", "Template.xhtml")
     xhtml_directory = os.path.join(tmpdir, "Working", "MyDocument")
@@ -140,7 +147,7 @@ def test_write_as_many_documents_with_template(tmpdir):
         template_file.write(template_content)
 
     os.makedirs(xhtml_directory)
-    xhtml_writer.write_as_many_documents(xhtml_directory, document, template_file_path = template_file_path, simulate = False)
+    xhtml_writer.write_as_many_documents(xhtml_directory, metadata, document, section_template_file_path = template_file_path, simulate = False)
 
     assert len(os.listdir(xhtml_directory)) == 2
 
@@ -214,11 +221,13 @@ def test_write_as_many_documents_with_template(tmpdir):
 
 
 def test_write_as_many_documents_with_simulate(tmpdir):
-    xhtml_writer = EpubXhtmlWriter()
+    xhtml_parser = lxml.html.XHTMLParser(remove_blank_text = True)
+    xhtml_writer = EpubXhtmlWriter(DocumentToXhtmlConverter(), xhtml_parser)
 
+    metadata = { "title": "The Title" }
     document = create_document()
     xhtml_directory = os.path.join(tmpdir, "Working", "MyDocument")
 
-    xhtml_writer.write_as_many_documents(xhtml_directory, document, simulate = True)
+    xhtml_writer.write_as_many_documents(xhtml_directory, metadata, document, simulate = True)
 
     assert not os.path.exists(xhtml_directory)

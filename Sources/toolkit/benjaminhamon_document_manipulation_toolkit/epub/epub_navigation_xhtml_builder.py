@@ -14,18 +14,7 @@ class EpubNavigationXhtmlBuilder:
 
 
     def __init__(self, title: str) -> None:
-        self._xhtml_document = EpubNavigationXhtmlBuilder._create_document(title)
-
-
-    @staticmethod
-    def _create_document(title: str) -> lxml.etree._ElementTree:
-        document = epub_xhtml_helpers.create_xhtml()
-
-        head_element = epub_xhtml_helpers.find_xhtml_element(document.getroot(), "./x:head")
-        title_element = epub_xhtml_helpers.create_xhtml_subelement(head_element, "title")
-        title_element.text = title
-
-        return document
+        self._xhtml_document = epub_xhtml_helpers.create_xhtml_base(title)
 
 
     def get_xhtml_document(self) -> lxml.etree._ElementTree:

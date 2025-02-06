@@ -77,8 +77,8 @@ def test_create_package(tmpdir):
     toc_file_path = os.path.join(source_directory, "toc.xhtml")
 
     os.makedirs(source_directory)
-    content_writer.write_xml(os.path.join(source_directory, "my_first_section.xhtml"), epub_xhtml_helpers.create_xhtml())
-    content_writer.write_xml(os.path.join(source_directory, "my_second_section.xhtml"), epub_xhtml_helpers.create_xhtml())
+    content_writer.write_xml(os.path.join(source_directory, "my_first_section.xhtml"), epub_xhtml_helpers.create_xhtml_base("my_first_section"))
+    content_writer.write_xml(os.path.join(source_directory, "my_second_section.xhtml"), epub_xhtml_helpers.create_xhtml_base("my_second_section"))
     container_file_path = os.path.join(source_directory, "container.xml")
     package_document_file_path = os.path.join(source_directory, "content.opf")
     toc_file_path = os.path.join(source_directory, "toc.xhtml")

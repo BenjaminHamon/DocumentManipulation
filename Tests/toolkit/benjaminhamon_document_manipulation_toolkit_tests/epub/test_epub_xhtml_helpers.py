@@ -10,13 +10,15 @@ import pytest
 from benjaminhamon_document_manipulation_toolkit.epub import epub_xhtml_helpers
 
 
-def test_create_xhtml():
-    document = epub_xhtml_helpers.create_xhtml()
+def test_create_xhtml_base():
+    document = epub_xhtml_helpers.create_xhtml_base("The Title")
 
     document_as_string_expected = """
 <?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-  <head/>
+  <head>
+    <title>The Title</title>
+  </head>
   <body/>
 </html>
 """

@@ -7,10 +7,12 @@ import shutil
 from typing import List, Optional
 
 import lxml.etree
+import lxml.html
 
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_toolkit.documents import document_operations
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
+from benjaminhamon_document_manipulation_toolkit.epub.document_to_xhtml_converter import DocumentToXhtmlConverter
 from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import EpubXhtmlWriter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_to_document_converter import OdtToDocumentConverter
@@ -76,7 +78,8 @@ def convert_odt_to_xhtml( # pylint: disable = too-many-arguments
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
     odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
-    xhtml_writer = EpubXhtmlWriter()
+    xhtml_parser = lxml.html.XHTMLParser(remove_blank_text = True)
+    xhtml_writer = EpubXhtmlWriter(DocumentToXhtmlConverter(), xhtml_parser)
 
     document_content = read_source(odt_reader, source_file_path_collection, section_regex)
 
@@ -88,8 +91,8 @@ def convert_odt_to_xhtml( # pylint: disable = too-many-arguments
             shutil.rmtree(destination_directory)
         os.makedirs(destination_directory)
 
-    xhtml_writer.write_as_many_documents(destination_directory, document_content,
-        template_file_path = template_file_path, css_file_path = style_sheet_file_path, simulate = simulate)
+    xhtml_writer.write_as_many_documents(destination_directory, {}, document_content,
+        section_template_file_path = template_file_path, css_file_path = style_sheet_file_path, simulate = simulate)
 
 
 def read_source(odt_reader: OdtReader, source_file_path_collection: List[str], section_regex: Optional[str] = None) -> RootElement:

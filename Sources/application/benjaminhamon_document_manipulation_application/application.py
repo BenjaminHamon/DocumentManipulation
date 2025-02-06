@@ -14,7 +14,6 @@ from benjaminhamon_document_manipulation_application.commands.create_epub_packag
 from benjaminhamon_document_manipulation_application.commands.generate_epub_files_command import GenerateEpubFilesCommand
 from benjaminhamon_document_manipulation_application.commands.generate_cover_command import GenerateCoverCommand
 from benjaminhamon_document_manipulation_application.commands.generate_information_as_xhtml_command import GenerateInformationAsXhtmlCommand
-from benjaminhamon_document_manipulation_application.commands.info_command import InfoCommand
 from benjaminhamon_document_manipulation_application.commands.rewrite_odt_command import RewriteOdtCommand
 from benjaminhamon_document_manipulation_application.commands.split_odt_command import SplitOdtCommand
 from benjaminhamon_document_manipulation_application.commands.stage_files_for_epub_package_command import StageFilesForEpubPackageCommand
@@ -72,7 +71,6 @@ def create_command_collection() -> List[ApplicationCommand]:
         GenerateCoverCommand(),
         GenerateEpubFilesCommand(),
         GenerateInformationAsXhtmlCommand(),
-        InfoCommand(),
         RewriteOdtCommand(),
         SplitOdtCommand(),
         StageFilesForEpubPackageCommand(),

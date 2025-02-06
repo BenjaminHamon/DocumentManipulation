@@ -11,6 +11,7 @@ def create_document() -> lxml.etree._ElementTree:
     namespaces = {
         "dc": odt_namespaces.dc_namespace,
         "draw": odt_namespaces.draw_namespace,
+        "meta": odt_namespaces.meta_namespace,
         "office": odt_namespaces.office_namespace,
         "text": odt_namespaces.text_namespace,
     }

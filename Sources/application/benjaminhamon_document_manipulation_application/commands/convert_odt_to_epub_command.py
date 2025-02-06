@@ -49,7 +49,8 @@ class ConvertOdtToEpubCommand(ApplicationCommand):
             destination_file_path = os.path.normpath(arguments.destination),
             intermediate_directory = os.path.normpath(arguments.intermediate),
             extra_information = dict(arguments.extra),
-            overwrite = arguments.overwrite)
+            overwrite = arguments.overwrite,
+            simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

@@ -29,7 +29,8 @@ class CreateEpubPackageCommand(ApplicationCommand):
         create_epub_package(
             source_directory = os.path.normpath(arguments.source),
             destination_file_path = os.path.normpath(arguments.destination),
-            overwrite = arguments.overwrite)
+            overwrite = arguments.overwrite,
+            simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

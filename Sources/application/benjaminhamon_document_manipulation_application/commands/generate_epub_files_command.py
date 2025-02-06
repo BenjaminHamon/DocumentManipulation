@@ -30,7 +30,8 @@ class GenerateEpubFilesCommand(ApplicationCommand):
             serializer = create_serializer(os.path.splitext(arguments.configuration)[1].lstrip(".")),
             configuration_file_path = os.path.normpath(arguments.configuration),
             destination_directory = os.path.normpath(arguments.destination),
-            overwrite = arguments.overwrite)
+            overwrite = arguments.overwrite,
+            simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

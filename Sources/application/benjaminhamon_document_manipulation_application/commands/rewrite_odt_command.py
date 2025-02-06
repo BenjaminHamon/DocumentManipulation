@@ -33,7 +33,8 @@ class RewriteOdtCommand(ApplicationCommand):
             source_file_path = os.path.normpath(arguments.source),
             destination_file_path = os.path.normpath(arguments.destination),
             template_file_path = os.path.normpath(arguments.template) if arguments.template is not None else None,
-            overwrite = arguments.overwrite)
+            overwrite = arguments.overwrite,
+            simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

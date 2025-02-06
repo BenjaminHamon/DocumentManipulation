@@ -39,7 +39,8 @@ class ConvertOdtToXhtmlCommand(ApplicationCommand):
             style_sheet_file_path = os.path.normpath(arguments.style_sheet) if arguments.template is not None else None,
             style_map_file_path = arguments.style_map,
             section_regex = arguments.section_regex,
-            overwrite = arguments.overwrite)
+            overwrite = arguments.overwrite,
+            simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

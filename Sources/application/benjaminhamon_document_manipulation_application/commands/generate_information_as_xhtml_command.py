@@ -46,7 +46,8 @@ class GenerateInformationAsXhtmlCommand(ApplicationCommand):
             template_file_path = os.path.normpath(arguments.template),
             revision_control = arguments.revision_control,
             extra_information = dict(arguments.extra),
-            overwrite = arguments.overwrite)
+            overwrite = arguments.overwrite,
+            simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

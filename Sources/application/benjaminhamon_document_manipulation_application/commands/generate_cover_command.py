@@ -56,7 +56,8 @@ class GenerateCoverCommand(ApplicationCommand):
             image_format = arguments.format,
             revision_control = arguments.revision_control,
             extra_information = dict(arguments.extra),
-            overwrite = arguments.overwrite)
+            overwrite = arguments.overwrite,
+            simulate = simulate)
 
 
     async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:

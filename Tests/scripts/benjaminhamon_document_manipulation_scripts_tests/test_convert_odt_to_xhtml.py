@@ -3,54 +3,27 @@
 import os
 
 from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import convert_odt_to_xhtml
-from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import create_serializer
-
-
-def test_convert_odt_to_xhtml(tmpdir):
-    workspace_directory = os.path.join(tmpdir, "Workspace")
-    source_file_path = os.path.join(workspace_directory, "FullText.fodt")
-    css_file_path = os.path.join(workspace_directory, "Styles.css")
-    output_directory = os.path.join(workspace_directory, "SectionsAsXhtml")
-
-    _setup_workspace(workspace_directory)
-
-    convert_odt_to_xhtml(
-        serializer = create_serializer("yaml"),
-        source_file_path_collection = [ source_file_path ],
-        destination_directory = output_directory,
-        style_sheet_file_path = css_file_path,
-        section_regex = r"^Chapter ",
-        simulate = False,
-    )
-
-    _assert_output(workspace_directory)
-
-
-def test_convert_odt_to_xhtml_with_simulate(tmpdir):
-    workspace_directory = os.path.join(tmpdir, "Workspace")
-    source_file_path = os.path.join(workspace_directory, "FullText.fodt")
-    css_file_path = os.path.join(workspace_directory, "Styles.css")
-    output_directory = os.path.join(workspace_directory, "SectionsAsXhtml")
-
-    _setup_workspace(workspace_directory)
-
-    convert_odt_to_xhtml(
-        serializer = create_serializer("yaml"),
-        source_file_path_collection = [ source_file_path ],
-        destination_directory = output_directory,
-        style_sheet_file_path = css_file_path,
-        section_regex = r"^Chapter ",
-        simulate = True,
-    )
-
-    assert not os.path.exists(output_directory)
 
 
 def _setup_workspace(workspace_directory: str) -> None:
-    source_file_path = os.path.join(workspace_directory, "FullText.fodt")
-    css_file_path = os.path.join(workspace_directory, "Styles.css")
 
-    fodt_data = """
+    def create_configuration() -> None:
+        configuration_file_path = os.path.join(workspace_directory, "OdtToXhtmlConfiguration.yaml")
+
+        configuration_data = """
+style_sheet_file_path: "{workspace_directory}/Styles.css"
+"""
+
+        configuration_data = configuration_data.lstrip().format(workspace_directory = workspace_directory.replace("\\", "/"))
+
+        with open(configuration_file_path, mode = "w", encoding = "utf-8") as configuration_file:
+            configuration_file.write(configuration_data)
+
+
+    def create_fodt() -> None:
+        fodt_file_path = os.path.join(workspace_directory, "FullText.fodt")
+
+        fodt_data = """
 <?xml version="1.0" encoding="utf-8"?>
 <office:document
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
@@ -61,8 +34,6 @@ def _setup_workspace(workspace_directory: str) -> None:
   </office:meta>
   <office:body>
     <office:text>
-      <text:h text:style-name="section-heading">Foreword</text:h>
-      <text:p text:style-name="section-paragraph">Foreword text</text:p>
       <text:h text:style-name="section-heading">Chapter 1</text:h>
       <text:p text:style-name="section-paragraph">Chapter 1 paragraph 1</text:p>
       <text:p text:style-name="section-paragraph">Chapter 1 paragraph 2</text:p>
@@ -80,13 +51,62 @@ def _setup_workspace(workspace_directory: str) -> None:
 </office:document>
 """
 
-    fodt_data = fodt_data.lstrip()
+        fodt_data = fodt_data.lstrip()
+
+        with open(fodt_file_path, mode = "w", encoding = "utf-8") as fodt_file:
+            fodt_file.write(fodt_data)
+
+    def create_style_sheet() -> None:
+        css_file_path = os.path.join(workspace_directory, "Styles.css")
+
+        with open(css_file_path, mode = "w", encoding = "utf-8") as css_file:
+            css_file.write("")
 
     os.makedirs(workspace_directory)
-    with open(source_file_path, mode = "w", encoding = "utf-8") as source_file:
-        source_file.write(fodt_data)
-    with open(css_file_path, mode = "w", encoding = "utf-8") as css_file:
-        css_file.write("")
+
+    create_configuration()
+    create_fodt()
+    create_style_sheet()
+
+
+def test_convert_odt_to_xhtml_as_many_files(tmpdir):
+    workspace_directory = os.path.join(tmpdir, "Workspace")
+    configuration_file_path = os.path.join(workspace_directory, "OdtToXhtmlConfiguration.yaml")
+    source_file_path = os.path.join(workspace_directory, "FullText.fodt")
+    output_directory = os.path.join(workspace_directory, "SectionsAsXhtml")
+
+    _setup_workspace(workspace_directory)
+
+    convert_odt_to_xhtml(
+        configuration_file_path = configuration_file_path,
+        definition_file_path = None,
+        source_file_path = source_file_path,
+        destination_file_path_or_directory = output_directory,
+        write_as_single_file = False,
+        simulate = False,
+    )
+
+    _assert_output(workspace_directory)
+
+
+def test_convert_odt_to_xhtml_as_many_files_with_simulate(tmpdir):
+    workspace_directory = os.path.join(tmpdir, "Workspace")
+    configuration_file_path = os.path.join(workspace_directory, "OdtToXhtmlConfiguration.yaml")
+    source_file_path = os.path.join(workspace_directory, "FullText.fodt")
+    output_directory = os.path.join(workspace_directory, "SectionsAsXhtml")
+
+    _setup_workspace(workspace_directory)
+
+    convert_odt_to_xhtml(
+        configuration_file_path = configuration_file_path,
+        definition_file_path = None,
+        source_file_path = source_file_path,
+        destination_file_path_or_directory = output_directory,
+        write_as_single_file = False,
+        simulate = True,
+    )
+
+    assert not os.path.exists(output_directory)
 
 
 def _assert_output(workspace_directory: str) -> None:

@@ -1,7 +1,7 @@
-from typing import Dict
+from typing import Mapping
 
 
-def format_text(source_text: str, parameters: Dict[str,str]) -> str:
+def format_text(source_text: str, parameters: Mapping[str,str]) -> str:
     try:
         return source_text.format(**parameters)
     except KeyError as exception:

@@ -35,7 +35,7 @@ def test_create_container_as_xml():
     assert document_as_string == document_as_string_expected
 
 
-def test_convert_package_document_to_xml():
+def test_convert_package_document_to_xhtml():
     content_writer = EpubContentWriter()
 
     package_document = EpubPackageDocument()
@@ -56,7 +56,7 @@ def test_convert_package_document_to_xml():
     package_document.add_spine_item(EpubSpineItem("my_first_section_xhtml"))
     package_document.add_spine_item(EpubSpineItem("my_second_section_xhtml"))
 
-    package_document_as_xml = content_writer.convert_package_document_to_xml(package_document, ".")
+    package_document_as_xml = content_writer.convert_package_document_to_xhtml(package_document, ".")
 
     document_as_string_expected = """
 <?xml version="1.0" encoding="utf-8"?>

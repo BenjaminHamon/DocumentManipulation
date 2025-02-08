@@ -79,7 +79,7 @@ class EpubPackageBuilder:
                         if matching_mapping is not None:
                             link_element.attrib["href"] = matching_mapping[1]
 
-                self._content_writer.write_xml(destination, document, simulate = simulate)
+                self._content_writer.write_xml_file(destination, document, simulate = simulate)
 
 
     def create_package(self, package_file_path: str, staging_directory: str, simulate: bool = False) -> None:

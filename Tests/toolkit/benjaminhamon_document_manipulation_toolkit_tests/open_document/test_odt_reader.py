@@ -12,16 +12,16 @@ from benjaminhamon_document_manipulation_toolkit.documents.elements.text_element
 from benjaminhamon_document_manipulation_toolkit.documents.elements.text_region_end_element import TextRegionEndElement
 from benjaminhamon_document_manipulation_toolkit.documents.elements.text_region_start_element import TextRegionStartElement
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
+from benjaminhamon_document_manipulation_toolkit.open_document.odt_to_document_converter import OdtToDocumentConverter
 
 
 def test_read_metadata_from_fodt():
     fodt_file_path = os.path.join(os.path.dirname(__file__), "empty.fodt")
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    fodt_data = odt_reader.read_fodt(fodt_file_path)
-    document_metadata = odt_reader.read_metadata(fodt_data)
+    document_metadata = odt_reader.read_metadata_from_file(fodt_file_path)
 
     assert document_metadata["title"] == "My Document"
     assert document_metadata["author"] == "Benjamin Hamon"
@@ -36,10 +36,9 @@ def test_read_metadata_from_odt():
     odt_file_path = os.path.join(os.path.dirname(__file__), "empty.odt")
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    odt_data = odt_reader.read_odt(odt_file_path, "meta.xml")
-    document_metadata = odt_reader.read_metadata(odt_data)
+    document_metadata = odt_reader.read_metadata_from_file(odt_file_path)
 
     assert document_metadata["title"] == "My Document"
     assert document_metadata["author"] == "Benjamin Hamon"
@@ -54,10 +53,9 @@ def test_read_content_from_empty_fodt():
     fodt_file_path = os.path.join(os.path.dirname(__file__), "empty.fodt")
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    fodt_data = odt_reader.read_fodt(fodt_file_path)
-    document_content = odt_reader.read_content(fodt_data)
+    document_content = odt_reader.read_content_from_file(fodt_file_path)
 
     assert len(document_content.children) == 0
 
@@ -66,10 +64,9 @@ def test_read_content_from_empty_odt():
     odt_file_path = os.path.join(os.path.dirname(__file__), "empty.odt")
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    odt_data = odt_reader.read_odt(odt_file_path, "content.xml")
-    document_content = odt_reader.read_content(odt_data)
+    document_content = odt_reader.read_content_from_file(odt_file_path)
 
     assert sum(1 for _ in document_content.enumerate_sections()) == 0
 
@@ -78,10 +75,9 @@ def test_read_content_from_simple_fodt():
     fodt_file_path = os.path.join(os.path.dirname(__file__), "simple.fodt")
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    fodt_data = odt_reader.read_fodt(fodt_file_path)
-    document_content = odt_reader.read_content(fodt_data)
+    document_content = odt_reader.read_content_from_file(fodt_file_path)
 
     assert sum(1 for _ in document_content.enumerate_sections()) == 1
 
@@ -107,10 +103,9 @@ def test_read_content_from_simple_odt():
     odt_file_path = os.path.join(os.path.dirname(__file__), "simple.odt")
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    odt_data = odt_reader.read_odt(odt_file_path, "content.xml")
-    document_content = odt_reader.read_content(odt_data)
+    document_content = odt_reader.read_content_from_file(odt_file_path)
 
     assert sum(1 for _ in document_content.enumerate_sections()) == 1
 
@@ -136,7 +131,6 @@ def test_read_content_from_clean_fodt():
 
 # cspell:disable
     fodt_data = """
-<?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
@@ -155,12 +149,12 @@ def test_read_content_from_clean_fodt():
 """
 # cspell:enable
 
-    fodt_data = fodt_data.lstrip().encode("utf-8")
+    fodt_data = fodt_data.lstrip()
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    document_content = odt_reader.read_content(fodt_data)
+    document_content = odt_reader.read_content_from_string(fodt_data)
 
     assert sum(1 for _ in document_content.enumerate_sections()) == 1
 
@@ -193,7 +187,6 @@ def test_read_content_from_clean_fodt():
 
 def test_read_content_with_soft_page_breaks():
     fodt_data = """
-<?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
@@ -207,12 +200,12 @@ def test_read_content_with_soft_page_breaks():
 </office:document>
     """
 
-    fodt_data = fodt_data.lstrip().encode("utf-8")
+    fodt_data = fodt_data.lstrip()
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    document_content = odt_reader.read_content(fodt_data)
+    document_content = odt_reader.read_content_from_string(fodt_data)
 
     assert sum(1 for _ in document_content.enumerate_sections()) == 1
 
@@ -255,7 +248,6 @@ def test_read_content_with_soft_page_breaks():
 
 def test_read_content_with_comments():
     fodt_data = """
-<?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
@@ -267,12 +259,12 @@ def test_read_content_with_comments():
 </office:document>
     """
 
-    fodt_data = fodt_data.lstrip().encode("utf-8")
+    fodt_data = fodt_data.lstrip()
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    document_content = odt_reader.read_content(fodt_data)
+    document_content = odt_reader.read_content_from_string(fodt_data)
 
     assert sum(1 for _ in document_content.enumerate_sections()) == 1
 
@@ -311,7 +303,6 @@ def test_read_content_with_comments():
 
 def test_read_comments():
     fodt_data = """
-<?xml version="1.0" encoding="utf-8"?>
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
   <office:body>
     <office:text>
@@ -323,12 +314,12 @@ def test_read_comments():
 </office:document>
     """
 
-    fodt_data = fodt_data.lstrip().encode("utf-8")
+    fodt_data = fodt_data.lstrip()
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
 
-    document_comments = odt_reader.read_comments(fodt_data)
+    document_comments = odt_reader.read_comments_from_string(fodt_data)
 
     assert len(document_comments) == 1
     assert document_comments[0].region_identifier == "__Annotation__123"

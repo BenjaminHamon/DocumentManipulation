@@ -3,6 +3,7 @@
 import os
 
 from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import convert_odt_to_xhtml
+from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import create_serializer
 
 
 def test_convert_odt_to_xhtml(tmpdir):
@@ -14,6 +15,7 @@ def test_convert_odt_to_xhtml(tmpdir):
     _setup_workspace(workspace_directory)
 
     convert_odt_to_xhtml(
+        serializer = create_serializer("yaml"),
         source_file_path_collection = [ source_file_path ],
         destination_directory = output_directory,
         style_sheet_file_path = css_file_path,
@@ -33,6 +35,7 @@ def test_convert_odt_to_xhtml_with_simulate(tmpdir):
     _setup_workspace(workspace_directory)
 
     convert_odt_to_xhtml(
+        serializer = create_serializer("yaml"),
         source_file_path_collection = [ source_file_path ],
         destination_directory = output_directory,
         style_sheet_file_path = css_file_path,
@@ -49,7 +52,13 @@ def _setup_workspace(workspace_directory: str) -> None:
 
     fodt_data = """
 <?xml version="1.0" encoding="utf-8"?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document
+    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:meta>
+    <meta:user-defined meta:name="Language">English</meta:user-defined>
+  </office:meta>
   <office:body>
     <office:text>
       <text:h text:style-name="section-heading">Foreword</text:h>

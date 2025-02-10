@@ -162,6 +162,7 @@ def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
         odt_to_epub_configuration.cover_file = intermediate_cover_file_path
 
     convert_odt_to_xhtml(
+        serializer = serializer,
         source_file_path_collection = [ intermediate_fodt_file_path ],
         destination_directory = intermediate_xhtml_section_directory,
         template_file_path = odt_to_epub_configuration.xhtml_section_template_file_path,

@@ -1,4 +1,4 @@
-# cspell:words fodt lxml postprocess
+# cspell:words fodt lxml
 
 import logging
 import os
@@ -11,7 +11,7 @@ from benjaminhamon_document_manipulation_toolkit.documents import document_opera
 from benjaminhamon_document_manipulation_toolkit.documents.elements.document_comment import DocumentComment
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.open_document import odt_operations
-from benjaminhamon_document_manipulation_toolkit.open_document.odt_builder import OdtBuilder
+from benjaminhamon_document_manipulation_toolkit.open_document.document_to_odt_converter import DocumentToOdtConverter
 
 
 logger = logging.getLogger("OdtWriter")
@@ -20,7 +20,8 @@ logger = logging.getLogger("OdtWriter")
 class OdtWriter:
 
 
-    def __init__(self, xml_parser: lxml.etree.XMLParser) -> None:
+    def __init__(self, converter: DocumentToOdtConverter, xml_parser: lxml.etree.XMLParser) -> None:
+        self._converter = converter
         self._xml_parser = xml_parser
 
         self.pretty_print = True
@@ -59,13 +60,13 @@ class OdtWriter:
 
         document_comments_as_dictionary = { comment.region_identifier: comment for comment in document_comments }
 
-        odt_builder = OdtBuilder(self._create_document(template_file_path))
-        odt_builder.add_content(document_content, document_comments_as_dictionary)
+        xml_document = self._create_document(template_file_path)
+        xml_document = self._converter.convert(xml_document, document_content, document_comments_as_dictionary)
 
-        self.write_to_file(output_file_path, odt_builder.get_xml_document(), flat_odt = flat_odt, simulate = simulate)
+        self.write_to_file(output_file_path, xml_document, flat_odt = flat_odt, simulate = simulate)
 
 
-    def write_as_many_documents(self, # pylint: disable = too-many-arguments
+    def write_as_many_documents(self, # pylint: disable = too-many-arguments, too-many-locals
             output_directory: str, document_content: RootElement, document_comments: List[DocumentComment],
             template_file_path: Optional[str] = None, flat_odt: bool = False, simulate: bool = False) -> None:
 
@@ -73,15 +74,17 @@ class OdtWriter:
         section_count = document_content.get_section_count()
 
         for section_index, section in enumerate(document_content.enumerate_sections()):
+            section_root = RootElement()
+            section_root.children.append(section)
             title = section.get_heading().get_title()
 
-            odt_builder = OdtBuilder(self._create_document(template_file_path))
-            odt_builder.add_section(section, document_comments_as_dictionary)
+            xml_document = self._create_document(template_file_path)
+            xml_document = self._converter.convert(xml_document, section_root, document_comments_as_dictionary)
 
             file_name = document_operations.generate_section_file_name(title, section_index, section_count)
             odt_file_path = os.path.join(output_directory, file_name + (".fodt" if flat_odt else ".odt"))
 
-            self.write_to_file(odt_file_path, odt_builder.get_xml_document(), flat_odt = flat_odt, simulate = simulate)
+            self.write_to_file(odt_file_path, xml_document, flat_odt = flat_odt, simulate = simulate)
 
 
     def _create_document(self, template_file_path: Optional[str]) -> lxml.etree._ElementTree:

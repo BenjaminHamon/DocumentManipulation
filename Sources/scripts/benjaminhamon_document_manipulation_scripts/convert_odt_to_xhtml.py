@@ -7,13 +7,15 @@ import shutil
 from typing import List, Optional
 
 import lxml.etree
-import yaml
 
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_toolkit.documents import document_operations
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import EpubXhtmlWriter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
+from benjaminhamon_document_manipulation_toolkit.open_document.odt_to_document_converter import OdtToDocumentConverter
+from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
+from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 def main() -> None:
@@ -22,6 +24,7 @@ def main() -> None:
     script_helpers.configure_logging(arguments.verbosity)
 
     convert_odt_to_xhtml(
+        serializer = create_serializer(os.path.splitext(arguments.style_sheet)[1].lstrip(".") if arguments.style_sheet is not None else "yaml"),
         source_file_path_collection = [ os.path.normpath(path) for path in arguments.source ],
         destination_directory = os.path.normpath(arguments.output),
         template_file_path = os.path.normpath(arguments.template) if arguments.template is not None else None,
@@ -49,7 +52,12 @@ def parse_arguments() -> argparse.Namespace:
     return arguments
 
 
+def create_serializer(serialization_type: str) -> Serializer:
+    return serializer_factory.create_serializer(serialization_type)
+
+
 def convert_odt_to_xhtml( # pylint: disable = too-many-arguments
+        serializer: Serializer,
         source_file_path_collection: List[str],
         destination_directory: str,
         style_sheet_file_path: Optional[str] = None,
@@ -67,13 +75,13 @@ def convert_odt_to_xhtml( # pylint: disable = too-many-arguments
             raise RuntimeError("Destination already exists: '%s'" % destination_directory)
 
     xml_parser = lxml.etree.XMLParser(encoding = "utf-8", remove_blank_text = True)
-    odt_reader = OdtReader(xml_parser)
+    odt_reader = OdtReader(OdtToDocumentConverter(), xml_parser)
     xhtml_writer = EpubXhtmlWriter()
 
     document_content = read_source(odt_reader, source_file_path_collection, section_regex)
 
     if style_map_file_path is not None:
-        convert_styles(document_content, style_map_file_path)
+        convert_styles(serializer, document_content, style_map_file_path)
 
     if not simulate:
         if os.path.exists(destination_directory):
@@ -88,12 +96,7 @@ def read_source(odt_reader: OdtReader, source_file_path_collection: List[str], s
     document_content: Optional[RootElement] = None
 
     for source_file_path in source_file_path_collection:
-        if source_file_path.endswith(".fodt"):
-            odt_content = odt_reader.read_fodt(source_file_path)
-        else:
-            odt_content = odt_reader.read_odt(source_file_path, "content.xml")
-
-        new_document_content = odt_reader.read_content(odt_content)
+        new_document_content = odt_reader.read_content_from_file(source_file_path)
 
         if document_content is None:
             document_content = new_document_content
@@ -112,9 +115,8 @@ def read_source(odt_reader: OdtReader, source_file_path_collection: List[str], s
     return document_content
 
 
-def convert_styles(document_content: RootElement, style_map_file_path: str) -> None:
-    with open(style_map_file_path, mode = "r", encoding = "utf-8") as style_map_file:
-        style_map_configuration: dict = yaml.safe_load(style_map_file)
+def convert_styles(serializer: Serializer, document_content: RootElement, style_map_file_path: str) -> None:
+    style_map_configuration: dict = serializer.deserialize_from_file(style_map_file_path, dict)
     style_map = { style["odt"]: style["css"] for style in style_map_configuration["style_collection"] }
 
     document_operations.convert_styles(document_content, style_map)

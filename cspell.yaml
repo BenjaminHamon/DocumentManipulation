@@ -6,6 +6,7 @@ ignorePaths:
   - ".venv-automation/**"
   - ".venv/**"
   - "**/__pycache__/**"
+  - "**/*.drawio"
   - "**/*.egg-info/**"
   - "Artifacts/**"
   - "Sources/*/build/**"

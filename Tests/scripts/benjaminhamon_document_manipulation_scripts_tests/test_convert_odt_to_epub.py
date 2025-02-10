@@ -1,4 +1,4 @@
-# cspell:words dcterms fodt idref itemref oebps opendocument relators rootfile rootfiles
+# cspell:words dcterms fodt idref itemref oebps opendocument rootfile rootfiles
 
 import datetime
 import io
@@ -8,20 +8,21 @@ import zipfile
 import pytest
 
 from benjaminhamon_document_manipulation_scripts.convert_odt_to_epub import convert_odt_to_epub
-from benjaminhamon_document_manipulation_scripts.convert_odt_to_epub import create_serializer
 
 
 def test_convert_odt_to_epub(tmpdir):
     workspace_directory = os.path.join(tmpdir, "Workspace")
     configuration_file_path = os.path.join(workspace_directory, "OdtToEpubConfiguration.yaml")
+    definition_file_path = os.path.join(workspace_directory, "DocumentDefinition.yaml")
     intermediate_directory = os.path.join(workspace_directory, "Intermediate")
     package_file_path = os.path.join(workspace_directory, "Document.epub")
 
     _setup_workspace(workspace_directory)
 
     convert_odt_to_epub(
-        serializer = create_serializer("yaml"),
         configuration_file_path = configuration_file_path,
+        definition_file_path = definition_file_path,
+        source_file_path = None,
         destination_file_path = package_file_path,
         intermediate_directory = intermediate_directory,
         now = datetime.datetime(2020, 1, 1, tzinfo = datetime.timezone.utc),
@@ -35,6 +36,7 @@ def test_convert_odt_to_epub(tmpdir):
 def test_convert_odt_to_epub_with_simulate(tmpdir):
     workspace_directory = os.path.join(tmpdir, "Workspace")
     configuration_file_path = os.path.join(workspace_directory, "OdtToEpubConfiguration.yaml")
+    definition_file_path = os.path.join(workspace_directory, "DocumentDefinition.yaml")
     intermediate_directory = os.path.join(workspace_directory, "Intermediate")
     package_file_path = os.path.join(workspace_directory, "Document.epub")
 
@@ -42,8 +44,9 @@ def test_convert_odt_to_epub_with_simulate(tmpdir):
 
     with pytest.raises(NotImplementedError):
         convert_odt_to_epub(
-            serializer = create_serializer("yaml"),
             configuration_file_path = configuration_file_path,
+            definition_file_path = definition_file_path,
+            source_file_path = None,
             destination_file_path = package_file_path,
             intermediate_directory = intermediate_directory,
             now = datetime.datetime(2020, 1, 1, tzinfo = datetime.timezone.utc),
@@ -61,9 +64,7 @@ def _setup_workspace(workspace_directory: str) -> None:
         configuration_file_path = os.path.join(workspace_directory, "OdtToEpubConfiguration.yaml")
 
         configuration_data = """
-information_file_path: "{workspace_directory}/Information.yaml"
 xhtml_information_template_file_path: "{workspace_directory}/InformationTemplate.xhtml"
-source_file_path: "{workspace_directory}/FullText.fodt"
 source_section_regex: "^Chapter "
 style_sheet_file_path: "{workspace_directory}/Styles.css"
 resource_files: [ "{workspace_directory}/Styles.css" ]
@@ -73,6 +74,20 @@ resource_files: [ "{workspace_directory}/Styles.css" ]
 
         with open(configuration_file_path, mode = "w", encoding = "utf-8") as configuration_file:
             configuration_file.write(configuration_data)
+
+    def create_definition() -> None:
+        definition_file_path = os.path.join(workspace_directory, "DocumentDefinition.yaml")
+
+        definition_data = """
+information_file_path: "{workspace_directory}/Information.yaml"
+source_file_path: "{workspace_directory}/FullText.fodt"
+content_section_identifiers: [ "Chapter *" ]
+"""
+
+        definition_data = definition_data.lstrip().format(workspace_directory = workspace_directory.replace("\\", "/"))
+
+        with open(definition_file_path, mode = "w", encoding = "utf-8") as definition_file:
+            definition_file.write(definition_data)
 
     def create_information() -> None:
         information_file_path = os.path.join(workspace_directory, "Information.yaml")
@@ -97,7 +112,13 @@ version_identifier: "1.0.0"
 
         fodt_data = """
 <?xml version="1.0" encoding="utf-8"?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<office:document
+    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+  <office:meta>
+    <meta:user-defined meta:name="Language">English</meta:user-defined>
+  </office:meta>
   <office:body>
     <office:text>
       <text:h text:style-name="section-heading">Foreword</text:h>
@@ -168,6 +189,7 @@ version_identifier: "1.0.0"
     os.makedirs(os.path.join(workspace_directory, "SectionsAsXhtml"))
 
     create_configuration()
+    create_definition()
     create_information()
     create_fodt()
     create_css()

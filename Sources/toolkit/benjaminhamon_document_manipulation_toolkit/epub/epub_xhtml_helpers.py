@@ -9,18 +9,37 @@ from benjaminhamon_document_manipulation_toolkit.epub import epub_namespaces
 from benjaminhamon_document_manipulation_toolkit.xml import xpath_helpers
 
 
-def create_xhtml() -> lxml.etree._ElementTree:
-    namespaces = {
+def get_namespaces() -> Dict[Optional[str],str]:
+    return {
         None: epub_namespaces.xhtml_default_namespace,
         "epub": epub_namespaces.xhtml_epub_namespace,
     }
 
-    html_element = lxml.etree.Element(lxml.etree.QName(epub_namespaces.xhtml_default_namespace, "html"), attrib = None, nsmap = namespaces) # type: ignore
 
-    create_xhtml_subelement(html_element, "head")
-    create_xhtml_subelement(html_element, "body")
+def qualify_tag(tag: str) -> lxml.etree.QName:
+    return lxml.etree.QName(epub_namespaces.xhtml_default_namespace, tag)
 
-    return lxml.etree.ElementTree(html_element)
+
+def create_xhtml_base(
+        title: str, parser: Optional[lxml.etree.XMLParser] = None, template_file_path: Optional[str] = None) -> lxml.etree._ElementTree:
+
+    def create_or_load():
+        if template_file_path is not None:
+            with open(template_file_path, mode = "r", encoding = "utf-8") as template_file:
+                return lxml.etree.parse(template_file, parser)
+
+        html_root = lxml.etree.Element("html", nsmap = get_namespaces())
+        head_as_html = create_xhtml_subelement(html_root, "head")
+        create_xhtml_subelement(head_as_html, "title")
+        create_xhtml_subelement(html_root, "body")
+        return lxml.etree.ElementTree(html_root)
+
+    html_document = create_or_load()
+    html_root = html_document.getroot()
+    title_as_html = find_xhtml_element(html_root, "./x:head/x:title")
+    title_as_html.text = title
+
+    return html_document
 
 
 def load_xhtml(xhtml_file_path: str) -> lxml.etree._ElementTree:
@@ -31,6 +50,13 @@ def load_xhtml(xhtml_file_path: str) -> lxml.etree._ElementTree:
     body_as_xml.text = None
 
     return xhtml_document
+
+
+def create_xhtml_element(tag: str, attributes: Optional[dict] = None, text: Optional[str] = None) -> lxml.etree._Element:
+    element = lxml.etree.Element(lxml.etree.QName(epub_namespaces.xhtml_default_namespace, tag), attrib = attributes, nsmap = None)
+    element.text = text
+
+    return element
 
 
 def create_xhtml_subelement(

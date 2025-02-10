@@ -6,7 +6,7 @@
 
 ## Overview
 
-Document Manipulation is a toolkit along with an application and scripts for manipulating text documents. It originates from my need to create EPUB files as part of my publishing activity and as of now remains a work in progress.
+Document Manipulation is a toolkit along with an application and scripts for manipulating text documents. It mostly cover EPUB creation, its original goal. The project is a work in progress.
 
 It is free and open source software. See [About](About.md) for more information.
 

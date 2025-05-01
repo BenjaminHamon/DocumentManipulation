@@ -178,6 +178,9 @@ class OdtToDocumentConverter:
         for current_xml_element in text_as_xml.iter(None):
             tag = lxml.etree.QName(current_xml_element).localname
 
+            if tag in ( "bookmark-start", "bookmark-end" ):
+                continue
+
             if tag not in ( "a", "h", "p", "span", "line-break", "annotation", "annotation-end" ):
                 raise ValueError("Unsupported text tag: '%s'" % tag)
 

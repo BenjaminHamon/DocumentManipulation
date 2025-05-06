@@ -65,7 +65,6 @@ def _setup_workspace(workspace_directory: str) -> None:
 
         configuration_data = """
 xhtml_information_template_file_path: "{workspace_directory}/InformationTemplate.xhtml"
-source_section_regex: "^Chapter "
 style_sheet_file_path: "{workspace_directory}/Styles.css"
 resource_files: [ "{workspace_directory}/Styles.css" ]
 """

@@ -26,11 +26,10 @@ classifiers = [
 ]
 
 dependencies = [
+    "benjaminhamon-standard-extensions[all] ~= 1.0.1",
     "html5lib ~= 1.1",
     "lxml ~= 6.0.1",
     "Markdown ~= 3.8.2",
-    "python-dateutil ~= 2.9.0",
-    "PyYAML ~= 6.0.2",
     "rlPyCairo ~= 0.4.0",
     "svglib ~= 1.5.1",
     "types-lxml ~= 2025.8.25",

@@ -60,6 +60,7 @@ def stage_files_for_epub_package( # pylint: disable = too-many-arguments
         configuration_file_path: str,
         destination_directory: str,
         parameters: Dict[str,str],
+        *,
         modified: Optional[datetime.datetime] = None,
         overwrite: bool = False,
         simulate: bool = False) -> None:

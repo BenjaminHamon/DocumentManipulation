@@ -28,13 +28,13 @@ class EpubContentWriter:
 
 
     def write_package_document_file(self,
-            package_document_file_path: str, package_document: EpubPackageDocument, reference_base: str, simulate: bool = False) -> None:
+            package_document_file_path: str, package_document: EpubPackageDocument, reference_base: str, *, simulate: bool = False) -> None:
 
         package_document_as_xhtml = self.convert_package_document_to_xhtml(package_document, reference_base)
         self.write_xml_file(package_document_file_path, package_document_as_xhtml, simulate = simulate)
 
 
-    def write_navigation_file(self, toc_file_path: str, navigation: EpubNavigation, reference_base: str, simulate: bool = False) -> None:
+    def write_navigation_file(self, toc_file_path: str, navigation: EpubNavigation, reference_base: str, *, simulate: bool = False) -> None:
         xhtml_builder = EpubNavigationXhtmlBuilder("Table of Contents")
         xhtml_builder.add_table_of_contents(navigation.navigation_items, reference_base)
         xhtml_builder.add_landmarks(navigation.landmarks, reference_base)
@@ -44,12 +44,12 @@ class EpubContentWriter:
         self.write_xml_file(toc_file_path, navigation_document, simulate = simulate)
 
 
-    def write_container_file(self, container_file_path: str, package_document_file_path: str, simulate: bool = False) -> None:
+    def write_container_file(self, container_file_path: str, package_document_file_path: str, *, simulate: bool = False) -> None:
         container_as_xml = self.create_container_as_xml(package_document_file_path)
         self.write_xml_file(container_file_path, container_as_xml, simulate = simulate)
 
 
-    def write_xml_file(self, output_file_path: str, document_as_html: lxml.etree._ElementTree, simulate: bool = False) -> None:
+    def write_xml_file(self, output_file_path: str, document_as_html: lxml.etree._ElementTree, *, simulate: bool = False) -> None:
         logger.debug("Writing '%s'", output_file_path)
 
         write_options = {

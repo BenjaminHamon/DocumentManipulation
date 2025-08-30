@@ -12,7 +12,9 @@ import svglib.svglib
 logger = logging.getLogger("SvgOperations")
 
 
-def write_to_file(output_file_path: str, svg_as_xml: lxml.etree._ElementTree, encoding: Optional[str] = None, simulate: bool = False) -> None:
+def write_to_file(
+        output_file_path: str, svg_as_xml: lxml.etree._ElementTree, *, encoding: Optional[str] = None, simulate: bool = False) -> None:
+
     logger.debug("Writing '%s'", output_file_path)
 
     if encoding is None:
@@ -32,7 +34,9 @@ def write_to_file(output_file_path: str, svg_as_xml: lxml.etree._ElementTree, en
         os.replace(output_file_path + ".tmp", output_file_path)
 
 
-def convert_to_image(output_file_path: str, svg_as_xml: lxml.etree._ElementTree, source_file_path: str, image_format: str, simulate: bool = False) -> None:
+def convert_to_image(
+        output_file_path: str, svg_as_xml: lxml.etree._ElementTree, source_file_path: str, image_format: str, *, simulate: bool = False) -> None:
+
     svg_renderer = svglib.svglib.SvgRenderer(source_file_path)
     drawing = svg_renderer.render(svg_as_xml.getroot())
 

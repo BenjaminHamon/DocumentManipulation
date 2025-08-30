@@ -50,6 +50,7 @@ def generate_epub_files(
         serializer: Serializer,
         configuration_file_path: str,
         destination_directory: str,
+        *,
         overwrite: bool = False,
         simulate: bool = False) -> None:
 

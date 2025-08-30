@@ -28,7 +28,7 @@ class OdtWriter:
         self.encoding = "utf-8"
 
 
-    def write_to_file(self, output_file_path: str, document: lxml.etree._ElementTree, flat_odt: bool = False, simulate: bool = False) -> None:
+    def write_to_file(self, output_file_path: str, document: lxml.etree._ElementTree, flat_odt: bool = False, *, simulate: bool = False) -> None:
         logger.debug("Writing '%s'", output_file_path)
 
         write_options = {
@@ -54,9 +54,15 @@ class OdtWriter:
                 os.replace(output_file_path + ".tmp", output_file_path)
 
 
-    def write_as_single_document(self, # pylint: disable = too-many-arguments
-            output_file_path: str, document_content: RootElement, document_comments: List[DocumentComment],
-            template_file_path: Optional[str] = None, flat_odt: bool = False, simulate: bool = False) -> None:
+    def write_as_single_document(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
+            output_file_path: str,
+            document_content: RootElement,
+            document_comments: List[DocumentComment],
+            template_file_path: Optional[str] = None,
+            flat_odt: bool = False,
+            *,
+            simulate: bool = False,
+            ) -> None:
 
         document_comments_as_dictionary = { comment.region_identifier: comment for comment in document_comments }
 
@@ -66,9 +72,15 @@ class OdtWriter:
         self.write_to_file(output_file_path, xml_document, flat_odt = flat_odt, simulate = simulate)
 
 
-    def write_as_many_documents(self, # pylint: disable = too-many-arguments, too-many-locals
-            output_directory: str, document_content: RootElement, document_comments: List[DocumentComment],
-            template_file_path: Optional[str] = None, flat_odt: bool = False, simulate: bool = False) -> None:
+    def write_as_many_documents(self, # pylint: disable = too-many-arguments, too-many-locals, too-many-positional-arguments
+            output_directory: str,
+            document_content: RootElement,
+            document_comments: List[DocumentComment],
+            template_file_path: Optional[str] = None,
+            flat_odt: bool = False,
+            *,
+            simulate: bool = False,
+            ) -> None:
 
         document_comments_as_dictionary = { comment.region_identifier: comment for comment in document_comments }
         section_count = document_content.get_section_count()

@@ -31,7 +31,7 @@ def configure_log_stream(stream: TextIO, level: str, message_format: str, date_f
     logging.root.addHandler(stream_handler)
 
 
-def configure_log_file( # pylint: disable = too-many-arguments
+def configure_log_file( # pylint: disable = too-many-arguments, too-many-positional-arguments
         file_path: str, level: str, message_format: str, date_format: str, mode: str, encoding: str) -> None:
 
     if os.path.dirname(file_path):

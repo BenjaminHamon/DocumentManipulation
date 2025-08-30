@@ -9,7 +9,7 @@ from automation_scripts.configuration.workspace_environment import WorkspaceEnvi
 class AutomationConfiguration:
 
 
-    def __init__(self, # pylint: disable = too-many-arguments
+    def __init__(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
             project_metadata: ProjectMetadata,
             python_development_configuration: PythonDevelopmentConfiguration,
             application_development_configuration: ApplicationDevelopmentConfiguration,

@@ -58,6 +58,7 @@ def load_document_definition(
 
 def gather_document_metadata( # pylint: disable = too-many-arguments
         serializer: Serializer,
+        *,
         metadata_from_source: Optional[Mapping[str,str]] = None,
         information_file_path: Optional[str] = None,
         dc_metadata_file_path: Optional[str] = None,

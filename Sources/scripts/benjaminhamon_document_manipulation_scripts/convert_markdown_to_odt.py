@@ -79,6 +79,7 @@ def convert_markdown_to_odt( # pylint: disable = too-many-arguments
         definition_file_path: Optional[str],
         source_file_path: Optional[str],
         destination_file_path: str,
+        *,
         overwrite: bool = False,
         simulate: bool = False) -> None:
 

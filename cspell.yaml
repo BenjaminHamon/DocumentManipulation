@@ -1,15 +1,22 @@
 ---
 
-# cspell:words fodt pycache venv
+# cspell:words fodt pycache pytest venv
+
+files:
+  - "**"
+  - "**/.*/**"
 
 ignorePaths:
+  - ".git/**"
   - ".venv-automation/**"
   - ".venv/**"
   - "**/__pycache__/**"
+  - "**/.pytest_cache/**"
   - "**/*.drawio"
   - "**/*.egg-info/**"
   - "Artifacts/**"
   - "Sources/*/build/**"
+  - "Sources/*/dist/**"
   - "Tests/**/*.fodt"
 
 words:

@@ -20,7 +20,7 @@ class MarkdownWriter:
         self.encoding = "utf-8"
 
 
-    def write_to_file(self, output_file_path: str, document: str, simulate: bool = False) -> None:
+    def write_to_file(self, output_file_path: str, document: str, *, simulate: bool = False) -> None:
         logger.debug("Writing '%s'", output_file_path)
 
         if not simulate:
@@ -30,7 +30,7 @@ class MarkdownWriter:
 
 
     def write_as_single_document(self, # pylint: disable = too-many-arguments
-            output_file_path: str, title: str, metadata: Mapping[str,str], content: RootElement, simulate: bool = False) -> None:
+            output_file_path: str, title: str, metadata: Mapping[str,str], content: RootElement, *, simulate: bool = False) -> None:
 
         document_as_markdown = ""
 
@@ -46,7 +46,7 @@ class MarkdownWriter:
 
 
     def write_as_many_documents(self, # pylint: disable = too-many-arguments
-            output_directory: str, metadata: Mapping[str,str], content: RootElement, simulate: bool = False) -> None:
+            output_directory: str, metadata: Mapping[str,str], content: RootElement, *, simulate: bool = False) -> None:
 
         section_count = content.get_section_count()
 

@@ -79,6 +79,7 @@ def convert_odt_to_xhtml( # pylint: disable = too-many-arguments, too-many-branc
         source_file_path: Optional[str],
         destination_file_path_or_directory: str,
         write_as_single_file: bool,
+        *,
         now: Optional[datetime.datetime] = None,
         overwrite: bool = False,
         simulate: bool = False) -> None:

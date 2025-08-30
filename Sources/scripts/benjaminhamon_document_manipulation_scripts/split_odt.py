@@ -45,6 +45,7 @@ def split_odt(
         source_file_path: str,
         destination_directory: str,
         template_file_path: Optional[str] = None,
+        *,
         overwrite: bool = False,
         simulate: bool = False) -> None:
 

@@ -44,6 +44,7 @@ def rewrite_odt(
         source_file_path: str,
         destination_file_path: str,
         template_file_path: Optional[str] = None,
+        *,
         overwrite: bool = False,
         simulate: bool = False) -> None:
 

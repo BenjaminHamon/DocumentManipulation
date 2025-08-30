@@ -91,13 +91,14 @@ def create_serializer(serialization_type: str) -> Serializer:
     return serializer
 
 
-def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals
+def convert_odt_to_epub( # pylint: disable = too-many-arguments, too-many-locals, too-many-positional-arguments
         configuration_file_path: str,
         definition_file_path: Optional[str],
         source_file_path: Optional[str],
         destination_file_path: str,
         intermediate_directory: str,
         extra_information: Mapping[str,str],
+        *,
         now: Optional[datetime.datetime] = None,
         overwrite: bool = False,
         simulate: bool = False) -> None:
@@ -214,6 +215,7 @@ def write_odt_to_xhtml_configuration(
         serializer: Serializer,
         configuration_file_path: str,
         odt_to_epub_configuration: OdtToEpubConfiguration,
+        *,
         simulate: bool = False) -> None:
 
     odt_to_xhtml_configuration = OdtToXhtmlConfiguration()
@@ -233,6 +235,7 @@ def write_epub_generation_configuration( # pylint: disable = too-many-arguments
         metadata: List[EpubMetadataItem],
         odt_to_epub_configuration: OdtToEpubConfiguration,
         xhtml_directory: str,
+        *,
         simulate: bool = False) -> None:
 
     epub_generation_configuration = EpubGenerationConfiguration()

@@ -1,11 +1,18 @@
 {
+	// cspell:words isort pytest venv
+
 	"$schema": "./schema.json",
+
+	"files.exclude": {
+        "Sources/*/*.egg-info": true,
+        "Sources/*/build": true,
+        "Sources/*/dist": true,
+	},
 
 	"isort.args": [ "--settings-file", ".isort.cfg" ],
 
 	"python.analysis.typeCheckingMode": "basic",
 	"python.analysis.diagnosticMode": "workspace",
-	"python.testing.pytestEnabled": true,
 
 	// For sources
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/scripts/python",
@@ -17,7 +24,7 @@
 		"./Sources/toolkit/",
 	],
 
-	"pylint.interpreter": [ "${workspaceFolder}/.venv/scripts/python" ],
+	"python.testing.pytestEnabled": true,
 	"python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Tests" ],
 
 	// // For automation
@@ -28,6 +35,6 @@
 	// 	"./Automation/Scripts",
 	// ],
 
-	// "pylint.interpreter": [ "${workspaceFolder}/.venv-automation/scripts/python" ],
+	// "python.testing.pytestEnabled": true,
 	// "python.testing.pytestArgs": [ "-c", "${workspaceFolder}/pytest.ini", "Automation" ],
 }

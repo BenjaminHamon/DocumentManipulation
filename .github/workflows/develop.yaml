@@ -9,6 +9,9 @@ on:
     branches:
       - develop
 
+env:
+  PYTHON_VERSION_FOR_APPLICATION: "3.11"
+
 jobs:
 
   check_for_linux:
@@ -74,3 +77,57 @@ jobs:
 
       - name: Run tests
         run: .venv-automation/Scripts/automation.exe --verbosity debug test
+
+  build_for_linux:
+    name: "Build the Linux application"
+    runs-on: ubuntu-latest
+    needs: check_for_linux
+
+    steps:
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION_FOR_APPLICATION }}
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Set up automation
+        run: python Automation/Setup/setup.py --verbosity debug
+
+      - name: Check automation
+        run: python Automation/Setup/check.py --verbosity debug
+
+      - name: Set up sources
+        run: .venv-automation/bin/automation --verbosity debug develop
+
+      - name: Build binaries
+        run: .venv-automation/bin/automation --verbosity debug application build-binaries
+
+  build_for_windows:
+    name: "Build the Windows application"
+    runs-on: windows-latest
+    needs: check_for_windows
+
+    steps:
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION_FOR_APPLICATION }}
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Set up automation
+        run: python Automation/Setup/setup.py --verbosity debug
+
+      - name: Check automation
+        run: python Automation/Setup/check.py --verbosity debug
+
+      - name: Set up sources
+        run: .venv-automation/Scripts/automation --verbosity debug develop
+
+      - name: Build binaries
+        run: .venv-automation/Scripts/automation --verbosity debug application build-binaries

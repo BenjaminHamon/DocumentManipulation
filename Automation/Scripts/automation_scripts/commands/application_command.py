@@ -7,6 +7,10 @@ import platform
 import shutil
 from typing import List
 
+import aiohttp
+
+from benjaminhamon_standard_extensions.web import web_authentication_helpers
+from benjaminhamon_standard_extensions.web.web_client_async import WebClientAsync
 from bhamon_development_toolkit.automation.automation_command import AutomationCommand
 from bhamon_development_toolkit.automation.automation_command_group import AutomationCommandGroup
 from bhamon_development_toolkit.processes.process_runner import ProcessRunner
@@ -19,7 +23,6 @@ from bhamon_development_toolkit.python.python_package import PythonPackage
 from bhamon_development_toolkit.security.interactive_credentials_provider import InteractiveCredentialsProvider
 
 from automation_scripts.configuration.automation_configuration import AutomationConfiguration
-from automation_scripts.toolkit.web.web_client import WebClient
 
 
 logger = logging.getLogger("Main")
@@ -213,7 +216,11 @@ class _UploadPackageCommand(AutomationCommand):
         pass
 
 
-    def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None: # pylint: disable = too-many-locals
+    def run(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
+        raise NotImplementedError("Not supported")
+
+
+    async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None: # pylint: disable = too-many-locals
         automation_configuration: AutomationConfiguration = kwargs["configuration"]
         application_configuration_identifier: str = arguments.configuration
 
@@ -239,13 +246,13 @@ class _UploadPackageCommand(AutomationCommand):
 
         credentials_provider = InteractiveCredentialsProvider()
         credentials = credentials_provider.get_credentials(repository_url)
-        web_client = WebClient(authentication = (credentials.username, credentials.secret))
+        if credentials.username is None or credentials.secret is None:
+            raise ValueError("Credentials are required for upload")
 
-        logger.info("Uploading to remote repository (URL: '%s')", repository_url)
-        if not simulate:
-            web_client.upload_file(artifact_remote_url, artifact_path)
-        logger.debug("Application package URL: '%s'", artifact_remote_url)
+        async with aiohttp.ClientSession() as session:
+            authentication = web_authentication_helpers.get_authentication_for_basic(credentials.username, credentials.secret)
+            web_client = WebClientAsync(logger, session, authentication = authentication)
 
-
-    async def run_async(self, arguments: argparse.Namespace, simulate: bool, **kwargs) -> None:
-        self.run(arguments, simulate = simulate, **kwargs)
+            logger.info("Uploading to remote repository (URL: '%s')", repository_url)
+            await web_client.upload("PUT", artifact_remote_url, artifact_path, simulate = simulate)
+            logger.debug("Application package URL: '%s'", artifact_remote_url)

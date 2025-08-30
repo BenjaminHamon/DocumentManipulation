@@ -49,6 +49,13 @@ jobs:
       - name: Run tests
         run: .venv-automation/bin/automation --verbosity debug test
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CheckResults_Python-${{ matrix.python-version }}_Linux
+          path: Artifacts
+        if: always()
+
   check_for_windows:
     name: "Run checks and tests on Windows using Python ${{ matrix.python-version }}"
     runs-on: windows-latest
@@ -83,6 +90,13 @@ jobs:
 
       - name: Run tests
         run: .venv-automation/Scripts/automation.exe --verbosity debug test
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CheckResults_Python-${{ matrix.python-version }}_Windows
+          path: Artifacts
+        if: always()
 
   build_for_linux:
     name: "Build the Linux application"

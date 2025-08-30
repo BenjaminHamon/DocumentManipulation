@@ -32,8 +32,8 @@ def test_update_xhtml_links(tmpdir):
 </html>
 """
 
-    os.makedirs(os.path.join(staging_directory, "EPUB", "content"))
-    with open(os.path.join(staging_directory, "EPUB", "content", "file.xhtml"), mode = "w", encoding = "utf-8") as xhtml_file:
+    os.makedirs(os.path.join(staging_directory, "EPUB", "Content"))
+    with open(os.path.join(staging_directory, "EPUB", "Content", "File.xhtml"), mode = "w", encoding = "utf-8") as xhtml_file:
         xhtml_file.write(xhtml_file_content_initial.lstrip())
 
     package_builder.update_xhtml_links(
@@ -45,7 +45,7 @@ def test_update_xhtml_links(tmpdir):
             ("Sources/Styles/Generic.css", "EPUB/Resources/Generic.css"),
             ("Sources/Styles/LocalEnvironment.css", "EPUB/Resources/TargetEnvironment.css") ])
 
-    with open(os.path.join(staging_directory, "EPUB", "content", "file.xhtml"), mode = "r", encoding = "utf-8") as xhtml_file:
+    with open(os.path.join(staging_directory, "EPUB", "Content", "File.xhtml"), mode = "r", encoding = "utf-8") as xhtml_file:
         xhtml_file_content_final = xhtml_file.read()
 
     xhtml_file_content_expected = """

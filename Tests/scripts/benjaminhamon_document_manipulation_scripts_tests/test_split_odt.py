@@ -73,6 +73,8 @@ def _assert_output(workspace_directory: str) -> None:
     output_directory = os.path.join(workspace_directory, "SectionsAsOdt")
 
     files_in_destination = os.listdir(output_directory)
+    files_in_destination.sort()
+
     files_in_destination_expected = [ "1 - Chapter 1.fodt", "2 - Chapter 2.fodt", "3 - Chapter 3.fodt" ]
 
     assert files_in_destination == files_in_destination_expected

@@ -241,7 +241,7 @@ def write_epub_generation_configuration( # pylint: disable = too-many-arguments
 
     epub_generation_configuration.content_files = []
     epub_generation_configuration.content_files += odt_to_epub_configuration.content_files_before
-    epub_generation_configuration.content_files += glob.glob(os.path.join(xhtml_directory, "*.xhtml"))
+    epub_generation_configuration.content_files += sorted(glob.glob(os.path.join(xhtml_directory, "*.xhtml")))
     epub_generation_configuration.content_files += odt_to_epub_configuration.content_files_after
 
     epub_generation_configuration.resource_files = odt_to_epub_configuration.resource_files

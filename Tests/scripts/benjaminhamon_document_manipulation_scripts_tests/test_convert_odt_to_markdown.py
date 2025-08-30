@@ -211,6 +211,8 @@ def _assert_output_as_many_documents(workspace_directory: str) -> None:
     output_directory = os.path.join(workspace_directory, "SectionsAsMarkdown")
 
     files_in_destination = os.listdir(output_directory)
+    files_in_destination.sort()
+
     files_in_destination_expected = [
         "0 - Information.yaml",
         "1 - Foreword.md",

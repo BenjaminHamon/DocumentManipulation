@@ -2,7 +2,7 @@
 
 import os
 
-import lxml.html.html5parser
+import lxml.html
 
 from benjaminhamon_document_manipulation_toolkit.documents import document_element_factory
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement

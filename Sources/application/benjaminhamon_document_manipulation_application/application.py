@@ -52,7 +52,7 @@ def create_argument_parser(command_collection: List[ApplicationCommand]) -> argp
     return main_parser
 
 
-def log_script_information(simulate: bool = False) -> None:
+def log_script_information(*, simulate: bool = False) -> None:
     if simulate:
         logger.info("(( The script is running as a simulation ))")
         logger.info("")

@@ -30,7 +30,7 @@ class EpubXhtmlWriter:
         self.encoding = "utf-8"
 
 
-    def write_to_file(self, output_file_path: str, document_as_html: lxml.etree._ElementTree, simulate: bool = False) -> None:
+    def write_to_file(self, output_file_path: str, document_as_html: lxml.etree._ElementTree, *, simulate: bool = False) -> None:
         logger.debug("Writing '%s'", output_file_path)
 
         write_options = {
@@ -48,9 +48,15 @@ class EpubXhtmlWriter:
             os.replace(output_file_path + ".tmp", output_file_path)
 
 
-    def write_as_single_document(self, # pylint: disable = too-many-arguments
-            output_file_path: str, title: str, content: RootElement,
-            template_file_path: Optional[str] = None, css_file_path: Optional[str] = None, simulate: bool = False) -> None:
+    def write_as_single_document(self, # pylint: disable = too-many-arguments, too-many-positional-arguments
+            output_file_path: str,
+            title: str,
+            content: RootElement,
+            template_file_path: Optional[str] = None,
+            css_file_path: Optional[str] = None,
+            *,
+            simulate: bool = False,
+            ) -> None:
 
         html_document = self._create_document(title, output_file_path, template_file_path, css_file_path)
         html_document = self._converter.convert(html_document, content)
@@ -58,14 +64,16 @@ class EpubXhtmlWriter:
         self.write_to_file(output_file_path, html_document, simulate = simulate)
 
 
-    def write_as_many_documents(self, # pylint: disable = too-many-arguments, too-many-locals
+    def write_as_many_documents(self, # pylint: disable = too-many-arguments, too-many-locals, too-many-positional-arguments
             output_directory: str,
             metadata: Mapping[str,str],
             content: RootElement,
             section_template_file_path: Optional[str] = None,
             information_template_file_path: Optional[str] = None,
             css_file_path: Optional[str] = None,
-            simulate: bool = False) -> None:
+            *,
+            simulate: bool = False,
+            ) -> None:
 
         section_count = content.get_section_count()
 
@@ -94,7 +102,9 @@ class EpubXhtmlWriter:
             metadata: Mapping[str,str],
             template_file_path: str,
             css_file_path: Optional[str] = None,
-            simulate: bool = False) -> None:
+            *,
+            simulate: bool = False,
+            ) -> None:
 
         html_document = self._create_document("Information", output_file_path, template_file_path, css_file_path)
         xml_operations.format_text_in_xml(html_document.getroot(), metadata)

@@ -34,6 +34,7 @@ def parse_arguments() -> argparse.Namespace:
 def create_epub_package(
         source_directory: str,
         destination_file_path: str,
+        *,
         overwrite: bool = False,
         simulate: bool = False) -> None:
 

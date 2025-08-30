@@ -78,7 +78,7 @@ def create_serializer(serialization_type: str) -> Serializer:
     return serializer
 
 
-def generate_cover( # pylint: disable = too-many-arguments, too-many-locals
+def generate_cover( # pylint: disable = too-many-arguments, too-many-locals, too-many-positional-arguments
         serializer: Serializer,
         information_file_path: Optional[str],
         dc_metadata_file_path: Optional[str],
@@ -87,6 +87,7 @@ def generate_cover( # pylint: disable = too-many-arguments, too-many-locals
         image_format: str,
         revision_control: Optional[str],
         extra_information: Mapping[str,str],
+        *,
         now: Optional[datetime.datetime] = None,
         overwrite: bool = False,
         simulate: bool = False) -> None:

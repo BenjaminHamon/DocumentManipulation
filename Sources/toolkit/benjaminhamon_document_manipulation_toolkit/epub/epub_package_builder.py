@@ -21,7 +21,7 @@ class EpubPackageBuilder:
         self._content_writer = content_writer
 
 
-    def stage_files(self, staging_directory: str, file_mappings: List[Tuple[str,str]], simulate: bool = False) -> None:
+    def stage_files(self, staging_directory: str, file_mappings: List[Tuple[str,str]], *, simulate: bool = False) -> None:
         logger.debug("Staging files")
 
         for source, destination in file_mappings:
@@ -34,7 +34,7 @@ class EpubPackageBuilder:
 
 
     def update_package_information(self,
-            package_document_file_path: str, parameters: Dict[str,str], simulate: bool = False) -> None:
+            package_document_file_path: str, parameters: Dict[str,str], *, simulate: bool = False) -> None:
 
         logger.debug("Updating package information")
 
@@ -51,7 +51,7 @@ class EpubPackageBuilder:
 
 
     def update_xhtml_links(self,
-            staging_directory: str, content_files: List[Tuple[str,str]], link_mappings: List[Tuple[str,str]], simulate: bool = False) -> None:
+            staging_directory: str, content_files: List[Tuple[str,str]], link_mappings: List[Tuple[str,str]], *, simulate: bool = False) -> None:
 
         logger.debug("Updating links")
 
@@ -82,7 +82,7 @@ class EpubPackageBuilder:
                 self._content_writer.write_xml_file(destination, document, simulate = simulate)
 
 
-    def create_package(self, package_file_path: str, staging_directory: str, simulate: bool = False) -> None:
+    def create_package(self, package_file_path: str, staging_directory: str, *, simulate: bool = False) -> None:
         logger.debug("Creating package (Path: '%s')", package_file_path)
 
         if not simulate:

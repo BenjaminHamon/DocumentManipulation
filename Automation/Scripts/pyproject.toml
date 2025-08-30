@@ -11,10 +11,10 @@ description = "Automation scripts for the local project"
 requires-python = ">= 3.11"
 
 dependencies = [
+    "benjaminhamon-standard-extensions[all] ~= 1.0.1",
     "bhamon-development-toolkit[python] ~= 3.1.1",
     "mockito ~= 1.5.4",
     "pyright ~= 1.1.404",
-    "requests ~= 2.32.5",
 ]
 
 [project.scripts]

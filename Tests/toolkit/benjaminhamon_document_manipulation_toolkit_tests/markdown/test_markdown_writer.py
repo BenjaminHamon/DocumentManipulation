@@ -2,11 +2,12 @@
 
 import os
 
+from benjaminhamon_standard_extensions.serialization.yaml_serializer import YamlSerializer
+
 from benjaminhamon_document_manipulation_toolkit.documents import document_element_factory
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.markdown.document_to_markdown_converter import DocumentToMarkdownConverter
 from benjaminhamon_document_manipulation_toolkit.markdown.markdown_writer import MarkdownWriter
-from benjaminhamon_document_manipulation_toolkit.serialization.yaml_serializer import YamlSerializer
 
 
 def create_document() -> RootElement:

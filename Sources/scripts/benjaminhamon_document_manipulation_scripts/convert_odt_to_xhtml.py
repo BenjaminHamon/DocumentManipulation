@@ -9,6 +9,9 @@ from typing import Optional
 import lxml.etree
 import lxml.html
 
+from benjaminhamon_standard_extensions.serialization import serializer_factory
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
+
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_toolkit.conversion.odt_to_xhtml_configuration import OdtToXhtmlConfiguration
 from benjaminhamon_document_manipulation_toolkit.conversion.serialization import odt_to_xhtml_configuration_serialization_converter
@@ -22,8 +25,6 @@ from benjaminhamon_document_manipulation_toolkit.epub.document_to_xhtml_converte
 from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import EpubXhtmlWriter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_reader import OdtReader
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_to_document_converter import OdtToDocumentConverter
-from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 def main() -> None:

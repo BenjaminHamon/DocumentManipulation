@@ -1,7 +1,8 @@
 from typing import Any
 
+from benjaminhamon_standard_extensions.serialization.serialization_converter import SerializationConverter
+
 from benjaminhamon_document_manipulation_toolkit.epub.epub_navigation_item import EpubNavigationItem
-from benjaminhamon_document_manipulation_toolkit.serialization.serialization_converter import SerializationConverter
 
 
 def factory() -> "EpubNavigationItemSerializationConverter":

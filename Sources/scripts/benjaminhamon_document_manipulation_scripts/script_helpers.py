@@ -4,13 +4,14 @@ import datetime
 import logging
 from typing import Dict, Mapping, Optional
 
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
+
 from benjaminhamon_document_manipulation_scripts.revision_control.git_client import GitClient
 from benjaminhamon_document_manipulation_scripts.revision_control.revision_control_client import RevisionControlClient
 from benjaminhamon_document_manipulation_toolkit.documents import metadata_operations
 from benjaminhamon_document_manipulation_toolkit.documents.document_definition import DocumentDefinition
 from benjaminhamon_document_manipulation_toolkit.documents.document_information import DocumentInformation
 from benjaminhamon_document_manipulation_toolkit.metadata.dc_metadata import DcMetadata
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 all_logging_levels = [ "debug", "info", "warning", "error", "critical" ]

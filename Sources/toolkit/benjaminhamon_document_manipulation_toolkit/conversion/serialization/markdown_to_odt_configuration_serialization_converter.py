@@ -3,9 +3,10 @@
 
 from typing import Any
 
+from benjaminhamon_standard_extensions.serialization.path_serialization_converter import PathSerializationConverter
+from benjaminhamon_standard_extensions.serialization.serialization_converter import SerializationConverter
+
 from benjaminhamon_document_manipulation_toolkit.conversion.markdown_to_odt_configuration import MarkdownToOdtConfiguration
-from benjaminhamon_document_manipulation_toolkit.serialization.path_serialization_converter import PathSerializationConverter
-from benjaminhamon_document_manipulation_toolkit.serialization.serialization_converter import SerializationConverter
 
 
 def factory() -> "MarkdownToOdtConfigurationSerializationConverter":

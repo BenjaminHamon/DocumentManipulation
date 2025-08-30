@@ -1,7 +1,8 @@
 from typing import Any
 
+from benjaminhamon_standard_extensions.serialization.serialization_converter import SerializationConverter
+
 from benjaminhamon_document_manipulation_toolkit.metadata.dc_contributor import DcContributor
-from benjaminhamon_document_manipulation_toolkit.serialization.serialization_converter import SerializationConverter
 
 
 def factory() -> "DcContributorSerializationConverter":

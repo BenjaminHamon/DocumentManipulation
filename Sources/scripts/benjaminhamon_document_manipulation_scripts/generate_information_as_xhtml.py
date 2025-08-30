@@ -3,8 +3,10 @@ import datetime
 import os
 from typing import Mapping, Optional
 
-import lxml.etree
 import lxml.html
+
+from benjaminhamon_standard_extensions.serialization import serializer_factory
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
 
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_scripts.revision_control.git_client import GitClient
@@ -17,8 +19,6 @@ from benjaminhamon_document_manipulation_toolkit.epub.epub_xhtml_writer import E
 from benjaminhamon_document_manipulation_toolkit.html import html_operations
 from benjaminhamon_document_manipulation_toolkit.metadata.dc_metadata import DcMetadata
 from benjaminhamon_document_manipulation_toolkit.metadata.serialization import dc_metadata_serialization_converter
-from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 from benjaminhamon_document_manipulation_toolkit.xml import xml_operations
 
 

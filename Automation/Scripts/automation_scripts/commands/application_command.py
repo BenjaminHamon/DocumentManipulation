@@ -114,7 +114,7 @@ class _BuildBinariesCommand(AutomationCommand):
         python_environment = PythonEnvironment(python_system_executable, pyinstaller_venv_directory)
         package_collection_for_pip = [ python_package.path_to_sources for python_package in all_python_packages ]
 
-        python_environment.setup_virtual_environment(simulate = simulate)
+        python_environment.setup_virtual_environment("pip.conf", simulate = simulate)
         python_environment.install_python_packages([ "pyinstaller ~= 6.15.0" ], simulate = simulate)
         python_environment.install_python_packages(package_collection_for_pip, simulate = simulate)
 

@@ -1,6 +1,6 @@
 ---
 
-# cspell:words venv
+# cspell:words libcairo2 venv
 
 name: Integration pipeline
 
@@ -27,6 +27,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies
+        run: sudo apt update && sudo apt install libcairo2-dev
 
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -59,6 +62,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies
+        run: sudo apt update && sudo apt install libcairo2-dev
 
       - name: Checkout sources
         uses: actions/checkout@v4

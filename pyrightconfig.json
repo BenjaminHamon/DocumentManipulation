@@ -1,0 +1,20 @@
+{
+	"include": [
+		"Sources",
+		"Tests"
+	],
+
+	"exclude": [
+        "Sources/*/*.egg-info",
+        "Sources/*/build",
+        "Sources/*/dist"
+	],
+
+	"extraPaths": [
+		"Sources/application",
+		"Sources/scripts",
+		"Sources/toolkit"
+	],
+
+	"typeCheckingMode": "basic"
+}

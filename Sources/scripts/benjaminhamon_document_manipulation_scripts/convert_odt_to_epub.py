@@ -5,6 +5,9 @@ import os
 import shutil
 from typing import List, Mapping, Optional
 
+from benjaminhamon_standard_extensions.serialization import serializer_factory
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
+
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_scripts.convert_odt_to_xhtml import convert_odt_to_xhtml
 from benjaminhamon_document_manipulation_scripts.create_epub_package import create_epub_package
@@ -27,8 +30,6 @@ from benjaminhamon_document_manipulation_toolkit.epub.serialization import epub_
 from benjaminhamon_document_manipulation_toolkit.epub.serialization import epub_generation_configuration_serialization_converter
 from benjaminhamon_document_manipulation_toolkit.metadata.dc_metadata import DcMetadata
 from benjaminhamon_document_manipulation_toolkit.metadata.serialization import dc_metadata_serialization_converter
-from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 def main() -> None:

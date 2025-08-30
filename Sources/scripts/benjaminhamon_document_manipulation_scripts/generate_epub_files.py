@@ -2,6 +2,9 @@ import argparse
 import os
 import shutil
 
+from benjaminhamon_standard_extensions.serialization import serializer_factory
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
+
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_toolkit.epub import epub_package_configuration_builder
 from benjaminhamon_document_manipulation_toolkit.epub.epub_content_configuration import EpubContentConfiguration
@@ -9,8 +12,6 @@ from benjaminhamon_document_manipulation_toolkit.epub.epub_content_writer import
 from benjaminhamon_document_manipulation_toolkit.epub.epub_generation_configuration import EpubGenerationConfiguration
 from benjaminhamon_document_manipulation_toolkit.epub.serialization import epub_generation_configuration_serialization_converter
 from benjaminhamon_document_manipulation_toolkit.epub.serialization import epub_content_configuration_serialization_converter
-from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 def main() -> None:

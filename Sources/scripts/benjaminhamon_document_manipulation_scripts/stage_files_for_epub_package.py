@@ -4,13 +4,14 @@ import os
 import shutil
 from typing import Dict, Optional
 
+from benjaminhamon_standard_extensions.serialization import serializer_factory
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
+
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_toolkit.epub.epub_content_configuration import EpubContentConfiguration
 from benjaminhamon_document_manipulation_toolkit.epub.epub_content_writer import EpubContentWriter
 from benjaminhamon_document_manipulation_toolkit.epub.epub_package_builder import EpubPackageBuilder
 from benjaminhamon_document_manipulation_toolkit.epub.serialization import epub_content_configuration_serialization_converter
-from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 def main() -> None:

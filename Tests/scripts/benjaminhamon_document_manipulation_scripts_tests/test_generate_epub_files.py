@@ -2,9 +2,10 @@
 
 import os
 
+from benjaminhamon_standard_extensions.serialization.yaml_serializer import YamlSerializer
+
 from benjaminhamon_document_manipulation_scripts.generate_epub_files import create_serializer
 from benjaminhamon_document_manipulation_scripts.generate_epub_files import generate_epub_files
-from benjaminhamon_document_manipulation_toolkit.serialization.yaml_serializer import YamlSerializer
 
 
 def test_generate_epub_files(tmpdir):

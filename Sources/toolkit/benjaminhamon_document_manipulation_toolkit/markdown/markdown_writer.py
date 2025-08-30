@@ -2,10 +2,11 @@ import logging
 import os
 from typing import Mapping
 
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
+
 from benjaminhamon_document_manipulation_toolkit.documents import document_operations
 from benjaminhamon_document_manipulation_toolkit.documents.elements.root_element import RootElement
 from benjaminhamon_document_manipulation_toolkit.markdown.document_to_markdown_converter import DocumentToMarkdownConverter
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 logger = logging.getLogger("MarkdownWriter")

@@ -7,6 +7,9 @@ from typing import Optional
 import lxml.etree
 import lxml.html.html5parser
 
+from benjaminhamon_standard_extensions.serialization import serializer_factory
+from benjaminhamon_standard_extensions.serialization.serializer import Serializer
+
 from benjaminhamon_document_manipulation_scripts import script_helpers
 from benjaminhamon_document_manipulation_toolkit.conversion.markdown_to_odt_configuration import MarkdownToOdtConfiguration
 from benjaminhamon_document_manipulation_toolkit.conversion.serialization import markdown_to_odt_configuration_serialization_converter
@@ -21,8 +24,6 @@ from benjaminhamon_document_manipulation_toolkit.markdown.markdown_reader import
 from benjaminhamon_document_manipulation_toolkit.markdown.markdown_to_html_converter import MarkdownToHtmlConverter
 from benjaminhamon_document_manipulation_toolkit.open_document.document_to_odt_converter import DocumentToOdtConverter
 from benjaminhamon_document_manipulation_toolkit.open_document.odt_writer import OdtWriter
-from benjaminhamon_document_manipulation_toolkit.serialization import serializer_factory
-from benjaminhamon_document_manipulation_toolkit.serialization.serializer import Serializer
 
 
 def main() -> None:

@@ -139,6 +139,8 @@ def _assert_output(workspace_directory: str) -> None: # pylint: disable = too-ma
     output_directory = os.path.join(workspace_directory, "EpubFiles")
 
     files_in_destination = os.listdir(output_directory)
+    files_in_destination.sort()
+
     files_in_destination_expected = [ "container.xml", "content.opf", "content.yaml", "toc.xhtml" ]
 
     assert files_in_destination == files_in_destination_expected
